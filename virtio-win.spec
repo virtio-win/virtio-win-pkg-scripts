@@ -3,6 +3,7 @@
 # affect the RPM content, please submit a patch them to the upstream spec
 # file hosted at: https://github.com/crobinso/virtio-win-pkg-scripts
 
+%global virtio_win_prewhql_build virtio-win-prewhql-96
 %global qemu_ga_win_build qemu-ga-win-7.0-10
 %global qxl_build qxl-win-unsigned-0.1-20
 
@@ -30,7 +31,7 @@ Source1: %{name}-%{version}-bin-for-rpm.zip
 Source2: %{qemu_ga_win_build}-installers.zip
 
 # Source files shipped in the srpm
-Source3: %{name}-%{version}.zip
+Source3: %{virtio_win_prewhql_build}-sources.zip
 Source4: %{qxl_build}-sources.zip
 Source5: %{qemu_ga_win_build}-sources.zip
 
