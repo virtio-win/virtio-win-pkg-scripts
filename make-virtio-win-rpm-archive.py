@@ -151,7 +151,7 @@ def build_vfd(fname, dmap, driverdir, rootdir, finaldir):
     shutil.rmtree(floppydir)
 
 
-def archive(nvr, driverdir, finaldir, outdir):
+def archive(nvr, driverdir, finaldir):
     """
     zip up the working directory
     """
@@ -174,8 +174,8 @@ def archive(nvr, driverdir, finaldir, outdir):
     run('cd %s && zip -9 -r %s %s' %
         (os.path.dirname(finaldir), archivefile, nvr), shell=True)
 
-    # Copy results to outdir
-    newarchive = os.path.join(outdir, os.path.basename(archivefile))
+    # Copy results to cwd
+    newarchive = os.path.join(os.getcwd(), os.path.basename(archivefile))
     shutil.copy2(archivefile, newarchive)
     print 'archive successfully built: %s' % newarchive
 
@@ -199,16 +199,7 @@ def get_options():
     parser.add_argument("driverdir",
         help="Directory containing the built drivers.")
 
-    parser.add_argument("--outdir", default=os.getcwd(),
-        help="Where to output the generated archive. default=cwd")
-
     options = parser.parse_args()
-
-    options.outdir = os.path.abspath(os.path.expanduser(options.outdir))
-    if not os.path.exists(options.outdir):
-        os.makedirs(options.outdir)
-    if not os.path.isdir(options.outdir):
-        parser.error("outdir=%s is not a directory" % options.outdir)
 
     return options
 
@@ -226,7 +217,7 @@ def main():
     build_vfd(options.nvr + '_amd64.vfd', vfd_dirs_64,
         options.driverdir, rootdir, finaldir)
 
-    archive(options.nvr, options.driverdir, finaldir, options.outdir)
+    archive(options.nvr, options.driverdir, finaldir)
 
     return 0
 

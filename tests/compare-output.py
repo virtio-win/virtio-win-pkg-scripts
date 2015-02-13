@@ -31,7 +31,7 @@ def run(cmd):
 # Functional helpers #
 ######################
 
-def extract_files(rootdir):
+def extract_files(filename):
     """
     Given a directory containing zip files, extract the zip files and
     vfd contents to a temporary directory for easy comparison.
@@ -40,15 +40,13 @@ def extract_files(rootdir):
     atexit.register(lambda: shutil.rmtree(output_dir))
 
     # Extract zip files
-    for filename in os.listdir(rootdir):
-        if not filename.endswith(".zip"):
-            fail("Unexpected filename %s/%s, only expecting zip files" %
-                 (rootdir, filename))
+    if not filename.endswith(".zip"):
+        fail("Unexpected filename %s, only expecting zip files" % filename)
 
-        zip_out_dir = os.path.join(output_dir, filename[:-4])
-        os.mkdir(zip_out_dir)
-        run("unzip %s/%s -d %s > /dev/null" %
-            (rootdir, filename, zip_out_dir))
+    zip_out_dir = os.path.join(output_dir,
+        os.path.splitext(os.path.basename(filename))[0])
+    os.mkdir(zip_out_dir)
+    run("unzip %s -d %s > /dev/null" % (filename, zip_out_dir))
 
     # Find .vfd files
     vfdfiles = []
@@ -74,20 +72,19 @@ def extract_files(rootdir):
 
 def parse_args():
     desc = """
-Helper for comparing the output of make-virtio-win-rpm-archive.py. Workflow is:
+Helper for comparing the output of make-virtio-win-rpm-archive.py:
 
-- Run make-virtio-win-rpm-archive.py --outdir FOO ...
+- Run make-virtio-win-rpm-archive.py ...
+- Run make-virtio-win-rpm-archive.py, then move $OUTPUT.zip to orig.zip
 - Make your changes to make-virtio-win-rpm-archive.py
-- Run make-virtio-win-rpm-archive.py --outdir BAR ...
-- Verify nothing changed (or expected changes): compare.py FOO BAR
+- Re-run make-virtio-win-rpm-archive.py, then move $OUTPUT.zip to new.zip
+- Review changes: %(prog)s orig.zip new.zip
 """
     parser = argparse.ArgumentParser(description=desc,
         formatter_class=argparse.RawDescriptionHelpFormatter)
 
-    parser.add_argument("origdir",
-        help="Directory containing original .zip output")
-    parser.add_argument("newdir",
-        help="Directory containing new .zip output")
+    parser.add_argument("orig", help="Original .zip output")
+    parser.add_argument("new", help="New .zip output")
 
     return parser.parse_args()
 
@@ -95,8 +92,8 @@ Helper for comparing the output of make-virtio-win-rpm-archive.py. Workflow is:
 def main():
     options = parse_args()
 
-    origdir = extract_files(os.path.abspath(options.origdir))
-    newdir = extract_files(os.path.abspath(options.newdir))
+    origdir = extract_files(os.path.abspath(options.orig))
+    newdir = extract_files(os.path.abspath(options.new))
 
     print
     print
