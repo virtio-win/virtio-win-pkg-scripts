@@ -33,35 +33,42 @@ def run(cmd):
 
 def extract_files(filename):
     """
-    Given a directory containing zip files, extract the zip files and
-    vfd contents to a temporary directory for easy comparison.
+    Passed in either a zip file or RPM, extract the contents, including
+    the contents of any contained vfd or iso files. Move these to a temp
+    directory for easy comparison.
     """
     output_dir = tempfile.mkdtemp(prefix="virtio-win-archive-compare-")
     atexit.register(lambda: shutil.rmtree(output_dir))
 
-    # Extract zip files
-    if not filename.endswith(".zip"):
+    # Extract the content
+    extract_dir = os.path.join(output_dir, "extracted-archive")
+    os.mkdir(extract_dir)
+    if filename.endswith(".zip"):
+        run("unzip %s -d %s > /dev/null" % (filename, extract_dir))
+    elif filename.endswith(".rpm"):
+        run("cd %s && rpm2cpio %s | cpio -idm --quiet" %
+            (extract_dir, filename))
+    else:
         fail("Unexpected filename %s, only expecting zip files" % filename)
 
-    zip_out_dir = os.path.join(output_dir,
-        os.path.splitext(os.path.basename(filename))[0])
-    os.mkdir(zip_out_dir)
-    run("unzip %s -d %s > /dev/null" % (filename, zip_out_dir))
 
     # Find .vfd files
-    vfdfiles = []
+    mediafiles = []
     for root, dirs, files in os.walk(output_dir):
         ignore = dirs
-        vfdfiles += [os.path.join(root, name) for name in files
-                     if name.endswith(".vfd")]
+        mediafiles += [os.path.join(root, name) for name in files
+                       if name.endswith(".vfd") or name.endswith(".iso")]
 
     # Extract vfd file contents with guestfish
-    for vfdfile in vfdfiles:
-        vfd_out_dir = os.path.join(output_dir, os.path.basename(vfdfile))
-        os.mkdir(vfd_out_dir)
+    for mediafile in mediafiles:
+        if os.path.islink(mediafile):
+            continue
+        media_out_dir = os.path.join(output_dir, os.path.basename(mediafile))
+        os.mkdir(media_out_dir)
 
         run("guestfish --ro --add %s --mount /dev/sda:/ glob copy-out '/*' %s"
-            " > /dev/null" % (vfdfile, vfd_out_dir))
+            " > /dev/null" % (mediafile, media_out_dir))
+        run("chmod -R 777 %s" % media_out_dir)
 
     return output_dir
 
@@ -72,7 +79,8 @@ def extract_files(filename):
 
 def parse_args():
     desc = """
-Helper for comparing the output of make-virtio-win-rpm-archive.py:
+Helper for comparing the output of make-virtio-win-rpm-archive.py. Can
+either compare the raw .zip output, or a virtio-win .rpm file. Example:
 
 - Run make-virtio-win-rpm-archive.py ...
 - Run make-virtio-win-rpm-archive.py, then move $OUTPUT.zip to orig.zip
@@ -83,8 +91,8 @@ Helper for comparing the output of make-virtio-win-rpm-archive.py:
     parser = argparse.ArgumentParser(description=desc,
         formatter_class=argparse.RawDescriptionHelpFormatter)
 
-    parser.add_argument("orig", help="Original .zip output")
-    parser.add_argument("new", help="New .zip output")
+    parser.add_argument("orig", help="Original .zip/.rpm output")
+    parser.add_argument("new", help="New .zip/.rpm output")
 
     return parser.parse_args()
 
@@ -104,7 +112,8 @@ def main():
     print
     print
     print "file diff:"
-    run("diff -rup --exclude \*.vfd %s %s" % (origdir, newdir))
+    run("diff -rup --exclude \*.vfd --exclude \*.iso %s %s" %
+        (origdir, newdir))
 
     return 0
 

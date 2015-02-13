@@ -15,5 +15,5 @@ directory that is then used in the specfile.
 
 Check for code errors with pylint: ./tests/pylint.sh
 
-Compare two runs of of the script with ./tests/compare-output.py, see the
---help output for details.
+Compare two runs of the output .zip or .rpm with ./tests/compare-output.py,
+see the --help output for details.
