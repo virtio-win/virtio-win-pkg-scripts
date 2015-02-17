@@ -46,5 +46,5 @@ qemu-guest-agent .msi builds.
 
 ### tests/
 
-Compare two runs of the output .zip or .rpm with ./tests/compare-output.py,
-see the --help output for details.
+Compare two runs of the output .zip, .rpm, or directory with
+./tests/compare-output.py, see the --help output for details.

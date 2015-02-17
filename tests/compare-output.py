@@ -41,15 +41,22 @@ def extract_files(filename):
     atexit.register(lambda: shutil.rmtree(output_dir))
 
     # Extract the content
-    extract_dir = os.path.join(output_dir, "extracted-archive")
-    os.mkdir(extract_dir)
-    if filename.endswith(".zip"):
+    if os.path.isdir(filename):
+        shutil.copytree(filename, os.path.join(output_dir, "dircopy"))
+    else:
+        extract_dir = os.path.join(output_dir, "extracted-archive")
+        os.mkdir(extract_dir)
+
+    if os.path.isdir(filename):
+        pass
+    elif filename.endswith(".zip"):
         run("unzip %s -d %s > /dev/null" % (filename, extract_dir))
     elif filename.endswith(".rpm"):
         run("cd %s && rpm2cpio %s | cpio -idm --quiet" %
             (extract_dir, filename))
     else:
-        fail("Unexpected filename %s, only expecting zip files" % filename)
+        fail("Unexpected filename %s, only expecting .zip, .rpm, or a "
+            "directory" % filename)
 
 
     # Find .vfd files
@@ -80,7 +87,8 @@ def extract_files(filename):
 def parse_args():
     desc = """
 Helper for comparing the output of make-virtio-win-rpm-archive.py. Can
-either compare the raw .zip output, or a virtio-win .rpm file. Example:
+either compare the raw .zip output, a virtio-win .rpm file, or two directories
+for make-driver-dir.py output. Example:
 
 - Run make-virtio-win-rpm-archive.py ...
 - Run make-virtio-win-rpm-archive.py, then move $OUTPUT.zip to orig.zip
@@ -91,8 +99,10 @@ either compare the raw .zip output, or a virtio-win .rpm file. Example:
     parser = argparse.ArgumentParser(description=desc,
         formatter_class=argparse.RawDescriptionHelpFormatter)
 
-    parser.add_argument("orig", help="Original .zip/.rpm output")
-    parser.add_argument("new", help="New .zip/.rpm output")
+    parser.add_argument("orig", help="Original .zip/.rpm/directory output")
+    parser.add_argument("new", help="New .zip/.rpm/directory output")
+    parser.add_argument("--treeonly", action="store_true",
+        help="Only show tree diff output.")
 
     return parser.parse_args()
 
@@ -109,11 +119,12 @@ def main():
     run("""bash -c 'diff -rup <(cd %s; tree) <(cd %s; tree)'""" %
         (origdir, newdir))
 
-    print
-    print
-    print "file diff:"
-    run("diff -rup --exclude \*.vfd --exclude \*.iso %s %s" %
-        (origdir, newdir))
+    if not options.treeonly:
+        print
+        print
+        print "file diff:"
+        run("diff -rup --exclude \*.vfd --exclude \*.iso %s %s" %
+            (origdir, newdir))
 
     return 0
 
