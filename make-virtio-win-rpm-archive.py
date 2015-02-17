@@ -1,6 +1,10 @@
 #!/usr/bin/python
 #
 # Script for generating .vfd and .zip for virtio-win RPM
+#
+# Note to the maintainer: This script is also used internally for the RHEL
+#   virtio-win RPM build process. Consider that when making changes to the
+#   output.
 
 import argparse
 import atexit
@@ -186,13 +190,14 @@ def archive(nvr, driverdir, finaldir):
 
 def get_options():
     description = """
-    Package pre-built Windows drivers into a virtual floppy disk and bundle
-    it in a ZIP file. Must pass a virtio-win version string, which is used
-    in the output file names, and a directory containing the built drivers.
+Package pre-built Windows drivers into a virtual floppy disk and bundle
+it in a ZIP file. Must pass a virtio-win version string, which is used
+in the output file names, and a directory containing the built drivers.
 
-    Example: %(prog)s virtio-win-1.2.3 /path/to/built/drivers
-    """
-    parser = argparse.ArgumentParser(description=description)
+Example: %(prog)s virtio-win-1.2.3 /path/to/built/drivers
+"""
+    parser = argparse.ArgumentParser(description=description,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
 
     parser.add_argument("nvr", help="Base name of the output, "
         "example=virtio-win-1.2.3")
