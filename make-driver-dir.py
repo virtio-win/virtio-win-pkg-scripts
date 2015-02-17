@@ -226,6 +226,7 @@ def main():
     check_remaining_files(options.virtio_win_dir, options.qxl_win_dir,
        seenfiles)
 
+    print "Generated %s" % outdir
     return 0
 
 
