@@ -1,3 +1,8 @@
+# Copyright 2015 Red Hat, Inc.
+#
+# This work is licensed under the terms of the GNU GPL, version 2 or later.
+# See the COPYING file in the top-level directory.
+
 # NOTE: This file is copied internally and used with some RHEL virtio-win
 #       build scripts. We should find a way to share it so they don't diverge.
 

@@ -1,5 +1,11 @@
 #!/usr/bin/python
 #
+# Copyright 2015 Red Hat, Inc.
+#
+# This work is licensed under the terms of the GNU GPL, version 2 or later.
+# See the COPYING file in the top-level directory.
+
+
 # Script for generating .vfd and .zip for virtio-win RPM
 #
 # Note to the maintainer: This script is also used internally for the RHEL

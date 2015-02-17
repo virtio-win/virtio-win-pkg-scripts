@@ -1,4 +1,9 @@
 #!/usr/bin/python
+#
+# Copyright 2015 Red Hat, Inc.
+#
+# This work is licensed under the terms of the GNU GPL, version 2 or later.
+# See the COPYING file in the top-level directory.
 
 """
 Helper for comparing make-virtio-win-rpm-archive.py output. See --help
