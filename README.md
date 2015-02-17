@@ -13,7 +13,5 @@ Run the script like:
 It will output an archive virtio-win-$version-bin-for-rpm.zip in the current
 directory that is then used in the specfile.
 
-Check for code errors with pylint: ./tests/pylint.sh
-
 Compare two runs of the output .zip or .rpm with ./tests/compare-output.py,
 see the --help output for details.
