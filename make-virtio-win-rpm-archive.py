@@ -161,7 +161,7 @@ def archive(nvr, driverdir, finaldir):
     """
     print 'archiving the results'
     for fname in os.listdir(driverdir):
-        # XXX: The RPM doesn't ship qxl on the driver CD, but this is a
+        # The RPM doesn't ship qxl on the driver CD, but this is a
         # historical oddity that will be fixed later.
         if fname == "qxl":
             continue
