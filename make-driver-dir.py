@@ -45,6 +45,18 @@ def fail(msg):
 # Functional helpers #
 ######################
 
+def download_virtio_win_license(outdir):
+    # The license isn't distributed with the built sources. Just download
+    # build an approximation from git.
+    print "Downloading license from kvm-guest-drivers-windows.git"
+    destfile = os.path.join(outdir, "virtio-win_license.txt")
+    os.system("wget -qO- https://raw.githubusercontent.com/YanVugenfirer/"
+              "kvm-guest-drivers-windows/master/LICENSE > %s" % destfile)
+    os.system("wget -qO- https://raw.githubusercontent.com/YanVugenfirer/"
+              "kvm-guest-drivers-windows/master/COPYING >> %s" % destfile)
+    return [destfile]
+
+
 def copy_pciserial(virtio_win_dir, outdir):
     destdir = os.path.join(outdir, "qemupciserial")
     os.mkdir(destdir)
@@ -222,6 +234,7 @@ def main():
 
     # Actually move the files
     seenfiles = []
+    seenfiles += download_virtio_win_license(outdir)
     seenfiles += copy_pciserial(options.virtio_win_dir, outdir)
     seenfiles += copy_virtio_drivers(options.virtio_win_dir, outdir,
         do_qxl=False)
