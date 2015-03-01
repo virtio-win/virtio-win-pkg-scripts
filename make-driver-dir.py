@@ -209,7 +209,7 @@ def check_remaining_files(virtio_win_dir, qxl_win_dir, seenfiles):
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Copy built windows drivers to a $PWD/drivers_output, "
+        description="Copy built windows drivers to --outdir "
                     "with the file layout expected by "
                     "make-virtio-win-rpm-archive.py. "
                     "See README.md for details.")
@@ -219,18 +219,21 @@ def parse_args():
     parser.add_argument("qxl_win_dir", help="Directory windows QXL "
         "build output")
 
-    options = parser.parse_args()
+    default_outdir = os.path.join(os.getcwd(), "drivers_output")
+    parser.add_argument("--outdir", help="Directory to output the organized "
+        "drivers. Default=%s" % default_outdir, default=default_outdir)
 
-    return options
+    return parser.parse_args()
 
 
 def main():
     options = parse_args()
+    outdir = options.outdir
 
-    outdir = os.path.join(os.getcwd(), "drivers_output")
-    if os.path.exists(outdir):
-        shutil.rmtree(outdir)
-    os.mkdir(outdir)
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
+    if os.listdir(outdir):
+        fail("%s is not empty." % outdir)
 
     # Actually move the files
     seenfiles = []
