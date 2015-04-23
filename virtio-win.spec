@@ -3,13 +3,13 @@
 # affect the RPM content, please submit a patch them to the upstream spec
 # file hosted at: https://github.com/crobinso/virtio-win-pkg-scripts
 
-%global virtio_win_prewhql_build virtio-win-prewhql-96
+%global virtio_win_prewhql_build virtio-win-prewhql-0.1-102
 %global qemu_ga_win_build qemu-ga-win-7.0-10
 %global qxl_build qxl-win-unsigned-0.1-20
 
 Summary: VirtIO para-virtualized drivers for Windows(R)
 Name: virtio-win
-Version: 1.7.3
+Version: 1.7.4
 Release: 1%{?dist}
 Group: Applications/System
 URL: http://www.redhat.com/
