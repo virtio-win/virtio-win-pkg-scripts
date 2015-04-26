@@ -3,14 +3,14 @@
 # affect the RPM content, please submit a patch them to the upstream spec
 # file hosted at: https://github.com/crobinso/virtio-win-pkg-scripts
 
-%global virtio_win_prewhql_build virtio-win-prewhql-96
+%global virtio_win_prewhql_build virtio-win-prewhql-0.1-102
 %global qemu_ga_win_build qemu-ga-win-7.0-10
 %global qxl_build qxl-win-unsigned-0.1-20
 
 Summary: VirtIO para-virtualized drivers for Windows(R)
 Name: virtio-win
-Version: 1.7.3
-Release: 1%{?dist}
+Version: 0.1.102
+Release: 1
 Group: Applications/System
 URL: http://www.redhat.com/
 BuildArch: noarch
@@ -81,3 +81,17 @@ Windows(R) guests.
 %{_datadir}/%{name}/*.vfd
 %{_datadir}/%{name}/drivers
 %{_datadir}/%{name}/guest-agent
+
+
+%changelog
+* Sun Apr 26 2015 Cole Robinson <crobinso@redhat.com> - 0.1.102-1
+- Update to virtio-win-prewhql-0.1-102
+
+* Sun Apr 26 2015 Cole Robinson <crobinso@redhat.com> - 0.1.101-1
+- Update to virtio-win-prewhql-0.1-101
+
+* Sun Apr 26 2015 Cole Robinson <crobinso@redhat.com> - 0.1.100-1
+- Update to virtio-win-prewhql-0.1-100
+
+* Sun Apr 26 2015 Cole Robinson <crobinso@redhat.com> - 0.1.96-1
+- Update to virtio-win-prewhql-0.1-96
