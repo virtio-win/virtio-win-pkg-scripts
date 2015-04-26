@@ -12,6 +12,7 @@ import re
 import shutil
 import subprocess
 import sys
+import textwrap
 
 from util import filemap
 
@@ -72,6 +73,8 @@ def copy_pciserial(virtio_win_dir, outdir):
 
 def _update_copymap_for_driver(virtio_win_dir, ostuple, drivername, copymap):
     destdirs = filemap.DRIVER_OS_MAP[drivername][ostuple]
+    missing_patterns = []
+
     for destdir in destdirs:
         dest_os = destdir.split("/")[0]
 
@@ -80,15 +83,19 @@ def _update_copymap_for_driver(virtio_win_dir, ostuple, drivername, copymap):
             filelist = filemap.FILELISTS.get(drivername)
 
         for pattern in filelist:
-            pattern = os.path.join(virtio_win_dir, ostuple, pattern)
-            files = glob.glob(pattern)
+            files = glob.glob(os.path.join(virtio_win_dir, ostuple, pattern))
             if not files:
-                fail("Did not find any files matching %s" % pattern)
+                strpattern = os.path.join(ostuple, pattern)
+                if strpattern not in missing_patterns:
+                    missing_patterns.append(strpattern)
+                continue
 
             for f in files:
                 if f not in copymap:
                     copymap[f] = []
                 copymap[f].append(os.path.join(drivername, destdir))
+
+    return missing_patterns
 
 
 def copy_virtio_drivers(virtio_win_dir, outdir, do_qxl=False):
@@ -110,16 +117,29 @@ def copy_virtio_drivers(virtio_win_dir, outdir, do_qxl=False):
         drivers.remove("qxl")
 
     copymap = {}
+    missing_patterns = []
     for drivername in drivers:
-        for ostuple in filemap.DRIVER_OS_MAP[drivername]:
+        for ostuple in sorted(filemap.DRIVER_OS_MAP[drivername]):
             if ostuple not in alldirs:
                 fail("driver=%s ostuple=%s not found in virtio-win input" %
                      (drivername, ostuple))
 
             # We know that the ostuple dir contains bits for this driver,
             # figure out what files we want to copy.
-            _update_copymap_for_driver(virtio_win_dir, ostuple, drivername,
-                copymap)
+            ret = _update_copymap_for_driver(virtio_win_dir,
+                ostuple, drivername, copymap)
+            missing_patterns.extend(ret)
+
+    if missing_patterns:
+        msg = ("\nDid not find any files matching these patterns:\n    %s\n\n"
+                % "\n    ".join(missing_patterns))
+        msg += textwrap.fill("This means we expected to find that file in the "
+            "virtio-win-prewhql archive, but it wasn't found. This means the "
+            "build output changed. Assuming this file was intentionally "
+            "removed, you'll need to update the file whitelists in "
+            "filemap.py to accurately reflect the current new file layout.")
+        msg += "\n\n"
+        fail(msg)
 
     # Actually copy the files, and track the ones we've seen
     for srcfile, dests in copymap.items():
@@ -173,7 +193,6 @@ def check_remaining_files(virtio_win_dir, qxl_win_dir, seenfiles):
         ".*/Wlh/amd64/balloon.*",
         ".*/Wlh/amd64/blnsvr.*",
         ".*/Wlh/amd64/vioser.*",
-
     ]
 
     remaining = []
@@ -197,10 +216,28 @@ def check_remaining_files(virtio_win_dir, qxl_win_dir, seenfiles):
                 seenpatterns.append(pattern)
 
     if notseen:
-        fail("Unhandled virtio-win files:\n" + "\n".join(sorted(notseen)))
+        msg = ("\nUnhandled virtio-win files:\n    %s\n\n" %
+                "\n    ".join(sorted(notseen)))
+        msg += textwrap.fill("This means the above files were not tracked "
+            "in filemap.py _and_ not tracked in the internal whitelist "
+            "in this script. This probably means that there is new build "
+            "output. You need to determine if it's something we should "
+            "be shipping (add it to filemap.py) or something we should "
+            "ignore (add it to the whitelist).")
+        fail(msg)
+
     if len(seenpatterns) != len(whitelist):
-        fail("Didn't match some whitelist entries:\n" +
-            "\n".join([p for p in whitelist if p not in seenpatterns]))
+        msg = ("\nDidn't match some whitelist entries:\n    %s\n\n" %
+                "\n    ".join([p for p in whitelist if p not in seenpatterns]))
+        msg += textwrap.fill("This means that the above pattern did not "
+            "match anything in the build output. That pattern comes from "
+            "the internal whitelist tracked as part of this script: they "
+            "are files that we expect to see in the build output, but "
+            "that we deliberately do _not_ ship as part of the RPM. If "
+            "the whitelist entry didn't match, it likely means that the "
+            "files are no longer output by the driver build, so you can "
+            "just remove the explicit whitelist entry.")
+        fail(msg)
 
 
 ###################
