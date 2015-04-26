@@ -58,12 +58,12 @@ def download_virtio_win_license(outdir):
     return [destfile]
 
 
-def copy_pciserial(virtio_win_dir, outdir):
+def copy_pciserial(input_dir, outdir):
     destdir = os.path.join(outdir, "qemupciserial")
     os.mkdir(destdir)
 
     seenfiles = [
-        os.path.join(virtio_win_dir, "qemupciserial.inf"),
+        os.path.join(input_dir, "qemupciserial.inf"),
     ]
 
     for f in seenfiles:
@@ -71,7 +71,7 @@ def copy_pciserial(virtio_win_dir, outdir):
     return seenfiles
 
 
-def _update_copymap_for_driver(virtio_win_dir, ostuple, drivername, copymap):
+def _update_copymap_for_driver(input_dir, ostuple, drivername, copymap):
     destdirs = filemap.DRIVER_OS_MAP[drivername][ostuple]
     missing_patterns = []
 
@@ -83,7 +83,7 @@ def _update_copymap_for_driver(virtio_win_dir, ostuple, drivername, copymap):
             filelist = filemap.FILELISTS.get(drivername)
 
         for pattern in filelist:
-            files = glob.glob(os.path.join(virtio_win_dir, ostuple, pattern))
+            files = glob.glob(os.path.join(input_dir, ostuple, pattern))
             if not files:
                 strpattern = os.path.join(ostuple, pattern)
                 if strpattern not in missing_patterns:
@@ -98,24 +98,19 @@ def _update_copymap_for_driver(virtio_win_dir, ostuple, drivername, copymap):
     return missing_patterns
 
 
-def copy_virtio_drivers(virtio_win_dir, outdir, do_qxl=False):
+def copy_virtio_drivers(input_dir, outdir):
     # Create a flat list of every leaf directory in the virtio-win directory
     alldirs = []
-    for dirpath, dirnames, files in os.walk(virtio_win_dir):
+    for dirpath, dirnames, files in os.walk(input_dir):
         ignore = files
         if dirnames:
             continue
 
-        ostuple = dirpath[len(virtio_win_dir) + 1:]
+        ostuple = dirpath[len(input_dir) + 1:]
         if ostuple not in alldirs:
             alldirs.append(ostuple)
 
     drivers = filemap.DRIVER_OS_MAP.keys()[:]
-    if do_qxl:
-        drivers = ["qxl"]
-    else:
-        drivers.remove("qxl")
-
     copymap = {}
     missing_patterns = []
     for drivername in drivers:
@@ -126,7 +121,7 @@ def copy_virtio_drivers(virtio_win_dir, outdir, do_qxl=False):
 
             # We know that the ostuple dir contains bits for this driver,
             # figure out what files we want to copy.
-            ret = _update_copymap_for_driver(virtio_win_dir,
+            ret = _update_copymap_for_driver(input_dir,
                 ostuple, drivername, copymap)
             missing_patterns.extend(ret)
 
@@ -153,7 +148,7 @@ def copy_virtio_drivers(virtio_win_dir, outdir, do_qxl=False):
     return copymap.keys()
 
 
-def check_remaining_files(virtio_win_dir, qxl_win_dir, seenfiles):
+def check_remaining_files(input_dir, seenfiles):
     # Expected files that we want to skip. The reason we are so strict here
     # is to make sure that we don't forget to ship important files that appear
     # in new virtio-win builds. If a new file appears, we probably need to ask
@@ -196,11 +191,7 @@ def check_remaining_files(virtio_win_dir, qxl_win_dir, seenfiles):
     ]
 
     remaining = []
-    for dirpath, dirnames, files in os.walk(virtio_win_dir):
-        ignore = dirnames
-        for f in files:
-            remaining.append(os.path.join(dirpath, f))
-    for dirpath, dirnames, files in os.walk(qxl_win_dir):
+    for dirpath, dirnames, files in os.walk(input_dir):
         ignore = dirnames
         for f in files:
             remaining.append(os.path.join(dirpath, f))
@@ -251,10 +242,8 @@ def parse_args():
                     "make-virtio-win-rpm-archive.py. "
                     "See README.md for details.")
 
-    parser.add_argument("virtio_win_dir", help="Directory containing "
-        "virtio-win build output")
-    parser.add_argument("qxl_win_dir", help="Directory windows QXL "
-        "build output")
+    parser.add_argument("input_dir", help="Directory containing "
+        "virtio-win and qxl-win build output")
 
     default_outdir = os.path.join(os.getcwd(), "drivers_output")
     parser.add_argument("--outdir", help="Directory to output the organized "
@@ -274,15 +263,12 @@ def main():
 
     # Actually move the files
     seenfiles = []
-    seenfiles += copy_virtio_drivers(options.virtio_win_dir, outdir,
-        do_qxl=False)
-    seenfiles += copy_virtio_drivers(options.qxl_win_dir, outdir, do_qxl=True)
+    seenfiles += copy_virtio_drivers(options.input_dir, outdir)
     seenfiles += download_virtio_win_license(outdir)
-    seenfiles += copy_pciserial(options.virtio_win_dir, outdir)
+    seenfiles += copy_pciserial(options.input_dir, outdir)
 
     # Verify that there is nothing left over that we missed
-    check_remaining_files(options.virtio_win_dir, options.qxl_win_dir,
-       seenfiles)
+    check_remaining_files(options.input_dir, seenfiles)
 
     print "Generated %s" % outdir
     return 0

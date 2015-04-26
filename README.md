@@ -15,12 +15,15 @@ build output and hits issues, please send patches or file an issue report.
 Run the script like:
 
     ./make-driver-dir.py \
-        /path/to/virtio-win-build-output \
-        /path/to/qxl-win-build-output
+        /path/to/driver-build-output
 
 It will copy the drivers to $PWD/drivers_output, with the file layout that
 make-virtio-win-rpm-archive.py expects, and what is largely shipped on the
 .iso file.
+
+driver-build-output is a directory containing the build output of
+virtio-win and qxl-win. They are separate projects, so you'll probably need
+to copy the output to a common directory in order for the script to work.
 
 * virtio-win comes from: https://github.com/YanVugenfirer/kvm-guest-drivers-windows
 * qxl-win comes from: http://cgit.freedesktop.org/spice/win32/qxl
