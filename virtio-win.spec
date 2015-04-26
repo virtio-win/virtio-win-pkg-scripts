@@ -1,7 +1,13 @@
+# -*- rpm-spec -*-
+
 # Note: This spec file is largely shared with the public virtio-win drivers
-# shipped on fedoraproject.org. If you make any changes to this file that
-# affect the RPM content, please submit a patch them to the upstream spec
-# file hosted at: https://github.com/crobinso/virtio-win-pkg-scripts
+# shipped on fedora sites. The canonical location is here:
+#
+# https://github.com/crobinso/virtio-win-pkg-scripts
+#
+# If you make any changes to this file that affect the RPM content (but not
+# version numbers or changelogs, etc), submit a patch them to the upstream
+# spec file.
 
 %global virtio_win_prewhql_build virtio-win-prewhql-0.1-102
 %global qemu_ga_win_build qemu-ga-win-7.0-10
