@@ -237,11 +237,11 @@ def main():
 
     # Actually move the files
     seenfiles = []
-    seenfiles += download_virtio_win_license(outdir)
-    seenfiles += copy_pciserial(options.virtio_win_dir, outdir)
     seenfiles += copy_virtio_drivers(options.virtio_win_dir, outdir,
         do_qxl=False)
     seenfiles += copy_virtio_drivers(options.qxl_win_dir, outdir, do_qxl=True)
+    seenfiles += download_virtio_win_license(outdir)
+    seenfiles += copy_pciserial(options.virtio_win_dir, outdir)
 
     # Verify that there is nothing left over that we missed
     check_remaining_files(options.virtio_win_dir, options.qxl_win_dir,
