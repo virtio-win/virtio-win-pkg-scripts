@@ -48,7 +48,7 @@ def fail(msg):
 
 def download_virtio_win_license(outdir):
     # The license isn't distributed with the built sources. Just download
-    # build an approximation from git.
+    # an approximation from git.
     print "Downloading license from kvm-guest-drivers-windows.git"
     destfile = os.path.join(outdir, "virtio-win_license.txt")
     os.system("wget -qO- https://raw.githubusercontent.com/YanVugenfirer/"
