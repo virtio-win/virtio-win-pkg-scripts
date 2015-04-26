@@ -1,0 +1,22 @@
+# Place this file in your /etc/yum.repos.d/ directory
+
+[virtio-win-stable]
+name=virtio-win builds roughly matching what was shipped in latest RHEL
+baseurl=http://fedorapeople.org/groups/virt/virtio-win/repo/stable
+enabled=1
+skip_if_unavailable=1
+gpgcheck=0
+
+[virtio-win-latest]
+name=Latest virtio-win builds
+baseurl=http://fedorapeople.org/groups/virt/virtio-win/repo/rpms
+enabled=0
+skip_if_unavailable=1
+gpgcheck=0
+
+[virtio-win-source]
+name=virtio-win source RPMs
+baseurl=http://fedorapeople.org/groups/virt/virtio-win/repo/srpms
+enabled=0
+skip_if_unavailable=1
+gpgcheck=0
