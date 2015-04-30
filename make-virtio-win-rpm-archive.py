@@ -167,11 +167,6 @@ def archive(nvr, driverdir, finaldir):
     """
     print 'archiving the results'
     for fname in os.listdir(driverdir):
-        # The RPM doesn't ship qxl on the driver CD, but this is a
-        # historical oddity that will be fixed later.
-        if fname == "qxl":
-            continue
-
         path = os.path.join(driverdir, fname)
         if os.path.isdir(path):
             shutil.copytree(path, os.path.join(finaldir, fname))
