@@ -23,7 +23,7 @@ public_dir = os.path.expanduser(
 hosteduser = os.environ.get("FAS_USERNAME", None) or getpass.getuser()
 
 stable_rpms = [
-    "0.1.96-1", # RHEL7.1 version
+    "0.1.96-1",  # RHEL7.1 version
 ]
 
 
