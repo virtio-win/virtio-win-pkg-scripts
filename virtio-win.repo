@@ -10,7 +10,7 @@ gpgcheck=0
 
 [virtio-win-latest]
 name=Latest virtio-win builds
-baseurl=http://fedorapeople.org/groups/virt/virtio-win/repo/rpms
+baseurl=http://fedorapeople.org/groups/virt/virtio-win/repo/latest
 enabled=0
 skip_if_unavailable=1
 gpgcheck=0

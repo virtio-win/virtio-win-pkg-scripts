@@ -353,7 +353,15 @@ def _generate_repos():
         shellcomm("ln -s ../rpms/%s %s" % (filename,
             os.path.join(public_dir, "stable", os.path.basename(fullpath))))
 
-    for rpmdir in ["rpms", "stable", "srpms"]:
+    # Generate latest symlinks
+    shellcomm("rm -rf %s/*" % os.path.join(public_dir, "latest"))
+    for fullpath in glob.glob(os.path.join(public_dir, "rpms", "*.rpm")):
+        filename = os.path.basename(fullpath)
+        shellcomm("ln -s ../rpms/%s %s" % (filename,
+            os.path.join(public_dir, "latest", os.path.basename(fullpath))))
+
+    # Generate repodata
+    for rpmdir in ["latest", "stable", "srpms"]:
         shellcomm("rm -rf %s" %
             os.path.join(public_dir, rpmdir, "repodata"))
         shellcomm("createrepo %s > /dev/null" %
