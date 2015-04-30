@@ -1,4 +1,5 @@
-# Place this file in your /etc/yum.repos.d/ directory
+# virtio-win yum repo
+# Details: https://fedoraproject.org/wiki/Windows_Virtio_Drivers
 
 [virtio-win-stable]
 name=virtio-win builds roughly matching what was shipped in latest RHEL
