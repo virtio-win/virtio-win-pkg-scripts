@@ -46,11 +46,12 @@ class Spec(object):
 
     def __init__(self, origpath, newvirtio, newqxl, newqemuga):
         self.origpath = origpath
-        self.origcontent = file(origpath).read()
-        self.clognewcontent = ("%changelog" +
-            self.origcontent.split("%changelog", 1)[1])
+        self._origfullcontent = file(self.origpath).read()
+        self.origcontent, self.clognewcontent = (
+            self._origfullcontent.split("%changelog", 1))
+        self.clognewcontent = "%changelog" + self.clognewcontent
 
-        self.newcontent = file(self.origpath).read()
+        self.newcontent = self.origcontent
 
         self.newvirtio = newvirtio
         self.newqxl = newqxl
@@ -100,7 +101,7 @@ class Spec(object):
         return newrelease, newversion
 
     def _get_final_content(self):
-        return self.newcontent + "\n\n" + self.clognewcontent
+        return self.newcontent + self.clognewcontent
 
     def _set_new_clog(self):
         clog = "* %s %s - %s-%s\n" % (
@@ -125,7 +126,7 @@ class Spec(object):
 
     def diff(self):
         return "".join(difflib.unified_diff(
-            self.origcontent.splitlines(1),
+            self._origfullcontent.splitlines(1),
             self._get_final_content().splitlines(1),
             fromfile="Orig spec",
             tofile="New spec"))
@@ -302,9 +303,6 @@ def _build_latest_rpm():
         (new_builds, qemu_ga_str, qemu_ga_str, rpm_dir,
          qemu_ga_str, qemu_ga_str, qemu_ga_str))
 
-    # We checkout the rpm_changelog so that subsequent runs don't
-    # generate multiple entries.
-    os.system("git checkout rpm_changelog")
 
     # Just creating the Spec will queue up all expected changes.
     spec = Spec(os.path.join(script_dir, "virtio-win.spec"),
