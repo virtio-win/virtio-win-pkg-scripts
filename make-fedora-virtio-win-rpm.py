@@ -259,18 +259,15 @@ def user_edit_clog_content(spec):
     tmp.close()
 
 
-###################
-# main() handling #
-###################
-
-def parse_args():
-    parser = argparse.ArgumentParser(description="Scoop up the downloaded "
-        "builds from new_builds, generate the RPM using the public scripts "
-        "and drop the output in $CWD.")
-    return parser.parse_args()
-
+##################
+# main() helpers #
+##################
 
 def _build_latest_rpm():
+    """
+    Extract new-builds/, build the driver dir, build the RPM archive,
+    edit the spec, build the RPM, copy it into place
+    """
     virtio_str = get_package_string("virtio-win-prewhql", new_builds)
     qxl_str = get_package_string("qxl-win-unsigned", new_builds)
     qemu_ga_str = get_package_string("qemu-ga-win", new_builds)
@@ -317,31 +314,41 @@ def _build_latest_rpm():
     shellcomm("cd %s && rpmbuild -ba %s" %
         (rpm_dir, os.path.basename(newspecpath)))
 
-    # Copy the RPMs to our tree
+    return glob.glob(os.path.join(rpm_dir, "*.rpm"))
+
+
+def _copy_rpms_to_local_tree(rpms):
+    """
+    Copy RPMs to our local tree mirror, to get ready for repo creation
+    """
     print
     print
-    for root, dirs, paths in os.walk(rpm_dir):
-        ignore = dirs
-        for path in paths:
-            if not path.endswith(".rpm"):
-                continue
+    for path in rpms:
+        filename = os.path.basename(path)
+        if filename.endswith(".src.rpm"):
+            dest = os.path.join(public_dir, "srpms", filename)
+        else:
+            dest = os.path.join(public_dir, "rpms", filename)
 
-            if path.endswith(".src.rpm"):
-                dest = os.path.join(public_dir, "srpms", path)
-            else:
-                dest = os.path.join(public_dir, "rpms", path)
-
-            shutil.move(os.path.join(root, path), dest)
-            print "Generated %s" % dest
+        shutil.move(path, dest)
+        print "Generated %s" % dest
 
 
 def _generate_repos():
+    """
+    Run createrepo
+    """
     for rpmdir in ["rpms", "stable"]:
         shellcomm("rm -rf %s" %
             os.path.join(public_dir, rpmdir, "repodata"))
         shellcomm("createrepo %s > /dev/null" %
             os.path.join(public_dir, rpmdir))
 
+
+def _push_repos():
+    """
+    rsync the changes to fedorapeople.org
+    """
     # Put the RPMs in place
     prog = (sys.stdin.isatty() and "--progress " or " ")
     shellcomm("rsync -avz %s --exclude repodata %s/ "
@@ -354,14 +361,27 @@ def _generate_repos():
         (prog, public_dir, hosteduser))
 
 
+###################
+# main() handling #
+###################
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Scoop up the downloaded "
+        "builds from new_builds, generate the RPM using the public scripts "
+        "and drop the output in $CWD.")
+    return parser.parse_args()
+
+
 def main():
     options = parse_args()
     ignore = options
 
-    _build_latest_rpm()
-    _generate_repos()
-
+    rpms = _build_latest_rpm()
+    _copy_rpms_to_local_tree(rpms)
     shutil.rmtree(new_builds)
+
+    _generate_repos()
+    _push_repos()
 
     # Inform user about manual tasks
     print "\n"
