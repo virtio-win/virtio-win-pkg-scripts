@@ -22,6 +22,10 @@ public_dir = os.path.expanduser(
     "~/src/fedora/virt-group-repos/virtio-win/repo-tree")
 hosteduser = os.environ.get("FAS_USERNAME", None) or getpass.getuser()
 
+stable_rpms = [
+    "0.1.96-1", # RHEL7.1 version
+]
+
 
 #########################
 # specfile helper class #
@@ -336,8 +340,19 @@ def _copy_rpms_to_local_tree(rpms):
 
 def _generate_repos():
     """
-    Run createrepo
+    Create repo trees, run createrepo
     """
+    # Generate stable symlinks
+    shellcomm("rm -rf %s/*" % os.path.join(public_dir, "stable"))
+    for stablever in stable_rpms:
+        filename = "virtio-win-%s.noarch.rpm" % stablever
+        fullpath = os.path.join(public_dir, "rpms", filename)
+        if not os.path.exists(fullpath):
+            fail("Didn't find stable RPM path %s" % fullpath)
+
+        shellcomm("ln -s ../rpms/%s %s" % (filename,
+            os.path.join(public_dir, "stable", os.path.basename(fullpath))))
+
     for rpmdir in ["rpms", "stable", "srpms"]:
         shellcomm("rm -rf %s" %
             os.path.join(public_dir, rpmdir, "repodata"))
@@ -349,6 +364,8 @@ def _push_repos():
     """
     rsync the changes to fedorapeople.org
     """
+    print
+    print
     if not yes_or_no("rsync the changes to fedorapeople? (y/n): "):
         return
 
