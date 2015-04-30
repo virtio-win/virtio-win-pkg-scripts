@@ -338,7 +338,7 @@ def _generate_repos():
     """
     Run createrepo
     """
-    for rpmdir in ["rpms", "stable"]:
+    for rpmdir in ["rpms", "stable", "srpms"]:
         shellcomm("rm -rf %s" %
             os.path.join(public_dir, rpmdir, "repodata"))
         shellcomm("createrepo %s > /dev/null" %
