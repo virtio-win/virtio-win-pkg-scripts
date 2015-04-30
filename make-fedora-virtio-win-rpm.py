@@ -349,6 +349,9 @@ def _push_repos():
     """
     rsync the changes to fedorapeople.org
     """
+    if not yes_or_no("rsync the changes to fedorapeople? (y/n): "):
+        return
+
     # Put the RPMs in place
     prog = (sys.stdin.isatty() and "--progress " or " ")
     shellcomm("rsync -avz %s --exclude repodata %s/ "
@@ -369,6 +372,10 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Scoop up the downloaded "
         "builds from new_builds, generate the RPM using the public scripts "
         "and drop the output in $CWD.")
+
+    parser.add_argument("--repo-only", action="store_true",
+        help="Only regenerate repo and push changes")
+
     return parser.parse_args()
 
 
@@ -376,9 +383,10 @@ def main():
     options = parse_args()
     ignore = options
 
-    rpms = _build_latest_rpm()
-    _copy_rpms_to_local_tree(rpms)
-    shutil.rmtree(new_builds)
+    if not options.repo_only:
+        rpms = _build_latest_rpm()
+        _copy_rpms_to_local_tree(rpms)
+        shutil.rmtree(new_builds)
 
     _generate_repos()
     _push_repos()
