@@ -1,4 +1,7 @@
 #!/usr/bin/python
+#
+# Wrapper to build a new RPM and upload contents to fedora repo
+# See --help and README for more details
 
 import argparse
 import atexit
@@ -16,12 +19,17 @@ import sys
 import tempfile
 
 
+rsync = "rsync -avz "
 script_dir = os.path.dirname(os.path.abspath(__file__))
 new_builds = os.path.join(script_dir, "new-builds")
-public_dir = os.path.expanduser(
+public_repodir = os.path.expanduser(
     "~/src/fedora/virt-group-repos/virtio-win/repo-tree")
+public_directdir = os.path.expanduser(
+    "~/src/fedora/virt-group-repos/virtio-win/direct-tree")
+http_directdir = "/groups/virt/virtio-win/direct-downloads"
 hosteduser = os.environ.get("FAS_USERNAME", None) or getpass.getuser()
 
+# List of stable versions. Keep the newest version first.
 stable_rpms = [
     "0.1.96-1",  # RHEL7.1 version
 ]
@@ -129,6 +137,10 @@ class Spec(object):
 #####################
 # utility functions #
 #####################
+
+def make_redirect(root, old, new):
+    return "redirect permanent %s/%s %s/%s\n" % (root, old, root, new)
+
 
 def fail(msg):
     print "ERROR: %s" % msg
@@ -318,7 +330,76 @@ def _build_latest_rpm():
     shellcomm("cd %s && rpmbuild -ba %s" %
         (rpm_dir, os.path.basename(newspecpath)))
 
-    return glob.glob(os.path.join(rpm_dir, "*.rpm"))
+    return spec, glob.glob(os.path.join(rpm_dir, "*.rpm"))
+
+
+def _copy_direct_download_content_to_tree(rpms, newversion, newqemuga):
+    """
+    Unpack the RPM we just made, copy certain bits like iso, vfd,
+    and agents to the direct download portion of the tree.
+
+    Also generate root dir .htaccess redirects
+    """
+    rpmpath = [r for r in rpms if r.endswith(".noarch.rpm")][0]
+    extract_dir = tempfile.mkdtemp(prefix='virtio-win-rpm-extract-')
+    atexit.register(lambda: shutil.rmtree(extract_dir))
+
+    # Extract RPM contents
+    shellcomm("cd %s && rpm2cpio %s | cpio -idmv &> /dev/null" %
+        (extract_dir, rpmpath))
+    sharedir = extract_dir + "/usr/share/virtio-win/"
+
+    # Move qemu-ga .msis
+    qemuga_basedir = os.path.join("archive-qemu-ga", newqemuga)
+    qemugadir = os.path.join(public_directdir, qemuga_basedir)
+    if not os.path.exists(qemugadir):
+        os.mkdir(qemugadir)
+        shellcomm("mv %s/* %s" %
+            (os.path.join(sharedir, "guest-agent"), qemugadir))
+
+    # Move virtio .iso and .vfds
+    virtioversion = "virtio-win-%s" % newversion
+    virtio_basedir = os.path.join("archive-virtio", virtioversion)
+    virtiodir = os.path.join(public_directdir, virtio_basedir)
+    if not os.path.exists(virtiodir):
+        os.mkdir(virtiodir)
+
+        def move_data(versionfile, symlink):
+            shellcomm("mv %s/%s %s" % (sharedir, versionfile, virtiodir))
+            shellcomm("mv %s/%s %s" % (sharedir, symlink, virtiodir))
+            return make_redirect(
+                os.path.join(http_directdir, virtio_basedir),
+                symlink, versionfile)
+
+        htaccess = ""
+        htaccess += move_data("%s.iso" % virtioversion, "virtio-win.iso")
+        htaccess += move_data("%s_x86.vfd" % virtioversion,
+                              "virtio-win_x86.vfd")
+        htaccess += move_data("%s_amd64.vfd" % virtioversion,
+                              "virtio-win_amd64.vfd")
+
+        # Write .htaccess, redirecting symlinks to versioned files, so
+        # nobody ends up with unversioned files locally, since that
+        # will make for crappy bug reports
+        file(os.path.join(virtiodir, ".htaccess"), "w").write(htaccess)
+
+
+    # Make latest-qemu-ga, latest-virtio, and stable-virtio links
+    def add_link(src, link):
+        fullsrc = os.path.join(public_directdir, src)
+        if not os.path.exists(fullsrc):
+            fail("Nonexistent link src %s" % fullsrc)
+
+        shellcomm("ln -sf %s %s" % (src, os.path.join(public_directdir, link)))
+        return make_redirect(http_directdir, link, src)
+
+    htaccess = ""
+    htaccess += add_link(qemuga_basedir, "latest-qemu-ga")
+    htaccess += add_link(virtio_basedir, "latest-virtio")
+    htaccess += add_link(
+        "archive-virtio/virtio-win-%s" % stable_rpms[0].rsplit("-")[0],
+        "stable-virtio")
+    file(os.path.join(public_directdir, ".htaccess"), "w").write(htaccess)
 
 
 def _copy_rpms_to_local_tree(rpms):
@@ -330,9 +411,9 @@ def _copy_rpms_to_local_tree(rpms):
     for path in rpms:
         filename = os.path.basename(path)
         if filename.endswith(".src.rpm"):
-            dest = os.path.join(public_dir, "srpms", filename)
+            dest = os.path.join(public_repodir, "srpms", filename)
         else:
-            dest = os.path.join(public_dir, "rpms", filename)
+            dest = os.path.join(public_repodir, "rpms", filename)
 
         shutil.move(path, dest)
         print "Generated %s" % dest
@@ -343,29 +424,30 @@ def _generate_repos():
     Create repo trees, run createrepo
     """
     # Generate stable symlinks
-    shellcomm("rm -rf %s/*" % os.path.join(public_dir, "stable"))
+    shellcomm("rm -rf %s/*" % os.path.join(public_repodir, "stable"))
     for stablever in stable_rpms:
         filename = "virtio-win-%s.noarch.rpm" % stablever
-        fullpath = os.path.join(public_dir, "rpms", filename)
+        fullpath = os.path.join(public_repodir, "rpms", filename)
         if not os.path.exists(fullpath):
             fail("Didn't find stable RPM path %s" % fullpath)
 
         shellcomm("ln -s ../rpms/%s %s" % (filename,
-            os.path.join(public_dir, "stable", os.path.basename(fullpath))))
+            os.path.join(public_repodir, "stable",
+                         os.path.basename(fullpath))))
 
     # Generate latest symlinks
-    shellcomm("rm -rf %s/*" % os.path.join(public_dir, "latest"))
-    for fullpath in glob.glob(os.path.join(public_dir, "rpms", "*.rpm")):
+    shellcomm("rm -rf %s/*" % os.path.join(public_repodir, "latest"))
+    for fullpath in glob.glob(os.path.join(public_repodir, "rpms", "*.rpm")):
         filename = os.path.basename(fullpath)
         shellcomm("ln -s ../rpms/%s %s" % (filename,
-            os.path.join(public_dir, "latest", os.path.basename(fullpath))))
+            os.path.join(public_repodir, "latest", os.path.basename(fullpath))))
 
     # Generate repodata
     for rpmdir in ["latest", "stable", "srpms"]:
         shellcomm("rm -rf %s" %
-            os.path.join(public_dir, rpmdir, "repodata"))
+            os.path.join(public_repodir, rpmdir, "repodata"))
         shellcomm("createrepo %s > /dev/null" %
-            os.path.join(public_dir, rpmdir))
+            os.path.join(public_repodir, rpmdir))
 
 
 def _push_repos():
@@ -379,14 +461,19 @@ def _push_repos():
 
     # Put the RPMs in place
     prog = (sys.stdin.isatty() and "--progress " or " ")
-    shellcomm("rsync -avz %s --exclude repodata %s/ "
+    shellcomm(rsync + "%s --exclude repodata %s/ "
         "%s@fedorapeople.org:~/virtgroup/virtio-win/repo" %
-        (prog, public_dir, hosteduser))
+        (prog, public_repodir, hosteduser))
 
     # Overwrite the repodata and remove stale files
-    shellcomm("rsync -avz %s --delete %s/ "
+    shellcomm(rsync + "%s --delete %s/ "
         "%s@fedorapeople.org:~/virtgroup/virtio-win/repo" %
-        (prog, public_dir, hosteduser))
+        (prog, public_repodir, hosteduser))
+
+    # Push direct files
+    shellcomm(rsync + "%s %s/ "
+        "%s@fedorapeople.org:~/virtgroup/virtio-win/direct-downloads" %
+        (prog, public_directdir, hosteduser))
 
 
 ###################
@@ -409,19 +496,23 @@ def main():
     ignore = options
 
     if not options.repo_only:
-        rpms = _build_latest_rpm()
+        spec, rpms = _build_latest_rpm()
+        _copy_direct_download_content_to_tree(rpms,
+                spec.newversion, spec.newqemuga)
         _copy_rpms_to_local_tree(rpms)
-        shutil.rmtree(new_builds)
 
     _generate_repos()
     _push_repos()
+
+    if not options.repo_only:
+        shutil.rmtree(new_builds)
 
     # Inform user about manual tasks
     print "\n"
     print "Don't forget to:"
     print "- Commit all the spec file changes"
-    print "- If this is a stable build, symlink it into stable/ and "
-    print "  regenerate the repos."
+    print "- If this is a stable build, update the stable_rpms list in"
+    print "  this scripts code and re-run with --repo-only"
     print
 
     return 0
