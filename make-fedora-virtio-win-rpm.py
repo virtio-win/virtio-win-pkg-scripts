@@ -22,10 +22,9 @@ import tempfile
 rsync = "rsync -avz "
 script_dir = os.path.dirname(os.path.abspath(__file__))
 new_builds = os.path.join(script_dir, "new-builds")
-public_repodir = os.path.expanduser(
-    "~/src/fedora/virt-group-repos/virtio-win/repo-tree")
-public_directdir = os.path.expanduser(
-    "~/src/fedora/virt-group-repos/virtio-win/direct-tree")
+local_root = os.path.expanduser("~/src/fedora/virt-group-repos/virtio-win")
+local_repodir = os.path.join(local_root, "repo")
+local_directdir = os.path.join(local_root, "direct-downloads")
 http_directdir = "/groups/virt/virtio-win/direct-downloads"
 hosteduser = os.environ.get("FAS_USERNAME", None) or getpass.getuser()
 
@@ -349,7 +348,7 @@ def _copy_direct_download_content_to_tree(rpms, newversion, newqemuga):
 
     # Move qemu-ga .msis
     qemuga_basedir = os.path.join("archive-qemu-ga", newqemuga)
-    qemugadir = os.path.join(public_directdir, qemuga_basedir)
+    qemugadir = os.path.join(local_directdir, qemuga_basedir)
     if not os.path.exists(qemugadir):
         os.mkdir(qemugadir)
         shellcomm("mv %s/* %s" %
@@ -358,7 +357,7 @@ def _copy_direct_download_content_to_tree(rpms, newversion, newqemuga):
     # Move virtio .iso and .vfds
     virtioversion = "virtio-win-%s" % newversion
     virtio_basedir = os.path.join("archive-virtio", virtioversion)
-    virtiodir = os.path.join(public_directdir, virtio_basedir)
+    virtiodir = os.path.join(local_directdir, virtio_basedir)
     if not os.path.exists(virtiodir):
         os.mkdir(virtiodir)
 
@@ -384,11 +383,11 @@ def _copy_direct_download_content_to_tree(rpms, newversion, newqemuga):
 
     # Make latest-qemu-ga, latest-virtio, and stable-virtio links
     def add_link(src, link):
-        fullsrc = os.path.join(public_directdir, src)
+        fullsrc = os.path.join(local_directdir, src)
         if not os.path.exists(fullsrc):
             fail("Nonexistent link src %s" % fullsrc)
 
-        shellcomm("ln -sf %s %s" % (src, os.path.join(public_directdir, link)))
+        shellcomm("ln -sf %s %s" % (src, os.path.join(local_directdir, link)))
         return make_redirect(http_directdir, link, src)
 
     htaccess = ""
@@ -397,7 +396,7 @@ def _copy_direct_download_content_to_tree(rpms, newversion, newqemuga):
     htaccess += add_link(
         "archive-virtio/virtio-win-%s" % stable_rpms[0].rsplit("-")[0],
         "stable-virtio")
-    file(os.path.join(public_directdir, ".htaccess"), "w").write(htaccess)
+    file(os.path.join(local_directdir, ".htaccess"), "w").write(htaccess)
 
 
 def _copy_rpms_to_local_tree(rpms):
@@ -409,9 +408,9 @@ def _copy_rpms_to_local_tree(rpms):
     for path in rpms:
         filename = os.path.basename(path)
         if filename.endswith(".src.rpm"):
-            dest = os.path.join(public_repodir, "srpms", filename)
+            dest = os.path.join(local_repodir, "srpms", filename)
         else:
-            dest = os.path.join(public_repodir, "rpms", filename)
+            dest = os.path.join(local_repodir, "rpms", filename)
 
         shutil.move(path, dest)
         print "Generated %s" % dest
@@ -422,30 +421,33 @@ def _generate_repos():
     Create repo trees, run createrepo
     """
     # Generate stable symlinks
-    shellcomm("rm -rf %s/*" % os.path.join(public_repodir, "stable"))
+    shellcomm("rm -rf %s/*" % os.path.join(local_repodir, "stable"))
     for stablever in stable_rpms:
         filename = "virtio-win-%s.noarch.rpm" % stablever
-        fullpath = os.path.join(public_repodir, "rpms", filename)
+        fullpath = os.path.join(local_repodir, "rpms", filename)
         if not os.path.exists(fullpath):
             fail("Didn't find stable RPM path %s" % fullpath)
 
         shellcomm("ln -s ../rpms/%s %s" % (filename,
-            os.path.join(public_repodir, "stable",
+            os.path.join(local_repodir, "stable",
                          os.path.basename(fullpath))))
 
     # Generate latest symlinks
-    shellcomm("rm -rf %s/*" % os.path.join(public_repodir, "latest"))
-    for fullpath in glob.glob(os.path.join(public_repodir, "rpms", "*.rpm")):
+    shellcomm("rm -rf %s/*" % os.path.join(local_repodir, "latest"))
+    for fullpath in glob.glob(os.path.join(local_repodir, "rpms", "*.rpm")):
         filename = os.path.basename(fullpath)
         shellcomm("ln -s ../rpms/%s %s" % (filename,
-            os.path.join(public_repodir, "latest", os.path.basename(fullpath))))
+            os.path.join(local_repodir, "latest", os.path.basename(fullpath))))
 
     # Generate repodata
     for rpmdir in ["latest", "stable", "srpms"]:
         shellcomm("rm -rf %s" %
-            os.path.join(public_repodir, rpmdir, "repodata"))
+            os.path.join(local_repodir, rpmdir, "repodata"))
         shellcomm("createrepo %s > /dev/null" %
-            os.path.join(public_repodir, rpmdir))
+            os.path.join(local_repodir, rpmdir))
+
+    # Put the repo file in place
+    shellcomm("cp -f virtio-win.repo %s" % local_root)
 
 
 def _push_repos():
@@ -460,18 +462,13 @@ def _push_repos():
     # Put the RPMs in place
     prog = (sys.stdin.isatty() and "--progress " or " ")
     shellcomm(rsync + "%s --exclude repodata %s/ "
-        "%s@fedorapeople.org:~/virtgroup/virtio-win/repo" %
-        (prog, public_repodir, hosteduser))
+        "%s@fedorapeople.org:~/virtgroup/virtio-win" %
+        (prog, local_root, hosteduser))
 
     # Overwrite the repodata and remove stale files
     shellcomm(rsync + "%s --delete %s/ "
-        "%s@fedorapeople.org:~/virtgroup/virtio-win/repo" %
-        (prog, public_repodir, hosteduser))
-
-    # Push direct files
-    shellcomm(rsync + "%s %s/ "
-        "%s@fedorapeople.org:~/virtgroup/virtio-win/direct-downloads" %
-        (prog, public_directdir, hosteduser))
+        "%s@fedorapeople.org:~/virtgroup/virtio-win" %
+        (prog, local_root, hosteduser))
 
 
 ###################
