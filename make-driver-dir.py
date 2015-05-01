@@ -154,39 +154,47 @@ def check_remaining_files(input_dir, seenfiles):
     # in new virtio-win builds. If a new file appears, we probably need to ask
     # the driver developers whether to ship it or not.
     whitelist = [
-        # These files just aren't shipped
+        # vadim confirmed these files should _not_ be shipped
+        # (private mail May 2015)
         ".*qemupciserial.cat",
         ".*NetKVMTemporaryCert\.cer",
         ".*DVL\.XML",
         ".*vioser-test.*",
 
-        # These are complete driver builds that aren't shipped. RHEL may
-        # not ship them because of supportability reasons, maybe we should
-        # consider shipping them publically though. Or it could just be
-        # redundant build output, it's unclear...
-        ".*/win7/x86/balloon.*",
-        ".*/win7/x86/blnsvr.*",
+
+        # virtio-win build system unconditionally builds every driver
+        # for every windows platform that supports it. However, depending
+        # on the driver, functionally identical binaries might be
+        # generated. In those cases, we ship only one build of the driver
+        # for every windows version it will work on (see filemap.py
+        # DRIVER_OS_MAP)
+        #
+        # This also simplifies the WHQL submission process, one submission
+        # can cover multiple windows versions.
+        #
+        # In those cases, we end up with unused virtio-win build output.
+        # That's what the below drivers cover.
+        #
+        # If you add to this list, be sure it's not a newly introduced
+        # driver that you are ignoring! Everything listed here needs
+        # be covered by a mapping in DRIVER_OS_MAP
+        ".*/win7/x86/balloon.*", ".*/win7/x86/blnsvr.*",
         ".*/win7/x86/viostor.*",
         ".*/win7/x86/vioscsi.*",
         ".*/win7/x86/vioser.*",
 
-        ".*/win7/amd64/balloon.*",
-        ".*/win7/amd64/blnsvr.*",
+        ".*/win7/amd64/balloon.*", ".*/win7/amd64/blnsvr.*",
         ".*/win7/amd64/viostor.*",
         ".*/win7/amd64/vioscsi.*",
         ".*/win7/amd64/vioser.*",
 
-        ".*/Wnet/x86/balloon.*",
-        ".*/Wnet/x86/blnsvr.*",
-        ".*/Wnet/x86/vioser.*",
-        ".*/Wnet/x86/WdfCoInstaller01009.dll",
+        ".*/Wnet/x86/balloon.*", ".*/Wnet/x86/blnsvr.*",
+        ".*/Wnet/x86/vioser.*", ".*/Wnet/x86/WdfCoInstaller01009.dll",
 
-        ".*/Wlh/x86/balloon.*",
-        ".*/Wlh/x86/blnsvr.*",
+        ".*/Wlh/x86/balloon.*", ".*/Wlh/x86/blnsvr.*",
         ".*/Wlh/x86/vioser.*",
 
-        ".*/Wlh/amd64/balloon.*",
-        ".*/Wlh/amd64/blnsvr.*",
+        ".*/Wlh/amd64/balloon.*", ".*/Wlh/amd64/blnsvr.*",
         ".*/Wlh/amd64/vioser.*",
     ]
 

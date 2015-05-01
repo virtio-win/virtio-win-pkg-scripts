@@ -25,6 +25,30 @@ import tempfile
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
+# .vfd images are floppy disk images that can be passed to windows
+# for OS install time driver usage. It's only strictly required for
+# winxp and win2003, newer versions can use the .iso for this purpose.
+# However we still ship all windows versions of these particular drivers
+# so the floppy images work for all windows versions.
+#
+# The .vfd files are size constrained, since they need to appear like
+# a floppy disk. AIUI the idea is we only ship the really essential
+# install time drivers. Here's what's on the floppy
+#
+# * block driver
+# * scsi driver
+# * net driver
+# * qxl driver
+#
+# storage and scsi and network make sense here. But qxl certainly
+# doesn't seem required at early install. I think it was added to
+# the floppy somewhat accidentally when it was first introduced to
+# the virtio-win RPM. Instead it should have been added to the .iso
+# But now that it's on the floppy I'm not going remove it for fear
+# of breaking things for someone.
+#
+# Note it's very unlikely that we should ever need to add a new driver
+# to the floppy, given it's limited target.
 vfd_dirs_32 = {
     'NetKVM/w8/x86'     : 'i386/Win8',
     'NetKVM/w8.1/x86'   : 'i386/Win8.1',
@@ -134,6 +158,18 @@ def build_vfd(fname, dmap, driverdir, rootdir, finaldir):
                 raise
 
         for src_file in os.listdir(src):
+            # See the .vfd description at the top of this file.
+            # Given that, not all files per driver really _need_ to be
+            # put on the .vfd.
+            #
+            # Details on the files we skip:
+            #
+            # * .pdb files are kinda redundant for the .vfd... they aren't
+            #   used in any automatic fashion, so just putting them on the
+            #   .iso is sufficient
+            # * .doc doesn't serve any purpose on the .vfd
+            # * netkvmco.dll is an end user configuration tool for, as
+            #   such doesn't have much use at boot/install time
             if (src_file.endswith('.pdb') or
                 src_file.endswith('.doc') or
                 src_file == 'netkvmco.dll'):
