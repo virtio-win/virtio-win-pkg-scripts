@@ -19,7 +19,6 @@ import sys
 import tempfile
 
 
-rsync = "rsync -avz "
 script_dir = os.path.dirname(os.path.abspath(__file__))
 new_builds = os.path.join(script_dir, "new-builds")
 local_root = os.path.expanduser("~/src/fedora/virt-group-repos/virtio-win")
@@ -450,25 +449,37 @@ def _generate_repos():
     shellcomm("cp -f virtio-win.repo %s" % local_root)
 
 
+def _run_rsync(dry):
+    rsync = "rsync --archive --verbose --compress --progress "
+    if dry:
+        rsync += "--dry-run "
+
+    # Put the RPMs in place
+    shellcomm("%s --exclude repodata %s/ "
+        "%s@fedorapeople.org:~/virtgroup/virtio-win" %
+        (rsync, local_root, hosteduser))
+
+    # Overwrite the repodata and remove stale files
+    shellcomm("%s --delete %s/ "
+        "%s@fedorapeople.org:~/virtgroup/virtio-win" %
+        (rsync, local_root, hosteduser))
+
+
 def _push_repos():
     """
     rsync the changes to fedorapeople.org
     """
     print
     print
-    if not yes_or_no("rsync the changes to fedorapeople? (y/n): "):
+    _run_rsync(dry=True)
+
+    print
+    print
+    if not yes_or_no("Review the --dry-run changes. "
+        "Do you want to push? (y/n): "):
         return
 
-    # Put the RPMs in place
-    prog = (sys.stdin.isatty() and "--progress " or " ")
-    shellcomm(rsync + "%s --exclude repodata %s/ "
-        "%s@fedorapeople.org:~/virtgroup/virtio-win" %
-        (prog, local_root, hosteduser))
-
-    # Overwrite the repodata and remove stale files
-    shellcomm(rsync + "%s --delete %s/ "
-        "%s@fedorapeople.org:~/virtgroup/virtio-win" %
-        (prog, local_root, hosteduser))
+    _run_rsync(dry=False)
 
 
 ###################
