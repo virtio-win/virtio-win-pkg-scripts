@@ -38,7 +38,7 @@ def run(cmd):
 
 def extract_files(filename):
     """
-    Passed in either a zip file or RPM, extract the contents, including
+    Passed in either a zip, tar.gz, or RPM, extract the contents, including
     the contents of any contained vfd or iso files. Move these to a temp
     directory for easy comparison.
     """
@@ -56,12 +56,14 @@ def extract_files(filename):
         pass
     elif filename.endswith(".zip"):
         run("unzip %s -d %s > /dev/null" % (filename, extract_dir))
+    elif filename.endswith(".tar.gz"):
+        run("tar -xvf %s --directory %s > /dev/null" % (filename, extract_dir))
     elif filename.endswith(".rpm"):
         run("cd %s && rpm2cpio %s | cpio -idm --quiet" %
             (extract_dir, filename))
     else:
-        fail("Unexpected filename %s, only expecting .zip, .rpm, or a "
-            "directory" % filename)
+        fail("Unexpected filename %s, only expecting .zip, *.tar.gz, .rpm, "
+             "or a directory" % filename)
 
 
     # Find .vfd files
@@ -92,20 +94,20 @@ def extract_files(filename):
 def parse_args():
     desc = """
 Helper for comparing the output of make-virtio-win-rpm-archive.py. Can
-either compare the raw .zip output, a virtio-win .rpm file, or two directories
-for make-driver-dir.py output. Example:
+either compare the raw .tar.gz output, a virtio-win .rpm file,
+or two directories for make-driver-dir.py output. Example:
 
 - Run make-virtio-win-rpm-archive.py ...
-- Run make-virtio-win-rpm-archive.py, then move $OUTPUT.zip to orig.zip
+- Run make-virtio-win-rpm-archive.py, then move $OUTPUT.tar.gz to orig.tar.gz
 - Make your changes to make-virtio-win-rpm-archive.py
-- Re-run make-virtio-win-rpm-archive.py, then move $OUTPUT.zip to new.zip
-- Review changes: %(prog)s orig.zip new.zip
+- Re-run make-virtio-win-rpm-archive.py, then move $OUTPUT.tar.gz to new.tar.gz
+- Review changes: %(prog)s orig.tar.gz new.tar.gz
 """
     parser = argparse.ArgumentParser(description=desc,
         formatter_class=argparse.RawDescriptionHelpFormatter)
 
-    parser.add_argument("orig", help="Original .zip/.rpm/directory output")
-    parser.add_argument("new", help="New .zip/.rpm/directory output")
+    parser.add_argument("orig", help="Original .tar.gz/.rpm/directory output")
+    parser.add_argument("new", help="New .tar.gz/.rpm/directory output")
     parser.add_argument("--treeonly", action="store_true",
         help="Only show tree diff output.")
 

@@ -294,7 +294,7 @@ def _build_latest_rpm():
     rpm_dir = tempfile.mkdtemp(prefix='virtio-win-rpm-dir-')
     atexit.register(lambda: shutil.rmtree(rpm_dir))
 
-    shellcomm("mv %s/*.zip %s" % (script_dir, rpm_dir))
+    shellcomm("mv %s/*.tar.gz %s" % (script_dir, rpm_dir))
     shellcomm("cp %s/*-sources.zip %s" % (new_builds, rpm_dir))
     shellcomm("cd %s && mkdir %s && cp *.msi %s && "
         "zip -9 -r %s/%s-installers.zip %s && rm -rf %s" %

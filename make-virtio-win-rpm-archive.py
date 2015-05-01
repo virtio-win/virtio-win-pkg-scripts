@@ -6,7 +6,7 @@
 # See the COPYING file in the top-level directory.
 
 
-# Script for generating .vfd and .zip for virtio-win RPM
+# Script for generating .vfd and .tar.gz for virtio-win RPM
 #
 # Note to the maintainer: This script is also used internally for the RHEL
 #   virtio-win RPM build process. Consider that when making changes to the
@@ -16,6 +16,7 @@ import argparse
 import atexit
 import errno
 import glob
+import hashlib
 import os
 import shutil
 import subprocess
@@ -130,7 +131,7 @@ def build_vfd(fname, dmap, driverdir, rootdir, finaldir):
     # The temp directory where we stage the files that will go on the vfd
     floppydir = os.path.join(rootdir, "drivers")
 
-    # The directory that will end up in the .zip archive, and in /usr/share
+    # The directory that will end up in the archive, and in /usr/share
     # via the RPM. We call this 'vfddrivers' to make it explicit where
     # they are coming from, but the RPM installs it as 'drivers' for
     # historical reasons.
@@ -197,22 +198,34 @@ def build_vfd(fname, dmap, driverdir, rootdir, finaldir):
     shutil.rmtree(floppydir)
 
 
-def archive(nvr, driverdir, finaldir):
-    """
-    zip up the working directory
-    """
-    print 'archiving the results'
-    for fname in os.listdir(driverdir):
-        path = os.path.join(driverdir, fname)
-        if os.path.isdir(path):
-            shutil.copytree(path, os.path.join(finaldir, fname))
-        else:
-            shutil.copy2(path, os.path.join(finaldir, fname))
+def hardlink_identical_files(outdir):
+    print "Hardlinking identical files..."
 
-    # Generate .zip
+    hashmap = {}
+    for root, dirs, files in os.walk(outdir):
+        ignore = dirs
+        for f in files:
+            path = os.path.join(root, f)
+            md5 = hashlib.md5(open(path, 'rb').read()).hexdigest()
+            if md5 not in hashmap:
+                hashmap[md5] = path
+                continue
+
+            # Found a collision
+            os.unlink(path)
+            run(["ln", hashmap[md5], path])
+
+
+def archive(nvr, finaldir):
+    """
+    tar up the working directory
+    """
+
+    # Generate .tar.gz
+    print 'archiving the results'
     archivefile = os.path.join(os.path.dirname(finaldir),
-        "%s-bin-for-rpm.zip" % nvr)
-    run('cd %s && zip -9 -r %s %s' %
+        "%s-bin-for-rpm.tar.gz" % nvr)
+    run('cd %s && tar -czvf %s %s' %
         (os.path.dirname(finaldir), archivefile, nvr), shell=True)
 
     # Copy results to cwd
@@ -228,7 +241,7 @@ def archive(nvr, driverdir, finaldir):
 def get_options():
     description = """
 Package pre-built Windows drivers into a virtual floppy disk and bundle
-it in a ZIP file. Must pass a virtio-win version string, which is used
+it in a tar file. Must pass a virtio-win version string, which is used
 in the output file names, and a directory containing the built drivers.
 
 Example: %(prog)s virtio-win-1.2.3 /path/to/built/drivers
@@ -259,7 +272,9 @@ def main():
     build_vfd(options.nvr + '_amd64.vfd', vfd_dirs_64,
         options.driverdir, rootdir, finaldir)
 
-    archive(options.nvr, options.driverdir, finaldir)
+    run(["cp", "-rp", "%s/." % options.driverdir, finaldir])
+    hardlink_identical_files(finaldir)
+    archive(options.nvr, finaldir)
 
     return 0
 

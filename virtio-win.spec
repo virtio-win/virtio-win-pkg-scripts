@@ -33,7 +33,7 @@ License: GPLv2
 %endif
 
 # Already built files
-Source1: %{name}-%{version}-bin-for-rpm.zip
+Source1: %{name}-%{version}-bin-for-rpm.tar.gz
 Source2: %{qemu_ga_win_build}-installers.zip
 
 # Source files shipped in the srpm
