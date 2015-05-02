@@ -326,7 +326,10 @@ def _build_latest_rpm():
     shellcomm("cd %s && rpmbuild -ba %s" %
         (rpm_dir, os.path.basename(newspecpath)))
 
-    return spec, glob.glob(os.path.join(rpm_dir, "*.rpm"))
+    rpms = []
+    rpms += glob.glob(os.path.join(rpm_dir, "*.rpm"))
+    rpms += glob.glob(os.path.join(rpm_dir, "noarch", "*.rpm"))
+    return spec, rpms
 
 
 def _copy_direct_download_content_to_tree(rpms, newversion, newqemuga):
