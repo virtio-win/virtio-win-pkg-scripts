@@ -491,7 +491,7 @@ def _push_repos():
     print
     if not yes_or_no("Review the --dry-run changes. "
         "Do you want to push? (y/n): "):
-        return
+        sys.exit(1)
 
     _run_rsync(dry=False)
 
