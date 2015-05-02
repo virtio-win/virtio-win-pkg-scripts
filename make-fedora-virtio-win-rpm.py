@@ -533,13 +533,13 @@ def main():
     if do_everything:
         shutil.rmtree(new_builds)
 
-    # Inform user about manual tasks
-    print "\n"
-    print "Don't forget to:"
-    print "- Commit all the spec file changes"
-    print "- If this is a stable build, update the stable_rpms list in"
-    print "  this scripts code and re-run with --repo-only"
-    print
+        print
+        print
+        print "Don't forget to:"
+        print "- Commit all the spec file changes"
+        print "- If this is a stable build, update the stable_rpms list in"
+        print "  this scripts code and re-run with --repo-only"
+        print
 
     return 0
 
