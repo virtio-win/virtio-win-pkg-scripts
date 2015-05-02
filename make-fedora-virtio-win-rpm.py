@@ -259,7 +259,7 @@ def make_virtio_win_rpm_archive(zip_dir, versionstr):
         (script_dir, versionstr, output_dir))
 
 
-def user_edit_clog_content(spec):
+def user_edit_clog_content(spec, virtiowin_clog):
     """
     Launch vim and let the user tweak the changelog if they want
     """
@@ -268,7 +268,7 @@ def user_edit_clog_content(spec):
     tmp.flush()
     tmp.seek(0)
 
-    os.system("vim %s" % tmp.name)
+    os.system("vim -p %s %s" % (virtiowin_clog, tmp.name))
     spec.newclog = tmp.read()
     tmp.close()
 
@@ -300,20 +300,28 @@ def _build_latest_rpm():
         (new_builds, qemu_ga_str, qemu_ga_str, rpm_dir,
          qemu_ga_str, qemu_ga_str, qemu_ga_str))
 
+    # A detailed changelog for virtio-win is listed in the -sources.zip
+    # Pull it out for reference when editing the RPM changelog
+    virtiowin_clog = os.path.join(rpm_dir, "virtio-win-changelog.txt")
+    shellcomm("unzip -p %s/%s-sources.zip "
+        "internal-kvm-guest-drivers-windows/status.txt > %s" %
+        (new_builds, virtio_str, virtiowin_clog))
 
     # Just creating the Spec will queue up all expected changes.
     spec = Spec(virtio_str, qxl_str, qemu_ga_str)
 
     # Confirm with the user that everything looks good
     while True:
+        os.system("clear")
+        user_edit_clog_content(spec, virtiowin_clog)
+        os.system("clear")
+
         print spec.diff()
         print
         if yes_or_no("Use this spec diff? (y/n, 'n' to edit changelog): "):
             break
 
-        os.system("clear")
-        user_edit_clog_content(spec)
-        os.system("clear")
+    os.unlink(virtiowin_clog)
 
     # Save the changes
     spec.write_changes()
