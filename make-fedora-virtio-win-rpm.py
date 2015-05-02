@@ -42,14 +42,12 @@ class Spec(object):
     Helper class for handling all the spec file editing.
     """
 
-    def __init__(self, origpath, newvirtio, newqxl, newqemuga):
-        self.origpath = origpath
-        self._origfullcontent = file(self.origpath).read()
-        self.origcontent, self.clognewcontent = (
-            self._origfullcontent.split("%changelog", 1))
-        self.clognewcontent = "%changelog" + self.clognewcontent
-
-        self.newcontent = self.origcontent
+    def __init__(self, newvirtio, newqxl, newqemuga):
+        self._specpath = os.path.join(script_dir, "virtio-win.spec")
+        self._clogpath = os.path.join(script_dir, "rpm_changelog")
+        self.newcontent = file(self._specpath).read()
+        self.newclog = file(self._clogpath).read()
+        self._origfullcontent = self.get_final_content()
 
         self.newvirtio = newvirtio
         self.newqxl = newqxl
@@ -72,7 +70,7 @@ class Spec(object):
     def _replace_global(self, pkgname, newvalue):
         patternstub = "%%global %s " % pkgname
         origpattern = patternstub + "([\w\.\d-]+)"
-        origvalue = re.findall(origpattern, self.origcontent)[0]
+        origvalue = re.findall(origpattern, self.newcontent)[0]
         self.newcontent = re.sub(origpattern, patternstub + newvalue,
             self.newcontent, count=1)
         return origvalue
@@ -80,8 +78,8 @@ class Spec(object):
     def _set_new_version(self):
         version_pattern = "Version: ([\w\.]+)"
         release_pattern = "Release: ([\w\.]+)"
-        origrelease = re.findall(release_pattern, self.origcontent)[0]
-        origversion = re.findall(version_pattern, self.origcontent)[0]
+        origrelease = re.findall(release_pattern, self.newcontent)[0]
+        origversion = re.findall(version_pattern, self.newcontent)[0]
 
         newversion = origversion
         newrelease = str(int(origrelease) + 1)
@@ -98,9 +96,6 @@ class Spec(object):
             self.newcontent, count=1)
         return newrelease, newversion
 
-    def _get_final_content(self):
-        return self.newcontent + self.clognewcontent
-
     def _set_new_clog(self):
         clog = "* %s %s - %s-%s\n" % (
             datetime.datetime.now().strftime("%a %b %d %Y"),
@@ -114,23 +109,27 @@ class Spec(object):
         if self.origqemuga != self.newqemuga:
             clog += "- Update to %s\n" % self.newqemuga
 
-        self.clognewcontent = re.sub("%changelog", "%%changelog\n%s" % clog,
-            self.clognewcontent).strip() + "\n"
+        self.newclog = re.sub("%changelog", "%%changelog\n%s" % clog,
+            self.newclog).strip() + "\n"
 
 
     ##################
     # Public helpers #
     ##################
 
+    def get_final_content(self):
+        return self.newcontent + self.newclog
+
     def diff(self):
         return "".join(difflib.unified_diff(
             self._origfullcontent.splitlines(1),
-            self._get_final_content().splitlines(1),
+            self.get_final_content().splitlines(1),
             fromfile="Orig spec",
             tofile="New spec"))
 
     def write_changes(self):
-        file(self.origpath, "w").write(self._get_final_content())
+        file(self._specpath, "w").write(self.newcontent)
+        file(self._clogpath, "w").write(self.newclog)
 
 
 #####################
@@ -265,12 +264,12 @@ def user_edit_clog_content(spec):
     Launch vim and let the user tweak the changelog if they want
     """
     tmp = tempfile.NamedTemporaryFile()
-    tmp.write(spec.clognewcontent)
+    tmp.write(spec.newclog)
     tmp.flush()
     tmp.seek(0)
 
     os.system("vim %s" % tmp.name)
-    spec.clognewcontent = tmp.read()
+    spec.newclog = tmp.read()
     tmp.close()
 
 
@@ -303,8 +302,7 @@ def _build_latest_rpm():
 
 
     # Just creating the Spec will queue up all expected changes.
-    spec = Spec(os.path.join(script_dir, "virtio-win.spec"),
-        virtio_str, qxl_str, qemu_ga_str)
+    spec = Spec(virtio_str, qxl_str, qemu_ga_str)
 
     # Confirm with the user that everything looks good
     while True:
@@ -319,8 +317,8 @@ def _build_latest_rpm():
 
     # Save the changes
     spec.write_changes()
-    newspecpath = os.path.join(rpm_dir, os.path.basename(spec.origpath))
-    shutil.copy2(spec.origpath, newspecpath)
+    newspecpath = os.path.join(rpm_dir, "virtio-win.spec")
+    file(newspecpath, "w").write(spec.get_final_content())
 
     # Build the RPM
     shellcomm("cd %s && rpmbuild -ba %s" %

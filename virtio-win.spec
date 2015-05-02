@@ -89,15 +89,3 @@ Windows(R) guests.
 %{_datadir}/%{name}/guest-agent
 
 
-%changelog
-* Sun Apr 26 2015 Cole Robinson <crobinso@redhat.com> - 0.1.102-1
-- Update to virtio-win-prewhql-0.1-102
-
-* Sun Apr 26 2015 Cole Robinson <crobinso@redhat.com> - 0.1.101-1
-- Update to virtio-win-prewhql-0.1-101
-
-* Sun Apr 26 2015 Cole Robinson <crobinso@redhat.com> - 0.1.100-1
-- Update to virtio-win-prewhql-0.1-100
-
-* Sun Apr 26 2015 Cole Robinson <crobinso@redhat.com> - 0.1.96-1
-- Update to virtio-win-prewhql-0.1-96
