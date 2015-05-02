@@ -395,7 +395,10 @@ def _copy_direct_download_content_to_tree(rpms, newversion, newqemuga):
         if not os.path.exists(fullsrc):
             fail("Nonexistent link src %s" % fullsrc)
 
-        shellcomm("ln -sf %s %s" % (src, os.path.join(local_directdir, link)))
+        linkpath = os.path.join(local_directdir, link)
+        if os.path.exists(linkpath):
+            os.unlink(linkpath)
+        shellcomm("ln -s %s %s" % (src, linkpath))
         return make_redirect(http_directdir, link, src)
 
     htaccess = ""
