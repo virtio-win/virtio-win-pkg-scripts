@@ -491,6 +491,8 @@ def parse_args():
         "builds from new_builds, generate the RPM using the public scripts "
         "and drop the output in $CWD.")
 
+    parser.add_argument("--rpm-only", action="store_true",
+        help="Only build RPM and move it to cwd.")
     parser.add_argument("--repo-only", action="store_true",
         help="Only regenerate repo and push changes")
 
@@ -501,16 +503,23 @@ def main():
     options = parse_args()
     ignore = options
 
-    if not options.repo_only:
+    do_everything = (not options.rpm_only and not options.repo_only)
+
+    if options.rpm_only or do_everything:
         spec, rpms = _build_latest_rpm()
-        _copy_direct_download_content_to_tree(rpms,
-                spec.newversion, spec.newqemuga)
-        _copy_rpms_to_local_tree(rpms)
+        if options.rpm_only:
+            shellcomm("mv %s ." %
+                [r for r in rpms if r.endswith("noarch.rpm")][0])
+        else:
+            _copy_direct_download_content_to_tree(rpms,
+                    spec.newversion, spec.newqemuga)
+            _copy_rpms_to_local_tree(rpms)
 
-    _generate_repos()
-    _push_repos()
+    if options.repo_only or do_everything:
+        _generate_repos()
+        _push_repos()
 
-    if not options.repo_only:
+    if do_everything:
         shutil.rmtree(new_builds)
 
     # Inform user about manual tasks
