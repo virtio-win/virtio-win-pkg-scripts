@@ -13,12 +13,12 @@
 %global qemu_ga_win_build qemu-ga-win-7.0-10
 %global qxl_build qxl-win-unsigned-0.1-20
 # qxlwddm is fedora only for now
-%global qxlwddm_build qxlwddm-0.1-01
+%global qxlwddm_build qxlwddm-0.1-11
 
 Summary: VirtIO para-virtualized drivers for Windows(R)
 Name: virtio-win
 Version: 0.1.103
-Release: 1
+Release: 2
 Group: Applications/System
 URL: http://www.redhat.com/
 BuildArch: noarch

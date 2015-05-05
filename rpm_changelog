@@ -1,4 +1,9 @@
 %changelog
+* Tue May 05 2015 Cole Robinson <crobinso@redhat.com> - 0.1.103-2
+- Distribute the pre-release pvpanic driver
+- Distribute the pre-release qxlwddm/qxldod driver
+- Distribute qemupciserial.cat
+
 * Fri May 01 2015 Cole Robinson <crobinso@redhat.com> - 0.1.103-1
 - Update to virtio-win-prewhql-0.1-103
 - BZ 1210166 vioscsi - Add multiqueue support to Windows virtio-scsi driver.
