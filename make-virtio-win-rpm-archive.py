@@ -48,6 +48,12 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 # But now that it's on the floppy I'm not going remove it for fear
 # of breaking things for someone.
 #
+# (Note: apparently extra drivers were added to the vfd a long time ago
+#  to work around a RHEV/Ovirt limitation: they could not add more that
+#  one CDROM to a VM, and one slot was already taken up by the windows
+#  media. No idea if this still applies, but if any additional drivers
+#  are requested for the VFDs, we should get clarification.)
+#
 # Note it's very unlikely that we should ever need to add a new driver
 # to the floppy, given it's limited target.
 vfd_dirs_32 = {
