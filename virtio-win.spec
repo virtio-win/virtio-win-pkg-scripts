@@ -12,6 +12,8 @@
 %global virtio_win_prewhql_build virtio-win-prewhql-0.1-103
 %global qemu_ga_win_build qemu-ga-win-7.0-10
 %global qxl_build qxl-win-unsigned-0.1-20
+# qxlwddm is fedora only for now
+%global qxlwddm_build qxlwddm-0.1-01
 
 Summary: VirtIO para-virtualized drivers for Windows(R)
 Name: virtio-win
@@ -28,6 +30,7 @@ License: Red Hat Proprietary and GPLv2
 %else
 # virtio-win: https://github.com/YanVugenfirer/kvm-guest-drivers-windows/blob/master/LICENSE
 # qxl: http://cgit.freedesktop.org/spice/win32/qxl/tree/xddm/COPYING
+# qxldod: https://github.com/vrozenfe/qxl-dod (no license file yet)
 # qemu-ga: http://git.qemu.org/?p=qemu.git;a=blob;f=COPYING
 License: GPLv2
 %endif
@@ -38,8 +41,11 @@ Source2: %{qemu_ga_win_build}-installers.zip
 
 # Source files shipped in the srpm
 Source3: %{virtio_win_prewhql_build}-sources.zip
-Source4: %{qxl_build}-sources.zip
-Source5: %{qemu_ga_win_build}-sources.zip
+Source4: %{qemu_ga_win_build}-sources.zip
+Source5: %{qxl_build}-sources.zip
+%if 0%{?fedora}
+Source6: %{qxlwddm_build}-sources.zip
+%endif
 
 BuildRequires: /usr/bin/mkisofs
 

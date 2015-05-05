@@ -42,7 +42,7 @@ class Spec(object):
     Helper class for handling all the spec file editing.
     """
 
-    def __init__(self, newvirtio, newqxl, newqemuga):
+    def __init__(self, newvirtio, newqxl, newqemuga, newqxlwddm):
         self._specpath = os.path.join(script_dir, "virtio-win.spec")
         self._clogpath = os.path.join(script_dir, "rpm_changelog")
         self.newcontent = file(self._specpath).read()
@@ -51,11 +51,14 @@ class Spec(object):
 
         self.newvirtio = newvirtio
         self.newqxl = newqxl
+        self.newqxlwddm = newqxlwddm
         self.newqemuga = newqemuga
 
         self.origvirtio = self._replace_global("virtio_win_prewhql_build",
             self.newvirtio)
         self.origqxl = self._replace_global("qxl_build", self.newqxl)
+        self.origqxlwddm = self._replace_global("qxlwddm_build",
+            self.newqxlwddm)
         self.origqemuga = self._replace_global("qemu_ga_win_build",
             self.newqemuga)
 
@@ -106,6 +109,8 @@ class Spec(object):
             clog += "- Update to %s\n" % self.newvirtio
         if self.origqxl != self.newqxl:
             clog += "- Update to %s\n" % self.newqxl
+        if self.origqxlwddm != self.newqxlwddm:
+            clog += "- Update to %s\n" % self.newqxlwddm
         if self.origqemuga != self.newqemuga:
             clog += "- Update to %s\n" % self.newqemuga
 
@@ -284,6 +289,7 @@ def _build_latest_rpm():
     """
     virtio_str = get_package_string("virtio-win-prewhql", new_builds)
     qxl_str = get_package_string("qxl-win-unsigned", new_builds)
+    qxlwddm_str = get_package_string("qxlwddm", new_builds)
     qemu_ga_str = get_package_string("qemu-ga-win", new_builds)
 
     # Call public scripts to generate the virtio .zip
@@ -308,7 +314,7 @@ def _build_latest_rpm():
         (new_builds, virtio_str, virtiowin_clog))
 
     # Just creating the Spec will queue up all expected changes.
-    spec = Spec(virtio_str, qxl_str, qemu_ga_str)
+    spec = Spec(virtio_str, qxl_str, qemu_ga_str, qxlwddm_str)
 
     # Confirm with the user that everything looks good
     while True:
@@ -338,7 +344,8 @@ def _build_latest_rpm():
     return spec, rpms
 
 
-def _copy_direct_download_content_to_tree(rpms, newversion, newqemuga):
+def _copy_direct_download_content_to_tree(rpms,
+        newversion, newrelease, newqemuga):
     """
     Unpack the RPM we just made, copy certain bits like iso, vfd,
     and agents to the direct download portion of the tree.
@@ -364,30 +371,32 @@ def _copy_direct_download_content_to_tree(rpms, newversion, newqemuga):
 
     # Move virtio .iso and .vfds
     virtioversion = "virtio-win-%s" % newversion
-    virtio_basedir = os.path.join("archive-virtio", virtioversion)
+    virtio_basedir = os.path.join("archive-virtio",
+        virtioversion + "-%s" % newrelease)
     virtiodir = os.path.join(local_directdir, virtio_basedir)
-    if not os.path.exists(virtiodir):
-        os.mkdir(virtiodir)
+    if os.path.exists(virtiodir):
+        fail("dir=%s already exists? Make sure we aren't "
+             "overwriting anything.")
 
-        def move_data(versionfile, symlink):
-            shellcomm("mv %s/%s %s" % (sharedir, versionfile, virtiodir))
-            shellcomm("mv %s/%s %s" % (sharedir, symlink, virtiodir))
-            return make_redirect(
-                os.path.join(http_directdir, virtio_basedir),
-                symlink, versionfile)
+    os.mkdir(virtiodir)
+    def move_data(versionfile, symlink):
+        shellcomm("mv %s/%s %s" % (sharedir, versionfile, virtiodir))
+        shellcomm("mv %s/%s %s" % (sharedir, symlink, virtiodir))
+        return make_redirect(
+            os.path.join(http_directdir, virtio_basedir),
+            symlink, versionfile)
 
-        htaccess = ""
-        htaccess += move_data("%s.iso" % virtioversion, "virtio-win.iso")
-        htaccess += move_data("%s_x86.vfd" % virtioversion,
-                              "virtio-win_x86.vfd")
-        htaccess += move_data("%s_amd64.vfd" % virtioversion,
-                              "virtio-win_amd64.vfd")
+    htaccess = ""
+    htaccess += move_data("%s.iso" % virtioversion, "virtio-win.iso")
+    htaccess += move_data("%s_x86.vfd" % virtioversion,
+                          "virtio-win_x86.vfd")
+    htaccess += move_data("%s_amd64.vfd" % virtioversion,
+                          "virtio-win_amd64.vfd")
 
-        # Write .htaccess, redirecting symlinks to versioned files, so
-        # nobody ends up with unversioned files locally, since that
-        # will make for crappy bug reports
-        file(os.path.join(virtiodir, ".htaccess"), "w").write(htaccess)
-
+    # Write .htaccess, redirecting symlinks to versioned files, so
+    # nobody ends up with unversioned files locally, since that
+    # will make for crappy bug reports
+    file(os.path.join(virtiodir, ".htaccess"), "w").write(htaccess)
 
     # Make latest-qemu-ga, latest-virtio, and stable-virtio links
     def add_link(src, link):
@@ -526,7 +535,7 @@ def main():
                 [r for r in rpms if r.endswith("noarch.rpm")][0])
         else:
             _copy_direct_download_content_to_tree(rpms,
-                    spec.newversion, spec.newqemuga)
+                    spec.newversion, spec.newrelease, spec.newqemuga)
             _copy_rpms_to_local_tree(rpms)
 
     if options.repo_only or do_everything:

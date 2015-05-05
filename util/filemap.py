@@ -79,6 +79,14 @@ FILELISTS['qxl'] = [
 ]
 
 
+FILELISTS['qxldod'] = [
+    "qxldod.cat",
+    "qxldod.inf",
+    "qxldod.pdb",
+    "qxldod.sys",
+]
+
+
 _viorngfiles = [
     'viorng.cat',
     'viorng.inf',
@@ -173,6 +181,12 @@ DRIVER_OS_MAP = {
 
         'w7/x86': ['w7/x86'],
         'w7/amd64': ['w7/amd64', '2k8R2/amd64'],
+    },
+
+
+    'qxldod': {
+        "Win8/x86": ["w8/x86", "w8.1/x86"],
+        'Win8/x64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
     },
 
 
