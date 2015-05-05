@@ -117,8 +117,8 @@ def copy_virtio_drivers(input_dir, outdir):
     for drivername in drivers:
         for ostuple in sorted(filemap.DRIVER_OS_MAP[drivername]):
             if ostuple not in alldirs:
-                fail("driver=%s ostuple=%s not found in virtio-win input" %
-                     (drivername, ostuple))
+                fail("driver=%s ostuple=%s not found in input=%s" %
+                     (drivername, ostuple, input_dir))
 
             # We know that the ostuple dir contains bits for this driver,
             # figure out what files we want to copy.
@@ -220,7 +220,7 @@ def check_remaining_files(input_dir, seenfiles):
 
     if notseen:
         msg = ("\nUnhandled virtio-win files:\n    %s\n\n" %
-                "\n    ".join(sorted(notseen)))
+                "\n    ".join([f[len(input_dir):] for f in sorted(notseen)]))
         msg += textwrap.fill("This means the above files were not tracked "
             "in filemap.py _and_ not tracked in the internal whitelist "
             "in this script. This probably means that there is new build "
@@ -272,6 +272,8 @@ def main():
         os.mkdir(outdir)
     if os.listdir(outdir):
         fail("%s is not empty." % outdir)
+
+    options.input_dir = os.path.abspath(os.path.expanduser(options.input_dir))
 
     # Actually move the files
     seenfiles = []
