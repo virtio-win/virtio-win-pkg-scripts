@@ -161,11 +161,6 @@ def check_remaining_files(input_dir, seenfiles):
         ".*DVL\.XML",
         ".*vioser-test.*",
 
-        # pvpanic is a new driver that appeared in build -103. We will
-        # ship it eventually, but devs have asked us to hold off until
-        # it's had some QE time.
-        ".*/.*/.*/pvpanic.*",
-
         # virtio-win build system unconditionally builds every driver
         # for every windows platform that supports it. However, depending
         # on the driver, functionally identical binaries might be

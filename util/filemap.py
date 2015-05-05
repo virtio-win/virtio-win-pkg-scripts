@@ -63,6 +63,14 @@ FILELISTS['NetKVM'] = FILELISTS['NetKVM:xp'][:] + ["netkvmco.dll",
     "readme.doc"]
 
 
+FILELISTS['pvpanic'] = [
+    "pvpanic.cat",
+    "pvpanic.inf",
+    "pvpanic.pdb",
+    "pvpanic.sys",
+]
+
+
 FILELISTS['qxl'] = [
     "qxl.cat",
     "qxl.inf",
@@ -142,6 +150,18 @@ DRIVER_OS_MAP = {
 
         'win7/x86': ['w7/x86'],
         'win7/amd64': ['2k8R2/amd64', 'w7/amd64'],
+
+        'win8/x86': ['w8/x86', 'w8.1/x86'],
+        'win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+    },
+
+
+    'pvpanic': {
+        'Wlh/x86': ['2k8/x86'],
+        'Wlh/amd64': ['2k8/amd64'],
+
+        'win7/x86': ['w7/x86'],
+        'win7/amd64': ['w7/amd64', '2k8R2/amd64'],
 
         'win8/x86': ['w8/x86', 'w8.1/x86'],
         'win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
