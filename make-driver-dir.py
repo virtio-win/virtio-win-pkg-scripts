@@ -64,6 +64,7 @@ def copy_pciserial(input_dir, outdir):
 
     seenfiles = [
         os.path.join(input_dir, "qemupciserial.inf"),
+        os.path.join(input_dir, "qemupciserial.cat"),
     ]
 
     for f in seenfiles:
@@ -156,7 +157,6 @@ def check_remaining_files(input_dir, seenfiles):
     whitelist = [
         # vadim confirmed these files should _not_ be shipped
         # (private mail May 2015)
-        ".*qemupciserial.cat",
         ".*NetKVMTemporaryCert\.cer",
         ".*DVL\.XML",
         ".*vioser-test.*",
