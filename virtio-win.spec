@@ -30,7 +30,7 @@ License: Red Hat Proprietary and GPLv2
 %else
 # virtio-win: https://github.com/YanVugenfirer/kvm-guest-drivers-windows/blob/master/LICENSE
 # qxl: http://cgit.freedesktop.org/spice/win32/qxl/tree/xddm/COPYING
-# qxldod: https://github.com/vrozenfe/qxl-dod (no license file yet)
+# qxldod: https://github.com/vrozenfe/qxl-dod/blob/master/LICENSE
 # qemu-ga: http://git.qemu.org/?p=qemu.git;a=blob;f=COPYING
 License: GPLv2
 %endif
