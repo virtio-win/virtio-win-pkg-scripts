@@ -1,4 +1,9 @@
 %changelog
+* Thu Jun 04 2015 Cole Robinson <crobinso@redhat.com> - 0.1.105-1
+- Update to virtio-win-prewhql-0.1-105
+- BZ 1223426 NetKVM Fix for performance degradation with multi-queue
+- BZ 1227164 viostor/vioscsi is not digital signed by Redhat
+
 * Mon May 25 2015 Cole Robinson <crobinso@redhat.com> - 0.1.104-1
 - Update to virtio-win-prewhql-0.1-104
 - BZ 1214568 vioscsi Add WMI facility to check the virito-scsi mq enabled
