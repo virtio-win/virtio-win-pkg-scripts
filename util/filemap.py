@@ -63,12 +63,16 @@ FILELISTS['NetKVM'] = FILELISTS['NetKVM:xp'][:] + ["netkvmco.dll",
     "readme.doc"]
 
 
-FILELISTS['pvpanic'] = [
+_pvpanicfiles = [
     "pvpanic.cat",
     "pvpanic.inf",
     "pvpanic.pdb",
     "pvpanic.sys",
 ]
+FILELISTS['pvpanic'] = _pvpanicfiles + ['WdfCoInstaller01011.dll']
+FILELISTS['pvpanic:w7'] = _pvpanicfiles + ['WdfCoInstaller01009.dll']
+FILELISTS['pvpanic:2k8'] = FILELISTS['pvpanic:w7']
+FILELISTS['pvpanic:2k8R2'] = FILELISTS['pvpanic:w7']
 
 
 FILELISTS['qxl'] = [
