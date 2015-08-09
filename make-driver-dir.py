@@ -161,6 +161,21 @@ def check_remaining_files(input_dir, seenfiles):
         ".*DVL\.XML",
         ".*vioser-test.*",
 
+        # These are files that are needed for the build process. They
+        # were added to the prewhql sources in July 2015.
+        # See: https://bugzilla.redhat.com/show_bug.cgi?id=1217799
+        #
+        # However we still need to rework this script to use those files,
+        # rather than grab licenses from http, and carry local vfd copies.
+        # It might take some coordination with the internal RHEL process
+        # though.
+        # Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1251770
+        ".*/COPYING",
+        ".*/LICENSE",
+        ".*/disk1",
+        ".*/txtsetup-i386.oem",
+        ".*/txtsetup-amd64.oem",
+
         # virtio-win build system unconditionally builds every driver
         # for every windows platform that supports it. However, depending
         # on the driver, functionally identical binaries might be
