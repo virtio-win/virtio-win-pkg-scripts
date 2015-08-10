@@ -1,4 +1,8 @@
 %changelog
+* Mon Aug 10 2015 Cole Robinson <crobinso@redhat.com> - 0.1.109-1
+- Update to virtio-win-prewhql-0.1-109
+- Bz 1250854 [vioscsi]The job named crash dump failed on windows 2008 -32/64 platform
+
 * Sun Aug 09 2015 Cole Robinson <crobinso@redhat.com> - 0.1.108-1
 - Update to virtio-win-prewhql-0.1-108
 - BZ 1183423#c10 Change the copyright on all the Windows drivers to "2015" in virtio-win-prewhql build
