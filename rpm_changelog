@@ -1,4 +1,7 @@
 %changelog
+* Sun Aug 30 2015 Cole Robinson <crobinso@redhat.com> - 0.1.109-2
+- Update to qemu-ga-win-7.2.1-1
+
 * Mon Aug 10 2015 Cole Robinson <crobinso@redhat.com> - 0.1.109-1
 - Update to virtio-win-prewhql-0.1-109
 - Bz 1250854 [vioscsi]The job named crash dump failed on windows 2008 -32/64 platform
