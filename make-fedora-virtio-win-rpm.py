@@ -439,7 +439,7 @@ def _copy_rpms_to_local_tree(rpms):
 
 def _generate_repos():
     """
-    Create repo trees, run createrepo
+    Create repo trees, run createrepo_c
     """
     # Generate stable symlinks
     shellcomm("rm -rf %s/*" % os.path.join(local_repodir, "stable"))
@@ -464,7 +464,7 @@ def _generate_repos():
     for rpmdir in ["latest", "stable", "srpms"]:
         shellcomm("rm -rf %s" %
             os.path.join(local_repodir, rpmdir, "repodata"))
-        shellcomm("createrepo %s > /dev/null" %
+        shellcomm("createrepo_c %s > /dev/null" %
             os.path.join(local_repodir, rpmdir))
 
     # Put the repo file in place
