@@ -1,4 +1,9 @@
 %changelog
+* Tue Sep 22 2015 Cole Robinson <crobinso@redhat.com> - 0.1.110-1
+- Update to virtio-win-prewhql-0.1-110
+- BZ 1223426 NetKVM Fix for performance degradation with multi-queue
+- BZ 1227164 viostor/vioscsi is not digital signed by Redhat
+
 * Sun Aug 30 2015 Cole Robinson <crobinso@redhat.com> - 0.1.109-2
 - Update to qemu-ga-win-7.2.1-1
 
