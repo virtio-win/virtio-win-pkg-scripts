@@ -170,11 +170,14 @@ def check_remaining_files(input_dir, seenfiles):
         # It might take some coordination with the internal RHEL process
         # though.
         # Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1251770
-        ".*/COPYING",
-        ".*/LICENSE",
-        ".*/disk1",
-        ".*/txtsetup-i386.oem",
-        ".*/txtsetup-amd64.oem",
+        #
+        # XXX however the -110 build on Sep 21 2015 dropped these files
+        # again, probably an oversight
+        #".*/COPYING",
+        #".*/LICENSE",
+        #".*/disk1",
+        #".*/txtsetup-i386.oem",
+        #".*/txtsetup-amd64.oem",
 
         # virtio-win build system unconditionally builds every driver
         # for every windows platform that supports it. However, depending
