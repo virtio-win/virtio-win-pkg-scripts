@@ -527,6 +527,7 @@ def main():
     options = parse_args()
     ignore = options
 
+    os.chdir(script_dir)
     do_everything = (not options.rpm_only and not options.repo_only)
 
     if options.rpm_only or do_everything:
