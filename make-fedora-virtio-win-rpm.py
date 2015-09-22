@@ -29,7 +29,7 @@ hosteduser = os.environ.get("FAS_USERNAME", None) or getpass.getuser()
 
 # List of stable versions. Keep the newest version first.
 stable_rpms = [
-    "0.1.102-1", # RHEL6.7 version
+    "0.1.102-1",  # RHEL6.7 version
     "0.1.96-1",  # RHEL7.1 version
 ]
 
