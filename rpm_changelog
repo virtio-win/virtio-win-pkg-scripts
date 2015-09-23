@@ -1,4 +1,7 @@
 %changelog
+* Wed Sep 23 2015 Cole Robinson <crobinso@redhat.com> - 0.1.110-2
+- Update to qxl-win-unsigned-0.1-24
+
 * Tue Sep 22 2015 Cole Robinson <crobinso@redhat.com> - 0.1.110-1
 - Update to virtio-win-prewhql-0.1-110
 - BZ 1223426 NetKVM Fix for performance degradation with multi-queue
