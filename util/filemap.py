@@ -29,8 +29,8 @@ SUPPORTED_PLATFORM_DIGITAL_SIG = {
     'w8.1/amd64' : 'v.6.3._.X.6.4',
     '2k12/amd64' : 'S.e.r.v.e.r.2.0.1.2.X.6.4',
     '2k12R2/amd64' : 'v.6.3._.S.e.r.v.e.r._.X.6.4',
-    'w10/x86' : 'v.1.0.0._.X.6.4',
-    'w10/amd64' : 'v.1.0.0.\0'
+    'w10/amd64' : 'v.1.0.0._.X.6.4',
+    'w10/x86' : 'v.1.0.0.\0'
 }
 
 # This is used to map the driver name to the name of the
