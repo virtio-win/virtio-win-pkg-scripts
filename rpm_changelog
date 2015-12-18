@@ -1,4 +1,10 @@
 %changelog
+* Fri Dec 18 2015 Cole Robinson <crobinso@redhat.com> - 0.1.112-1
+- Update to virtio-win-prewhql-0.1-112
+- BZ 1284769: [viostor] Windows XP installer stucks installing with virtio-drivers
+- BZ 1245957: [viostor] [WHQL][viostor][data-plane]it could not generate dump file on WIN2008-32/64 via WLK while running Crash Dump job
+- BZ 1289406: [vioser] Cannot install vioser driver successfully
+
 * Wed Sep 23 2015 Cole Robinson <crobinso@redhat.com> - 0.1.110-2
 - Update to qxl-win-unsigned-0.1-24
 
