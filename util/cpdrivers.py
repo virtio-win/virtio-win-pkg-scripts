@@ -13,15 +13,17 @@ The suitability is based on the info extracted from the .cat file, so
 re-signing affects that as expected.
 """
 
-import os
-import sys
-import hashlib
-import struct
-import mmap
-import shutil
 import argparse
-from itertools import chain
-from parsecat import parseCat
+import hashlib
+import itertools
+import mmap
+import os
+import shutil
+import struct
+import sys
+
+import parsecat  # pylint: disable=relative-import
+
 
 osMap = {
     'XPX86':                ((5, 1),    'x86',  'xp'),
@@ -95,13 +97,14 @@ def casedFname(dname, fname):
 
 
 def maxTimestamp(attributes):
-    return max(chain(attributes['signingTimes'], [attributes['timestamp']]))
+    return max(itertools.chain(attributes['signingTimes'],
+                               [attributes['timestamp']]))
 
 
 def processCat(dname, catname):
     catname = casedFname(dname, catname)
 
-    attributes, members = parseCat(os.path.join(dname, catname))
+    attributes, members = parsecat.parseCat(os.path.join(dname, catname))
     oses = attributes['OS'].split(',')
 
     # validate catalog members just because we can
@@ -172,7 +175,7 @@ def cpRecursive(src, dst):
 def isCatNewer(catfile, timestamp):
     if not os.path.exists(catfile):
         return False
-    attributes, ignore = parseCat(catfile)
+    attributes, ignore = parsecat.parseCat(catfile)
     return maxTimestamp(attributes) > timestamp
 
 
@@ -232,7 +235,8 @@ def main():
     args = parser.parse_args()
 
     copyDrivers(args.srcroot, args.dstroot, args.mode, args.dry_run)
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

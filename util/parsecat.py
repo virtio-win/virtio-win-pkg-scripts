@@ -8,14 +8,14 @@
 Parse relevant items in the ASN.1 structure of a Windows driver catalog file
 """
 
+import datetime
+import itertools
+import pprint
 import sys
-from pprint import pprint
-from itertools import chain
-from datetime import datetime
+
 from pyasn1_modules import rfc2315
-from pyasn1.type import tag, namedtype, namedval, univ, char, useful
+from pyasn1.type import tag, namedtype, univ, char, useful
 from pyasn1.codec.der.decoder import decode
-from pyasn1 import debug
 
 
 # rfc2315 allowed only two certificate types here; later versions of CMS
@@ -212,11 +212,11 @@ def parseNameValueObj(nameValue):
 
 
 def parseUTCTime(utcTime):
-    return datetime.strptime(str(utcTime), '%y%m%d%H%M%SZ')
+    return datetime.datetime.strptime(str(utcTime), '%y%m%d%H%M%SZ')
 
 
 def parseGeneralizedTime(genTime):
-    return datetime.strptime(str(genTime), '%Y%m%d%H%M%S.%fZ')
+    return datetime.datetime.strptime(str(genTime), '%Y%m%d%H%M%S.%fZ')
 
 
 def parseTimeChoice(timeChoice):
@@ -282,10 +282,10 @@ def parseCat(fname):
     attributes = dict(parseNameValueObj(attr) for attr in ctl['attributes'])
 
     attributes['timestamp'] = parseUTCTime(ctl['utcTime'])
-    attributes['signingTimes'] = list(chain.from_iterable(
+    attributes['signingTimes'] = list(itertools.chain.from_iterable(
         getSigningTimes(si) for si in content['signerInfos']))
 
     return attributes, members
 
 if __name__ == "__main__":
-    pprint(parseCat(sys.argv[1]))
+    pprint.pprint(parseCat(sys.argv[1]))
