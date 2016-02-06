@@ -172,7 +172,7 @@ def cpRecursive(src, dst):
 def isCatNewer(catfile, timestamp):
     if not os.path.exists(catfile):
         return False
-    attributes, _ = parseCat(catfile)
+    attributes, ignore = parseCat(catfile)
     return maxTimestamp(attributes) > timestamp
 
 
