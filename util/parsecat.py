@@ -223,7 +223,7 @@ def parseTimeChoice(timeChoice):
     utcTime = timeChoice['utcTime']
     if utcTime:
         return parseUTCTime(utcTime)
-    return parseGeneralizedTime(signingTime['genTime'])
+    return parseGeneralizedTime(timeChoice['genTime'])
 
 
 def getSigningTimeAuthenticode(data):
