@@ -242,7 +242,7 @@ def getSigningTimeRFC3161(data):
     content = parsePKCS7SignedData(data)
     contentInfo = content['contentInfo']
     contentType = contentInfo['contentType']
-    assert (contentInfo['contentType'] ==
+    assert (contentType ==
             univ.ObjectIdentifier('1.2.840.113549.1.9.16.1.4'))
     ostr, ignore = decode(contentInfo['content'], asn1Spec=univ.OctetString())
     tSTInfo, ignore = decode(ostr, asn1Spec=TSTInfo())

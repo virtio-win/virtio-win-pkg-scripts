@@ -200,17 +200,18 @@ modes = {
 }
 
 
-def updateMode(mode, dry_run):
+def updateMode(climode, clidry):
     global cpTree
     global cp
-    cpTree, cp = modes[mode]
+    cpTree, cp = modes[climode]
     global dryrun
-    dryrun = dry_run
+    dryrun = clidry
 
 
-def copyDrivers(srcroot, dstroot, mode, dryrun):
-    updateMode(mode, dryrun)
+def copyDrivers(srcroot, dstroot, climode, clidry):
+    updateMode(climode, clidry)
     for root, dirs, files in os.walk(srcroot):
+        ignore = dirs
         for f in files:
             fn, fe = os.path.splitext(f)
             if fe.lower() == ".inf":
