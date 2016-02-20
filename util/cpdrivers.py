@@ -65,6 +65,8 @@ def calcPEHash(data, hashobj):
         0x20b: 168     # PE32+
         }[pemagic]
     sec, seclen = struct.unpack_from("2I", data, secdir)
+    if sec == 0:
+        sec = len(data)
     # signature is always the tail part
     assert sec + seclen == len(data)
 
