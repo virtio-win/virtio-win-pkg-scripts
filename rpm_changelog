@@ -1,4 +1,12 @@
 %changelog
+* Mon Feb 29 2016 Cole Robinson <crobinso@redhat.com> - 0.1.113-1
+- Update to virtio-win-prewhql-0.1-113
+- Put win10 drivers on the .vfd images
+- BZ 1303510: [virtio-win] Change the copyright on all the Windows drivers to "2016" in virtio-win-prewhql build
+- BZ 1122364: [vioserial] Complete pending write request on port removal
+- BZ 1296099: [vioserial] Fix race in read cancellation logic
+- BZ 1293249: [vioserial] Fix IOCTL_GET_INFORMATION,
+
 * Fri Dec 18 2015 Cole Robinson <crobinso@redhat.com> - 0.1.112-1
 - Update to virtio-win-prewhql-0.1-112
 - BZ 1284769: [viostor] Windows XP installer stucks installing with virtio-drivers
