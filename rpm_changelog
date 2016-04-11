@@ -1,4 +1,11 @@
 %changelog
+* Sun Apr 10 2016 Cole Robinson <crobinso@redhat.com> - 0.1.117-1
+- Update to virtio-win-prewhql-0.1-117
+- Bug 1321903 [vioscsi]  Windows 10 Installer stuck at Getting files ready for installation with Virtio SCSI
+- Trying out the new build system.
+- vioserial - code rework and cleanup
+- general - switching signing back to SHA-1
+
 * Mon Feb 29 2016 Cole Robinson <crobinso@redhat.com> - 0.1.113-1
 - Update to virtio-win-prewhql-0.1-113
 - Put win10 drivers on the .vfd images
