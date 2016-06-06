@@ -1,4 +1,11 @@
 %changelog
+* Mon Jun 06 2016 Cole Robinson <crobinso@redhat.com> - 0.1.118-1
+- Update to virtio-win-prewhql-0.1-118
+- BZ#1293249: Fix IOCTL_GET_INFORMATION regression
+- Enable RSC
+- Fix IPv6 offload support with SLIRP
+- Fix MPE HCK test problems
+
 * Sun Apr 10 2016 Cole Robinson <crobinso@redhat.com> - 0.1.117-1
 - Update to virtio-win-prewhql-0.1-117
 - Bug 1321903 [vioscsi]  Windows 10 Installer stuck at Getting files ready for installation with Virtio SCSI
