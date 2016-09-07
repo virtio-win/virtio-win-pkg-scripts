@@ -60,6 +60,8 @@ FILELISTS['Balloon:2k3'] = FILELISTS['Balloon:xp']
 FILELISTS['Balloon:2k8'] = FILELISTS['Balloon:xp']
 FILELISTS['Balloon:2k8R2'] = FILELISTS['Balloon:xp']
 FILELISTS['Balloon:w7'] = FILELISTS['Balloon:xp']
+FILELISTS['Balloon:w10'] = _balloonfiles
+FILELISTS['Balloon:2k16'] = FILELISTS['Balloon:w10']
 
 
 FILELISTS['NetKVM:xp'] = [
@@ -83,6 +85,8 @@ FILELISTS['pvpanic'] = _pvpanicfiles + ['WdfCoInstaller01011.dll']
 FILELISTS['pvpanic:w7'] = _pvpanicfiles + ['WdfCoInstaller01009.dll']
 FILELISTS['pvpanic:2k8'] = FILELISTS['pvpanic:w7']
 FILELISTS['pvpanic:2k8R2'] = FILELISTS['pvpanic:w7']
+FILELISTS['pvpanic:w10'] = _pvpanicfiles
+FILELISTS['pvpanic:2k16'] = FILELISTS['pvpanic:w10']
 
 
 FILELISTS['qxl'] = [
@@ -115,6 +119,8 @@ FILELISTS['viorng:2k3'] = FILELISTS['viorng:xp']
 FILELISTS['viorng:2k8R2'] = FILELISTS['viorng:xp']
 FILELISTS['viorng:2k8'] = FILELISTS['viorng:xp']
 FILELISTS['viorng:w7'] = FILELISTS['viorng:xp']
+FILELISTS['viorng:w10'] = _viorngfiles
+FILELISTS['viorng:2k16'] = FILELISTS['viorng:w10']
 
 
 FILELISTS['vioscsi'] = [
@@ -137,6 +143,8 @@ FILELISTS['vioserial:2k3'] = FILELISTS['vioserial:xp']
 FILELISTS['vioserial:2k8'] = FILELISTS['vioserial:xp']
 FILELISTS['vioserial:2k8R2'] = FILELISTS['vioserial:xp']
 FILELISTS['vioserial:w7'] = FILELISTS['vioserial:xp']
+FILELISTS['vioserial:w10'] = _vioserialfiles
+FILELISTS['vioserial:2k16'] = FILELISTS['vioserial:w10']
 
 
 FILELISTS['viostor'] = [
