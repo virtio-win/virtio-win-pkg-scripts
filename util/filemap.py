@@ -154,13 +154,21 @@ FILELISTS['viostor'] = [
 #        output-dir/2k3/x86
 DRIVER_OS_MAP = {
     'Balloon': {
-        'WXp/x86': ['xp/x86', '2k3/x86', '2k8/x86', 'w7/x86'],
+        'WXp/x86': ['xp/x86', '2k3/x86'],
 
-        'Wnet/amd64': ['2k3/amd64', '2k8/amd64', '2k8R2/amd64', 'w7/amd64'],
+        'Wnet/amd64': ['2k3/amd64'],
 
-        'win8/x86': ['w8/x86', 'w8.1/x86', 'w10/x86'],
-        'win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64',
-                       'w10/amd64'],
+        'Wlh/x86': ['2k8/x86'],
+        'Wlh/amd64': ['2k8/amd64'],
+
+        'win7/x86': ['w7/x86'],
+        'win7/amd64': ['w7/amd64', '2k8R2/amd64'],
+
+        'win8/x86': ['w8/x86', 'w8.1/x86'],
+        'win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+
+        'win10/x86': ['w10/x86'],
+        'win10/amd64': ['w10/amd64', '2k16/amd64'],
     },
 
 
@@ -174,9 +182,11 @@ DRIVER_OS_MAP = {
         'win7/x86': ['w7/x86'],
         'win7/amd64': ['2k8R2/amd64', 'w7/amd64'],
 
-        'win8/x86': ['w8/x86', 'w8.1/x86', 'w10/x86'],
-        'win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64',
-                       'w10/amd64'],
+        'win8/x86': ['w8/x86', 'w8.1/x86'],
+        'win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+
+        'win10/x86': ['w10/x86'],
+        'win10/amd64': ['w10/amd64', '2k16/amd64'],
     },
 
 
@@ -187,9 +197,11 @@ DRIVER_OS_MAP = {
         'win7/x86': ['w7/x86'],
         'win7/amd64': ['w7/amd64', '2k8R2/amd64'],
 
-        'win8/x86': ['w8/x86', 'w8.1/x86', 'w10/x86'],
-        'win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64',
-                       'w10/amd64'],
+        'win8/x86': ['w8/x86', 'w8.1/x86'],
+        'win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+
+        'win10/x86': ['w10/x86'],
+        'win10/amd64': ['w10/amd64', '2k16/amd64'],
     },
 
 
@@ -215,30 +227,45 @@ DRIVER_OS_MAP = {
         'win7/x86': ['w7/x86'],
         'win7/amd64': ['w7/amd64', '2k8R2/amd64'],
 
-        'win8/x86': ['w8/x86', 'w8.1/x86', 'w10/x86'],
-        'win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64',
-                       'w10/amd64'],
+        'win8/x86': ['w8/x86', 'w8.1/x86'],
+        'win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+
+        'win10/x86': ['w10/x86'],
+        'win10/amd64': ['w10/amd64', '2k16/amd64'],
     },
 
 
     'vioscsi': {
-        'Wlh/x86': ['2k8/x86', 'w7/x86'],
-        'Wlh/amd64': ['2k8/amd64', '2k8R2/amd64', 'w7/amd64'],
+        'Wlh/x86': ['2k8/x86'],
+        'Wlh/amd64': ['2k8/amd64'],
 
-        'win8/x86': ['w8/x86', 'w8.1/x86', 'w10/x86'],
-        'win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64',
-                       'w10/amd64'],
+        'win7/x86': ['w7/x86'],
+        'win7/amd64': ['w7/amd64', '2k8R2/amd64'],
+
+        'win8/x86': ['w8/x86', 'w8.1/x86'],
+        'win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+
+        'win10/x86': ['w10/x86'],
+        'win10/amd64': ['w10/amd64', '2k16/amd64'],
     },
 
 
     'vioserial': {
-        'WXp/x86': ['xp/x86', '2k3/x86', '2k8/x86', 'w7/x86'],
+        'WXp/x86': ['xp/x86', '2k3/x86'],
 
-        'Wnet/amd64': ['2k3/amd64', '2k8/amd64', '2k8R2/amd64', 'w7/amd64'],
+        'Wnet/amd64': ['2k3/amd64'],
 
-        'win8/x86': ['w8/x86', 'w8.1/x86', 'w10/x86'],
-        'win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64',
-                       'w10/amd64'],
+        'Wlh/x86': ['2k8/x86'],
+        'Wlh/amd64': ['2k8/amd64'],
+
+        'win7/x86': ['w7/x86'],
+        'win7/amd64': ['w7/amd64', '2k8R2/amd64'],
+
+        'win8/x86': ['w8/x86', 'w8.1/x86'],
+        'win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+
+        'win10/x86': ['w10/x86'],
+        'win10/amd64': ['w10/amd64', '2k16/amd64'],
     },
 
 
@@ -248,11 +275,16 @@ DRIVER_OS_MAP = {
         'Wnet/x86': ['2k3/x86'],
         'Wnet/amd64': ['2k3/amd64'],
 
-        'Wlh/x86': ['2k8/x86', 'w7/x86'],
-        'Wlh/amd64': ['2k8/amd64', '2k8R2/amd64', 'w7/amd64'],
+        'Wlh/x86': ['2k8/x86'],
+        'Wlh/amd64': ['2k8/amd64'],
 
-        'win8/x86': ['w8/x86', 'w8.1/x86', 'w10/x86'],
-        'win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64',
-                       'w10/amd64'],
+        'win7/x86': ['w7/x86'],
+        'win7/amd64': ['w7/amd64', '2k8R2/amd64'],
+
+        'win8/x86': ['w8/x86', 'w8.1/x86'],
+        'win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+
+        'win10/x86': ['w10/x86'],
+        'win10/amd64': ['w10/amd64', '2k16/amd64'],
     },
 }
