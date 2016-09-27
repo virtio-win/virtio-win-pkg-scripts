@@ -81,6 +81,7 @@ vfd_dirs_32 = {
 }
 
 vfd_dirs_64 = {
+    'viostor/2k16/amd64' : 'amd64/Win2016',
     'viostor/w10/amd64' : 'amd64/Win10',
     'viostor/2k12/amd64': 'amd64/Win2012',
     'viostor/2k12R2/amd64': 'amd64/Win2012R2',
@@ -90,6 +91,7 @@ vfd_dirs_64 = {
     'viostor/2k8/amd64' : 'amd64/Win2008',
     'viostor/2k8R2/amd64' : 'amd64/Win2008R2',
     'viostor/2k3/amd64' : 'amd64/Win2003',
+    'vioscsi/2k16/amd64' : 'amd64/Win2016',
     'vioscsi/w10/amd64' : 'amd64/Win10',
     'vioscsi/2k12/amd64': 'amd64/Win2012',
     'vioscsi/2k12R2/amd64': 'amd64/Win2012R2',
@@ -100,6 +102,7 @@ vfd_dirs_64 = {
     'vioscsi/2k8R2/amd64' : 'amd64/Win2008R2',
     'qxl/w7/amd64'      : 'amd64/Win7',
     'qxl/2k8R2/amd64'   : 'amd64/Win2008R2',
+    'NetKVM/2k16/amd64' : 'amd64/Win2016',
     'NetKVM/w10/amd64'  : 'amd64/Win10',
     'NetKVM/2k12/amd64' : 'amd64/Win2012',
     'NetKVM/2k12R2/amd64' : 'amd64/Win2012R2',
