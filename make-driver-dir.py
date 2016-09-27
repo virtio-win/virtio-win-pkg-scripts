@@ -157,7 +157,6 @@ def check_remaining_files(input_dir, seenfiles):
     whitelist = [
         # vadim confirmed these files should _not_ be shipped
         # (private mail May 2015)
-        ".*NetKVMTemporaryCert\.cer",
         ".*DVL\.XML",
         ".*vioser-test.*",
 
@@ -192,24 +191,8 @@ def check_remaining_files(input_dir, seenfiles):
         # If you add to this list, be sure it's not a newly introduced
         # driver that you are ignoring! Everything listed here needs
         # be covered by a mapping in DRIVER_OS_MAP
-        ".*/win7/x86/balloon.*", ".*/win7/x86/blnsvr.*",
-        ".*/win7/x86/viostor.*",
-        ".*/win7/x86/vioscsi.*",
-        ".*/win7/x86/vioser.*",
-
-        ".*/win7/amd64/balloon.*", ".*/win7/amd64/blnsvr.*",
-        ".*/win7/amd64/viostor.*",
-        ".*/win7/amd64/vioscsi.*",
-        ".*/win7/amd64/vioser.*",
-
         ".*/Wnet/x86/balloon.*", ".*/Wnet/x86/blnsvr.*",
         ".*/Wnet/x86/vioser.*", ".*/Wnet/x86/WdfCoInstaller01009.dll",
-
-        ".*/Wlh/x86/balloon.*", ".*/Wlh/x86/blnsvr.*",
-        ".*/Wlh/x86/vioser.*",
-
-        ".*/Wlh/amd64/balloon.*", ".*/Wlh/amd64/blnsvr.*",
-        ".*/Wlh/amd64/vioser.*",
     ]
 
     remaining = []
