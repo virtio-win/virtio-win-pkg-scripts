@@ -1,4 +1,16 @@
 %changelog
+* Tue Sep 27 2016 Cole Robinson <crobinso@redhat.com> - 0.1.126-1
+- Update to virtio-win-prewhql-0.1-126
+- Add virtio-input drivers
+- NetKVM fix SDV problems
+- Debug targets
+- Enable RSC in INF file
+- Enable dynamic RSC offload based on QEMU implementation
+- Use new RSC information fields in virtio_net_hdr_v1
+- Add RSC related definitions based on virtio 1.0 spec to virtio_net.h
+- Sync with Win10 branch
+- Many bug fixes
+
 * Thu Jun 16 2016 Cole Robinson <crobinso@redhat.com> - 0.1.118-2
 - Update to qemu-ga-win-7.3.2-1
 
