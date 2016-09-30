@@ -379,7 +379,7 @@ def _copy_direct_download_content_to_tree(rpms,
     virtiodir = os.path.join(local_directdir, virtio_basedir)
     if os.path.exists(virtiodir):
         fail("dir=%s already exists? Make sure we aren't "
-             "overwriting anything.")
+             "overwriting anything." % virtiodir)
 
     os.mkdir(virtiodir)
     def move_data(versionfile, symlink):
@@ -404,12 +404,13 @@ def _copy_direct_download_content_to_tree(rpms,
     # Make latest-qemu-ga, latest-virtio, and stable-virtio links
     def add_link(src, link):
         fullsrc = os.path.join(local_directdir, src)
-        if not os.path.exists(fullsrc):
-            fail("Nonexistent link src %s" % fullsrc)
-
         linkpath = os.path.join(local_directdir, link)
+
+        if not os.path.exists(fullsrc):
+            fail("Nonexistent link src=%s for target=%s" % (fullsrc, linkpath))
         if os.path.exists(linkpath):
             os.unlink(linkpath)
+
         shellcomm("ln -s %s %s" % (src, linkpath))
         return make_redirect(http_directdir, link, src)
 
@@ -417,7 +418,7 @@ def _copy_direct_download_content_to_tree(rpms,
     htaccess += add_link(qemuga_basedir, "latest-qemu-ga")
     htaccess += add_link(virtio_basedir, "latest-virtio")
     htaccess += add_link(
-        "archive-virtio/virtio-win-%s" % stable_rpms[0].rsplit("-")[0],
+        "archive-virtio/virtio-win-%s" % stable_rpms[0],
         "stable-virtio")
     file(os.path.join(local_directdir, ".htaccess"), "w").write(htaccess)
 
