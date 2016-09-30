@@ -1,4 +1,7 @@
 %changelog
+* Fri Sep 30 2016 Cole Robinson <crobinso@redhat.com> - 0.1.126-2
+- Ship .dll files for vioinput driver
+
 * Tue Sep 27 2016 Cole Robinson <crobinso@redhat.com> - 0.1.126-1
 - Update to virtio-win-prewhql-0.1-126
 - Add virtio-input drivers
