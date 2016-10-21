@@ -196,11 +196,12 @@ DRIVER_OS_MAP = {
 
 
     'NetKVM': {
-        'XP/x86': ['xp/x86', '2k3/x86'],
-        'XP/amd64': ['2k3/amd64'],
+        'Wxp/x86': ['xp/x86', '2k3/x86'],
 
-        'Vista/x86': ['2k8/x86'],
-        'Vista/amd64': ['2k8/amd64'],
+        'Wnet/amd64': ['2k3/amd64'],
+
+        'Wlh/x86': ['2k8/x86'],
+        'Wlh/amd64': ['2k8/amd64'],
 
         'Win7/x86': ['w7/x86'],
         'Win7/amd64': ['2k8R2/amd64', 'w7/amd64'],
