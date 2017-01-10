@@ -58,13 +58,14 @@ def download_virtio_win_license(outdir):
     return [destfile]
 
 
-def copy_pciserial(input_dir, outdir):
-    destdir = os.path.join(outdir, "qemupciserial")
+def copy_inf_cat_driver(input_dir, outdir, drivername):
+    # Copies a driver consisting of just an .inf and .cat file
+    destdir = os.path.join(outdir, drivername)
     os.mkdir(destdir)
 
     seenfiles = [
-        os.path.join(input_dir, "qemupciserial.inf"),
-        os.path.join(input_dir, "qemupciserial.cat"),
+        os.path.join(input_dir, drivername + ".inf"),
+        os.path.join(input_dir, drivername + ".cat"),
     ]
 
     for f in seenfiles:
@@ -270,7 +271,8 @@ def main():
     seenfiles = []
     seenfiles += copy_virtio_drivers(options.input_dir, outdir)
     seenfiles += download_virtio_win_license(outdir)
-    seenfiles += copy_pciserial(options.input_dir, outdir)
+    seenfiles += copy_inf_cat_driver(options.input_dir, outdir, "qemupciserial")
+    seenfiles += copy_inf_cat_driver(options.input_dir, outdir, "qemufwcfg")
 
     # Verify that there is nothing left over that we missed
     check_remaining_files(options.input_dir, seenfiles)
