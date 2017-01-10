@@ -191,8 +191,6 @@ def check_remaining_files(input_dir, seenfiles):
         # If you add to this list, be sure it's not a newly introduced
         # driver that you are ignoring! Everything listed here needs
         # be covered by a mapping in DRIVER_OS_MAP
-        ".*/Wnet/x86/balloon.*", ".*/Wnet/x86/blnsvr.*",
-        ".*/Wnet/x86/vioser.*", ".*/Wnet/x86/WdfCoInstaller01009.dll",
     ]
 
     remaining = []
