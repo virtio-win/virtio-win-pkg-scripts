@@ -177,8 +177,9 @@ FILELISTS['viostor'] = [
 #        output-dir/2k3/x86
 DRIVER_OS_MAP = {
     'Balloon': {
-        'Wxp/x86': ['xp/x86', '2k3/x86'],
+        'Wxp/x86': ['xp/x86'],
 
+        'Wnet/x86' : ['2k3/x86'],
         'Wnet/amd64': ['2k3/amd64'],
 
         'Wlh/x86': ['2k8/x86'],
@@ -196,8 +197,9 @@ DRIVER_OS_MAP = {
 
 
     'NetKVM': {
-        'Wxp/x86': ['xp/x86', '2k3/x86'],
+        'Wxp/x86': ['xp/x86'],
 
+        'Wnet/x86' : ['2k3/x86'],
         'Wnet/amd64': ['2k3/amd64'],
 
         'Wlh/x86': ['2k8/x86'],
@@ -290,8 +292,9 @@ DRIVER_OS_MAP = {
 
 
     'vioserial': {
-        'Wxp/x86': ['xp/x86', '2k3/x86'],
+        'Wxp/x86': ['xp/x86'],
 
+        'Wnet/x86' : ['2k3/x86'],
         'Wnet/amd64': ['2k3/amd64'],
 
         'Wlh/x86': ['2k8/x86'],
