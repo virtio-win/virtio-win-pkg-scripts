@@ -1,4 +1,22 @@
 %changelog
+* Mon Jan 16 2017 Cole Robinson <crobinso@redhat.com> - 0.1.130-1
+- Update to virtio-win-prewhql-0.1-130
+- BZ#1389445: VirtIO definition of bool as int used by all drivers that use VirtIO library, except (currently) netkvm which is C++ and uses bool as fundamental C++ type.
+- BZ#1389125: viostor - extend viostor driver with STORAGE_REQUEST_BLOCK support
+- BZ#1395790 - vioscsi.sys BSOD when adding CPU to live Windows Server 2012R2 guest
+- BZ#1410964 - 4K virtual drives broken on Windows
+- NetKVM Return correct info for OID_TCP_OFFLOAD_PARAMETERS
+- Balloon: Fix blnsvr race conditions
+- NetKvm: Support WMI commands
+- NetKvm: Use fewer virtio receive SG descriptors
+- NetKvm: Fix race of changing of RSS parameters and TX
+- virtiolib: Fix uninitialized variable in VirtIOWdfFinalizeFeatures
+- NetKVM: Fix 1c_IOCTLCoverage test failure
+- NetKVM: Fix RX kick timing
+- vioscsi: Fix verifier and debug spew due to worker exiting with affinity set. By default the workers have no affinity. We set it to the specific cpu, but KeSetSystemAffinityThreadEx returns 0, as there was no affinity. You still have to KeSetSystemAffinityThreadEx before you exit and reset it back to 0.
+- balloon: Fix completion-cancellation races
+- netkvm: Optimize checksum routine on 64-bit
+
 * Fri Sep 30 2016 Cole Robinson <crobinso@redhat.com> - 0.1.126-2
 - Ship .dll files for vioinput driver
 
