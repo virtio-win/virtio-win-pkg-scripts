@@ -111,6 +111,8 @@ _vioinputfiles = [
     'vioinput.inf',
     'vioinput.pdb',
     'vioinput.sys',
+    'viohidkmdf.pdb',
+    'viohidkmdf.sys',
 ]
 FILELISTS['vioinput:w7'] = _vioinputfiles + ['WdfCoInstaller01009.dll']
 FILELISTS['vioinput:2k8R2'] = FILELISTS["vioinput:w7"]
