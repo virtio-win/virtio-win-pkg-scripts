@@ -51,9 +51,9 @@ def download_virtio_win_license(outdir):
     # an approximation from git.
     print "Downloading license from kvm-guest-drivers-windows.git"
     destfile = os.path.join(outdir, "virtio-win_license.txt")
-    os.system("wget -qO- https://raw.githubusercontent.com/YanVugenfirer/"
+    os.system("wget -qO- https://raw.githubusercontent.com/virtio-win/"
               "kvm-guest-drivers-windows/master/LICENSE > %s" % destfile)
-    os.system("wget -qO- https://raw.githubusercontent.com/YanVugenfirer/"
+    os.system("wget -qO- https://raw.githubusercontent.com/virtio-win/"
               "kvm-guest-drivers-windows/master/COPYING >> %s" % destfile)
     return [destfile]
 

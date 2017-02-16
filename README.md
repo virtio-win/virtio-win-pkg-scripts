@@ -29,7 +29,7 @@ driver-build-output is a directory containing the build output of
 virtio-win and qxl-win. They are separate projects, so you'll probably need
 to copy the output to a common directory in order for the script to work.
 
-* virtio-win comes from: https://github.com/YanVugenfirer/kvm-guest-drivers-windows
+* virtio-win comes from: https://github.com/virtio-win/kvm-guest-drivers-windows
 * qxl-win comes from: http://cgit.freedesktop.org/spice/win32/qxl
 
 
