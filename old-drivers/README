@@ -1,0 +1,8 @@
+This directory contains builds of drivers that are no longer generated
+as part of the virtio-win build, but we want to keep distributing a
+working version.
+
+* xp-viostor:
+    Windows XP virtio storage driver. From redhat internal build 130.
+    Windows XP is out of support, and it's difficult to keep maintaining
+    the old driver, so virtio-win no longer builds viostor for XP.

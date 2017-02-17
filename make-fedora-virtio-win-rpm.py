@@ -252,11 +252,14 @@ def make_virtio_win_rpm_archive(zip_dir, versionstr):
     versionstr = (versionstr.rsplit(".", 1)[0] + "." +
         versionstr.rsplit(".", 1)[1].replace("-", ".")).replace("-prewhql", "")
 
-    # Extract contents
+    # Extract virtio/qxl/... build archives
     for zipfile in glob.glob(os.path.join(zip_dir, "*.zip")):
         if zipfile.endswith("-sources.zip"):
             continue
         shellcomm("unzip %s -d %s" % (zipfile, input_dir))
+
+    # Copy static old-drivers/ content into place
+    shellcomm("cp -r old-drivers/xp-viostor/* %s" % input_dir)
 
     # Build the driver dir
     shellcomm("%s/make-driver-dir.py %s --outdir %s" %
