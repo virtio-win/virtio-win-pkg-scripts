@@ -260,6 +260,7 @@ def make_virtio_win_rpm_archive(zip_dir, versionstr):
 
     # Copy static old-drivers/ content into place
     shellcomm("cp -r old-drivers/xp-viostor/* %s" % input_dir)
+    shellcomm("cp -r old-drivers/xp-qxl/* %s" % input_dir)
 
     # Build the driver dir
     shellcomm("%s/make-driver-dir.py %s --outdir %s" %
