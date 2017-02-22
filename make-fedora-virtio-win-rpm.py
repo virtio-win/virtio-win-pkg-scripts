@@ -258,6 +258,12 @@ def make_virtio_win_rpm_archive(zip_dir, versionstr):
             continue
         shellcomm("unzip %s -d %s" % (zipfile, input_dir))
 
+        # Move qxlwddm output dir to just be Win8/..., which is the
+        # older format
+        basename = os.path.splitext(os.path.basename(zipfile))[0]
+        if "qxlwddm" in basename:
+            shellcomm("mv %s/%s %s/Win8" % (input_dir, basename, input_dir))
+
     # Copy static old-drivers/ content into place
     shellcomm("cp -r old-drivers/xp-viostor/* %s" % input_dir)
     shellcomm("cp -r old-drivers/xp-qxl/* %s" % input_dir)

@@ -1,4 +1,15 @@
 %changelog
+* Wed Feb 22 2017 Cole Robinson <crobinso@redhat.com> - 0.1.132-1
+- Update to virtio-win-prewhql-0.1-132
+- Update to qxlwddm-0.15-0
+- Winxp viostor driver is no longer being updated, will remain locked at the 0.1.130 version
+- Winxp qxl driver is no longer being updated, will remain locked at the spice-space 0.1.18 version
+- BZ#1369353 - [balloon] backport available memory stat support
+- BZ#1419785 - [virtio-win][whql][balloon] Guest WIN8-32 occured BSOD in job "DF - PNP Stop (Rebalance) Device Test (Certification)"
+- pvpanic: Add IOCTL_GET_CRASH_DUMP_HEADER
+- vioinput: Use viohidkmdf.sys instead of mshidkmdf.sys
+- BZ#1403550 - [RFE] viostor.sys Add multi-queue support
+
 * Mon Jan 16 2017 Cole Robinson <crobinso@redhat.com> - 0.1.130-1
 - Update to virtio-win-prewhql-0.1-130
 - BZ#1389445: VirtIO definition of bool as int used by all drivers that use VirtIO library, except (currently) netkvm which is C++ and uses bool as fundamental C++ type.

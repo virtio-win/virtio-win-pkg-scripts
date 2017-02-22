@@ -9,15 +9,15 @@
 # version numbers or changelogs, etc), submit a patch them to the upstream
 # spec file.
 
-%global virtio_win_prewhql_build virtio-win-prewhql-0.1-130
+%global virtio_win_prewhql_build virtio-win-prewhql-0.1-132
 %global qemu_ga_win_build qemu-ga-win-7.3.2-1
 %global qxl_build qxl-win-unsigned-0.1-24
 # qxlwddm is fedora only for now
-%global qxlwddm_build qxlwddm-0.1-12
+%global qxlwddm_build qxlwddm-0.15-0
 
 Summary: VirtIO para-virtualized drivers for Windows(R)
 Name: virtio-win
-Version: 0.1.130
+Version: 0.1.132
 Release: 1
 Group: Applications/System
 URL: http://www.redhat.com/

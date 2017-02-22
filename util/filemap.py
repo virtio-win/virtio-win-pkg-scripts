@@ -240,7 +240,9 @@ DRIVER_OS_MAP = {
         'xp/x86': ['xp/x86'],
 
         'w7/x86': ['w7/x86'],
-        'w7/amd64': ['w7/amd64', '2k8R2/amd64'],
+        'w7/amd64': ['w7/amd64'],
+
+        '2k8R2/amd64': ['2k8R2/amd64'],
     },
 
 
