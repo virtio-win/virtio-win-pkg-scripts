@@ -35,6 +35,24 @@ stable_rpms = [
     "0.1.96-1",  # RHEL7.1 version
 ]
 
+# Directories added here are removed on exit
+CLEAN_DIRS = []
+NO_CLEANUP = False
+
+
+def _atexit_cleanup():
+    if NO_CLEANUP:
+        if CLEAN_DIRS:
+            print "Not cleaning up dirs: %s" % " ".join(CLEAN_DIRS)
+        return
+
+    for d in CLEAN_DIRS:
+        print "Removing %s" % d
+        shutil.rmtree(d)
+
+
+atexit.register(_atexit_cleanup)
+
 
 #########################
 # specfile helper class #
@@ -243,9 +261,9 @@ def make_virtio_win_rpm_archive(zip_dir, versionstr):
     the RPM
     """
     input_dir = tempfile.mkdtemp(prefix='virtio-win-input-dir-')
-    atexit.register(lambda: shutil.rmtree(input_dir))
+    CLEAN_DIRS.append(input_dir)
     output_dir = tempfile.mkdtemp(prefix='virtio-win-driver-dir-')
-    atexit.register(lambda: shutil.rmtree(output_dir))
+    CLEAN_DIRS.append(output_dir)
 
     # Change virtio-win-prewhql-0.1-100 to virtio-win-0.1.100, since it's
     # what we want for making RPM version happy
@@ -310,7 +328,7 @@ def _build_latest_rpm():
 
     # Populate RPM dir
     rpm_dir = tempfile.mkdtemp(prefix='virtio-win-rpm-dir-')
-    atexit.register(lambda: shutil.rmtree(rpm_dir))
+    CLEAN_DIRS.append(rpm_dir)
 
     shellcomm("mv %s/*.tar.gz %s" % (script_dir, rpm_dir))
     shellcomm("cp %s/*-sources.zip %s" % (new_builds, rpm_dir))
@@ -367,7 +385,7 @@ def _copy_direct_download_content_to_tree(rpms,
     """
     rpmpath = [r for r in rpms if r.endswith(".noarch.rpm")][0]
     extract_dir = tempfile.mkdtemp(prefix='virtio-win-rpm-extract-')
-    atexit.register(lambda: shutil.rmtree(extract_dir))
+    CLEAN_DIRS.append(extract_dir)
 
     # Extract RPM contents
     shellcomm("cd %s && rpm2cpio %s | cpio -idmv &> /dev/null" %
@@ -532,13 +550,16 @@ def parse_args():
         help="Only build RPM and move it to cwd.")
     parser.add_argument("--repo-only", action="store_true",
         help="Only regenerate repo and push changes")
+    parser.add_argument("--no-cleanup", action="store_true",
+        help="Don't clean up extracted/generated output (for debugging)")
 
     return parser.parse_args()
 
 
 def main():
     options = parse_args()
-    ignore = options
+    global NO_CLEANUP
+    NO_CLEANUP = options.no_cleanup
 
     os.chdir(script_dir)
     do_everything = (not options.rpm_only and not options.repo_only)
