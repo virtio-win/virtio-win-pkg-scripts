@@ -279,8 +279,10 @@ def make_virtio_win_rpm_archive(zip_dir, versionstr):
         # Move qxlwddm output dir to just be Win8/..., which is the
         # older format
         basename = os.path.splitext(os.path.basename(zipfile))[0]
-        if "qxlwddm" in basename:
-            shellcomm("mv %s/%s %s/Win8" % (input_dir, basename, input_dir))
+        if "wddm" in basename:
+            wddmdir = os.path.join(input_dir, basename)
+            shellcomm("rsync --archive %s/* %s/Win8/" % (wddmdir, input_dir))
+            shutil.rmtree(wddmdir)
 
     # Copy static old-drivers/ content into place
     shellcomm("cp -r old-drivers/xp-viostor/* %s" % input_dir)
@@ -320,7 +322,7 @@ def _build_latest_rpm():
     """
     virtio_str = get_package_string("virtio-win-prewhql", new_builds)
     qxl_str = get_package_string("qxl-win-unsigned", new_builds)
-    qxlwddm_str = get_package_string("qxlwddm", new_builds)
+    qxlwddm_str = get_package_string("spice-qxl-wddm-dod", new_builds)
     qemu_ga_str = get_package_string("qemu-ga-win", new_builds)
 
     # Call public scripts to generate the virtio .zip

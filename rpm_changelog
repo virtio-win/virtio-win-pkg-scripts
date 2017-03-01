@@ -1,4 +1,11 @@
 %changelog
+* Wed Mar 01 2017 Cole Robinson <crobinso@redhat.com> - 0.1.133-1
+- Update to virtio-win-prewhql-0.1-133
+- Update to spice-qxl-wddm-dod-0.16-0
+- BZ#1303510 - Change the copyright on all the Windows drivers to "2017" in virtio-win-prewhql build
+- NetKVM: Implement VIRTIO_NET_F_GUEST_ANNOUNCE feature
+- NetKVM: Make miniportShutdown return immediately on "NdisShutdownBugCheck"
+
 * Wed Feb 22 2017 Cole Robinson <crobinso@redhat.com> - 0.1.132-1
 - Update to virtio-win-prewhql-0.1-132
 - Update to qxlwddm-0.15-0
