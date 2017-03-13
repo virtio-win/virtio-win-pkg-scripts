@@ -118,6 +118,8 @@ FILELISTS['vioinput:w7'] = _vioinputfiles + ['WdfCoInstaller01009.dll']
 FILELISTS['vioinput:2k8R2'] = FILELISTS["vioinput:w7"]
 FILELISTS['vioinput:w8'] = _vioinputfiles + ['WdfCoInstaller01011.dll']
 FILELISTS['vioinput:w8.1'] = FILELISTS["vioinput:w8"]
+FILELISTS['vioinput:2k12'] = FILELISTS["vioinput:w8"]
+FILELISTS['vioinput:2k12R2'] = FILELISTS["vioinput:w8"]
 # win10+ doesn't need .dll
 FILELISTS['vioinput'] = _vioinputfiles
 
