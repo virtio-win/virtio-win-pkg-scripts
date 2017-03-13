@@ -279,7 +279,7 @@ def make_virtio_win_rpm_archive(zip_dir, versionstr):
         # Move qxlwddm output dir to just be Win8/..., which is the
         # older format
         basename = os.path.splitext(os.path.basename(zipfile))[0]
-        if "wddm" in basename:
+        if re.match("spice-qxl-wddm-dod.*Signed", basename):
             wddmdir = os.path.join(input_dir, basename)
             shellcomm("rsync --archive %s/* %s/Win8/" % (wddmdir, input_dir))
             shutil.rmtree(wddmdir)

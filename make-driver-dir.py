@@ -176,9 +176,6 @@ def check_remaining_files(input_dir, seenfiles):
         ".*/txtsetup-i386.oem",
         ".*/txtsetup-amd64.oem",
 
-        # Added in qxlwddm-0.15
-        ".*Win8/Changelog"
-
         # virtio-win build system unconditionally builds every driver
         # for every windows platform that supports it. However, depending
         # on the driver, functionally identical binaries might be
