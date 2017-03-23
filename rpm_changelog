@@ -1,4 +1,8 @@
 %changelog
+* Thu Mar 23 2017 Cole Robinson <crobinso@redhat.com> - 0.1.134-2
+- Update to qemu-ga-win-7.4.2-1
+- Install actually signed qxldod drivers (Issue #11)
+
 * Mon Mar 20 2017 Cole Robinson <crobinso@redhat.com> - 0.1.134-1
 - Update to virtio-win-prewhql-0.1-134
 - BZ#1429807 - [virtio-win][whql][netkvm] guests bsod(d1) when running job "NDISTest 6.0 - [1 Machine] - 1c_FaultHandling"
