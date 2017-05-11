@@ -101,7 +101,7 @@ FILELISTS['qxl'] = [
 FILELISTS['qxldod'] = [
     "qxldod.cat",
     "qxldod.inf",
-    #"qxldod.pdb",
+    "qxldod.pdb",
     "qxldod.sys",
 ]
 
