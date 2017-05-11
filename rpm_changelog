@@ -1,4 +1,8 @@
 %changelog
+* Thu May 11 2017 Cole Robinson <crobinso@redhat.com> - 0.1.137-1
+- Update to virtio-win-prewhql-0.1-137
+- BZ#1438410 Net-KVM:   Add VlanId property to no_RSS and no_RSC Inf files
+
 * Mon May 01 2017 Cole Robinson <crobinso@redhat.com> - 0.1.136-1
 - Update to virtio-win-prewhql-0.1-136
 - BZ#1369353 - balloon: backport available memory stat support. Trying to mimic what si_mem_available does in Linux. AvailPhys is the sum of memory in free, zero and standby list. CacheBytes is the current size of the system file cache.

@@ -177,7 +177,11 @@ def check_remaining_files(input_dir, seenfiles):
         ".*/txtsetup-amd64.oem",
 
         # Added in qxlwddm-0.15
-        ".*Win8/Changelog"
+        ".*Win8/Changelog",
+
+        # Added in virtio-win build 137, for rhel only
+        ".*/rhel/qemupciserial.cat",
+        ".*/rhel/qemupciserial.inf",
 
         # virtio-win build system unconditionally builds every driver
         # for every windows platform that supports it. However, depending
