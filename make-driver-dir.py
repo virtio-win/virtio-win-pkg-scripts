@@ -280,6 +280,7 @@ def main():
     seenfiles += download_virtio_win_license(outdir)
     seenfiles += copy_inf_cat_driver(options.input_dir, outdir, "qemupciserial")
     seenfiles += copy_inf_cat_driver(options.input_dir, outdir, "qemufwcfg")
+    seenfiles += copy_inf_cat_driver(options.input_dir, outdir, "smbus")
 
     # Verify that there is nothing left over that we missed
     check_remaining_files(options.input_dir, seenfiles)
