@@ -173,6 +173,23 @@ FILELISTS['viostor'] = [
     'viostor.sys',
 ]
 
+_qemupciserialfiles = [
+    'qemupciserial.cat',
+    'qemupciserial.inf',
+]
+FILELISTS['qemupciserial'] = _qemupciserialfiles
+
+_qemufwcfgfiles = [
+    'qemufwcfg.cat',
+    'qemufwcfg.inf',
+]
+FILELISTS['qemufwcfg'] = _qemufwcfgfiles
+
+_smbusfiles = [
+    'smbus.cat',
+    'smbus.inf',
+]
+FILELISTS['smbus'] = _smbusfiles
 
 # Describes what windows arch the virtio-win build output maps to.
 #
@@ -335,4 +352,18 @@ DRIVER_OS_MAP = {
         'Win10/x86': ['w10/x86'],
         'Win10/amd64': ['w10/amd64', '2k16/amd64'],
     },
+
+    'qemupciserial': {
+        './rhel': ['2k8/x86', '2k8/amd64', 'w7/x86', 'w7/amd64', '2k8R2/amd64', \
+                   'w8/x86', 'w8.1/x86', 'w8/amd64', 'w8.1/amd64', '2k12/amd64', \
+                   '2k12R2/amd64', 'w10/x86', 'w10/amd64', '2k16/amd64'],
+    },
+
+    'qemufwcfg': {
+        './': ['w10/x86', 'w10/amd64', '2k16/amd64'],
+    },
+
+    'smbus': {
+        './': ['2k8/x86', '2k8/amd64'],
+    }
 }
