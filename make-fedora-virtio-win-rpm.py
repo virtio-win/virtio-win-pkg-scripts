@@ -276,12 +276,18 @@ def make_virtio_win_rpm_archive(zip_dir, versionstr):
             continue
         shellcomm("unzip %s -d %s" % (zipfile, input_dir))
 
-        # Move qxlwddm output dir to just be Win8/..., which is the
-        # older format
-        if re.match("^.*spice-qxl-wddm-dod.*Unsigned.zip$", zipfile):
+        # qxlwddm archive layout is in flux. 0.17 has two directories
+        #  * 10/ : Contains Win10 binaries
+        #  * 10-base/ : Contains Win8 binaries
+        # Rename these to 'just work' with our scripts. When the changes
+        # settle down we can permanently adjust
+        if re.match("^.*spice-qxl-wddm-dod.*.zip$", zipfile):
             wddmdir = os.path.join(input_dir,
-                    re.sub("\-Unsigned\.zip", "", os.path.basename(zipfile)))
-            shellcomm("rsync --archive %s/* %s/Win8/" % (wddmdir, input_dir))
+                        os.path.splitext(os.path.basename(zipfile))[0])
+            shellcomm("rsync --archive %s/10/* %s/Win10/" %
+                    (wddmdir, input_dir))
+            shellcomm("rsync --archive %s/10-base/* %s/Win8/" %
+                    (wddmdir, input_dir))
             shutil.rmtree(wddmdir)
 
     # Copy static old-drivers/ content into place
