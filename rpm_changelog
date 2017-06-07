@@ -1,4 +1,18 @@
 %changelog
+* Wed Jun 07 2017 Cole Robinson <crobinso@redhat.com> - 0.1.139-1
+- Update to virtio-win-prewhql-0.1-139
+- BZ#1456403: [NetKVM] Implement MTU report feature of the virtio-net device
+- BZ#1455488: [vioser][ovmf] Guest occured BSOD when hotunplug virtio-serial-pci.
+- BZ#1393772: Add null driver for SM Bus Controller
+
+- Update to spice-qxl-wddm-dod-0.17-0
+- Prepare for hardware compatibility tests for Windows 10
+     - emulation of EDID data
+     - separate thread for rendering operations and display mode change
+     - VSync control
+- Make the driver compatible with Windows 7 device memory scheme
+- Fix problem on VM save/migration
+
 * Thu May 11 2017 Cole Robinson <crobinso@redhat.com> - 0.1.137-1
 - Update to virtio-win-prewhql-0.1-137
 - BZ#1438410 Net-KVM:   Add VlanId property to no_RSS and no_RSC Inf files
