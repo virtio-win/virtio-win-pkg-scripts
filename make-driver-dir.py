@@ -85,7 +85,8 @@ def _update_copymap_for_driver(input_dir, ostuple, drivername, copymap):
             filelist = filemap.FILELISTS.get(drivername)
 
         for pattern in filelist:
-            files = glob.glob(os.path.join(input_dir, ostuple, pattern))
+            files = glob.glob(os.path.abspath(
+                os.path.join(input_dir, ostuple, pattern)))
             if not files:
                 strpattern = os.path.join(ostuple, pattern)
                 if strpattern not in missing_patterns:
@@ -117,7 +118,11 @@ def copy_virtio_drivers(input_dir, outdir):
     missing_patterns = []
     for drivername in drivers:
         for ostuple in sorted(filemap.DRIVER_OS_MAP[drivername]):
-            if ostuple not in alldirs:
+            # ./rhel is only used on RHEL builds for the qemupciserial
+            # driver, so if it's not present on public builds, ignore it
+            if drivername == "qemupciserial" and ostuple == "./rhel":
+                continue
+            if ostuple not in alldirs and ostuple != "./":
                 fail("driver=%s ostuple=%s not found in input=%s" %
                      (drivername, ostuple, input_dir))
 
@@ -275,8 +280,6 @@ def main():
     seenfiles = []
     seenfiles += copy_virtio_drivers(options.input_dir, outdir)
     seenfiles += download_virtio_win_license(outdir)
-    seenfiles += copy_inf_cat_driver(options.input_dir, outdir, "qemupciserial")
-    seenfiles += copy_inf_cat_driver(options.input_dir, outdir, "qemufwcfg")
 
     # Verify that there is nothing left over that we missed
     check_remaining_files(options.input_dir, seenfiles)
