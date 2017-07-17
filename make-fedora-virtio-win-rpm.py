@@ -303,7 +303,7 @@ def make_virtio_win_rpm_archive(zip_dir, versionstr):
         (script_dir, versionstr, output_dir))
 
 
-def user_edit_clog_content(spec, virtiowin_clog):
+def user_edit_clog_content(spec, virtiowin_clog, qxlwddm_clog):
     """
     Launch vim and let the user tweak the changelog if they want
     """
@@ -312,7 +312,7 @@ def user_edit_clog_content(spec, virtiowin_clog):
     tmp.flush()
     tmp.seek(0)
 
-    os.system("vim -p %s %s" % (virtiowin_clog, tmp.name))
+    os.system("vim -p %s %s %s" % (virtiowin_clog, qxlwddm_clog, tmp.name))
     spec.newclog = tmp.read()
     tmp.close()
 
@@ -352,13 +352,19 @@ def _build_latest_rpm():
         "internal-kvm-guest-drivers-windows/status.txt > %s" %
         (new_builds, virtio_str, virtiowin_clog))
 
+    # Same with the qxl wddm changelog
+    wddm_clog = os.path.join(rpm_dir, "qxlwwdm-changelog.txt")
+    shellcomm("unzip -p %s/%s-sources.zip "
+        "spice-qxl-wddm-dod/Changelog > %s" %
+        (new_builds, qxlwddm_str, wddm_clog))
+
     # Just creating the Spec will queue up all expected changes.
     spec = Spec(virtio_str, qxl_str, qemu_ga_str, qxlwddm_str)
 
     # Confirm with the user that everything looks good
     while True:
         os.system("clear")
-        user_edit_clog_content(spec, virtiowin_clog)
+        user_edit_clog_content(spec, virtiowin_clog, wddm_clog)
         os.system("clear")
 
         print spec.diff()
