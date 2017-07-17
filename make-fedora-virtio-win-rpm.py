@@ -281,14 +281,14 @@ def make_virtio_win_rpm_archive(zip_dir, versionstr):
         #  * 10-base/ : Contains Win8 binaries
         # Rename these to 'just work' with our scripts. When the changes
         # settle down we can permanently adjust
-        if re.match("^.*spice-qxl-wddm-dod.*.zip$", zipfile):
-            wddmdir = os.path.join(input_dir,
-                        os.path.splitext(os.path.basename(zipfile))[0])
-            shellcomm("rsync --archive %s/10/* %s/Win10/" %
-                    (wddmdir, input_dir))
-            shellcomm("rsync --archive %s/10-base/* %s/Win8/" %
-                    (wddmdir, input_dir))
-            shutil.rmtree(wddmdir)
+        zipbasename = os.path.basename(zipfile)
+        unzipdir = os.path.join(input_dir, os.path.splitext(zipbasename)[0])
+        if re.match("^spice-qxl-wddm-dod-\d+\.\d+.zip$", zipbasename):
+            shellcomm("rsync --archive %s/* %s/Win10/" % (unzipdir, input_dir))
+            shutil.rmtree(unzipdir)
+        if re.match("^spice-qxl-wddm-dod-.*8.1-compatible.zip$", zipbasename):
+            shellcomm("rsync --archive %s/* %s/Win8/" % (unzipdir, input_dir))
+            shutil.rmtree(unzipdir)
 
     # Copy static old-drivers/ content into place
     shellcomm("cp -r old-drivers/xp-viostor/* %s" % input_dir)
