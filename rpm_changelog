@@ -1,4 +1,10 @@
 %changelog
+* Mon Jul 17 2017 Cole Robinson <crobinso@redhat.com> - 0.1.140-1
+- Update to virtio-win-prewhql-0.1-140
+- Update to spice-qxl-wddm-dod-0.18-0
+- BZ#1451978: [NetKVM] latest virtio driver (network) for Windows drops lots of packets
+- qxlwddm: Fix physical memory unmapping
+
 * Wed Jun 07 2017 Cole Robinson <crobinso@redhat.com> - 0.1.139-1
 - Update to virtio-win-prewhql-0.1-139
 - BZ#1456403: [NetKVM] Implement MTU report feature of the virtio-net device
