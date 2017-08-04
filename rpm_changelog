@@ -1,4 +1,8 @@
 %changelog
+* Fri Aug 04 2017 Cole Robinson <crobinso@redhat.com> - 0.1.141-1
+- Update to virtio-win-prewhql-0.1-141
+- [NetKVM] Send clone of original announcement NBL
+
 * Mon Jul 17 2017 Cole Robinson <crobinso@redhat.com> - 0.1.140-1
 - Update to virtio-win-prewhql-0.1-140
 - Update to spice-qxl-wddm-dod-0.18-0
