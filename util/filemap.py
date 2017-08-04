@@ -73,7 +73,7 @@ FILELISTS['NetKVM:xp'] = [
 ]
 FILELISTS['NetKVM:2k3'] = FILELISTS['NetKVM:xp']
 FILELISTS['NetKVM'] = FILELISTS['NetKVM:xp'][:] + ["netkvmco.dll",
-    "readme.doc"]
+    "netkvmco.pdb", "readme.doc"]
 
 
 _pvpanicfiles = [
@@ -130,7 +130,9 @@ _viorngfiles = [
     'viorng.pdb',
     'viorng.sys',
     'viorngci.dll',
+    'viorngci.pdb',
     'viorngum.dll',
+    'viorngum.pdb',
 ]
 FILELISTS['viorng'] = _viorngfiles + ['WdfCoInstaller01011.dll']
 FILELISTS['viorng:xp'] = _viorngfiles + ['WdfCoInstaller01009.dll']
