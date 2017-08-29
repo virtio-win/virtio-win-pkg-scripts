@@ -53,8 +53,6 @@ def download_virtio_win_license(outdir):
     destfile = os.path.join(outdir, "virtio-win_license.txt")
     os.system("wget -qO- https://raw.githubusercontent.com/virtio-win/"
               "kvm-guest-drivers-windows/master/LICENSE > %s" % destfile)
-    os.system("wget -qO- https://raw.githubusercontent.com/virtio-win/"
-              "kvm-guest-drivers-windows/master/COPYING >> %s" % destfile)
     return [destfile]
 
 
