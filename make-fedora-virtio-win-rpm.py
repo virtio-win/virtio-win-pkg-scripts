@@ -28,6 +28,9 @@ http_directdir = "/groups/virt/virtio-win/direct-downloads"
 hosteduser = os.environ.get("FAS_USERNAME", None) or getpass.getuser()
 
 # List of stable versions. Keep the newest version first.
+#
+# Note, if you update this, --repo-only doesn't currently handle
+# the .htacess updating. Do it by hand or fix this script :)
 stable_rpms = [
     "0.1.141-1",  # RHEL7.4 zstream
     "0.1.126-2",  # RHEL7.3 and RHEL6.9
