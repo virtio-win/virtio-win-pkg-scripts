@@ -121,7 +121,8 @@ def copy_virtio_drivers(input_dir, outdir, flavor):
             # driver, so if it's not present on public builds, ignore it
             # Similarly, if we're asked to create a RHEL build, don't
             # look for the Fedora qemupciserial in ./
-            if drivername == "qemupciserial" and ostuple != qemupciserial_ostuple:
+            if (drivername == "qemupciserial" and
+                ostuple != qemupciserial_ostuple):
                 continue
             if os.path.normpath(ostuple) not in alldirs and ostuple != "./":
                 fail("driver=%s ostuple=%s not found in input=%s" %

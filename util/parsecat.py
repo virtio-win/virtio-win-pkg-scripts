@@ -287,5 +287,6 @@ def parseCat(fname):
 
     return attributes, members
 
+
 if __name__ == "__main__":
     pprint.pprint(parseCat(sys.argv[1]))

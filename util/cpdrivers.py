@@ -126,6 +126,7 @@ def processCat(dname, catname):
     timestamp = maxTimestamp(attributes)
     return dstsubdirs, timestamp
 
+
 dryrun = True
 cpTree = None
 cp = None

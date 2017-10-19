@@ -425,6 +425,7 @@ def _copy_direct_download_content_to_tree(rpms,
              "overwriting anything." % virtiodir)
 
     os.mkdir(virtiodir)
+
     def move_data(versionfile, symlink):
         shellcomm("mv %s/%s %s" % (sharedir, versionfile, virtiodir))
         shellcomm("mv %s/%s %s" % (sharedir, symlink, virtiodir))
