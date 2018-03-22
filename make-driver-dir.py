@@ -177,7 +177,6 @@ def check_remaining_files(input_dir, seenfiles, flavor):
         # It might take some coordination with the internal RHEL process
         # though.
         # Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1251770
-        ".*/COPYING",
         ".*/LICENSE",
         ".*/disk1",
         ".*/txtsetup-i386.oem",

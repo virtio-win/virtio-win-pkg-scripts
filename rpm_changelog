@@ -1,4 +1,10 @@
 %changelog
+* Thu Mar 22 2018 Cole Robinson <crobinso@redhat.com> - 0.1.149-1
+- Update to virtio-win-prewhql-0.1-149
+- BZ#1549455 - [viostor] Event ID: 158 is logged on Win10/WS2016 when two or more virtio-blk disks attached to VM
+- BZ#1537430 - [NetKvm] Import LinkSpeed/Duplex configs from the hypervisor
+- BZ#1351089 - [NetKvm] Don't set MAC address using configuration space in virtio 1.0 device
+
 * Fri Aug 04 2017 Cole Robinson <crobinso@redhat.com> - 0.1.141-1
 - Update to virtio-win-prewhql-0.1-141
 - [NetKVM] Send clone of original announcement NBL
