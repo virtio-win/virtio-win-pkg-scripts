@@ -245,18 +245,21 @@ def yes_or_no(msg):
 # Functional helpers #
 ######################
 
-def get_package_string(package, zip_dir):
+def get_package_string(package, zip_dir, rpm=False):
     """
     Find the latest packages by parsing filenames from new_builds
     """
-    pattern = os.path.join(zip_dir, package + "*-sources.zip")
+    suffix = "-sources.zip"
+    if rpm:
+        suffix = ".src.rpm"
+    pattern = os.path.join(zip_dir, package + "*" + suffix)
     sources_files = glob.glob(pattern)
     if not sources_files:
         fail("Didn't find any matches for %s\n"
             "That directory should contain the downloaded output "
             "from virtio-win-get-latest-builds.py" % pattern)
 
-    return os.path.basename(sources_files[0]).rsplit("-", 1)[0]
+    return os.path.basename(sources_files[0])[:-len(suffix)]
 
 
 def make_virtio_win_rpm_archive(zip_dir, versionstr):
@@ -333,21 +336,39 @@ def _build_latest_rpm():
     virtio_str = get_package_string("virtio-win-prewhql", new_builds)
     qxl_str = get_package_string("qxl-win-unsigned", new_builds)
     qxlwddm_str = get_package_string("spice-qxl-wddm-dod", new_builds)
-    qemu_ga_str = get_package_string("qemu-ga-win", new_builds)
+    qemu_ga_str = get_package_string("mingw-qemu-ga-win", new_builds, rpm=True)
+    qemu_ga_str = qemu_ga_str[len("mingw-"):]
 
-    # Call public scripts to generate the virtio .zip
-    make_virtio_win_rpm_archive(new_builds, virtio_str)
-
-    # Populate RPM dir
+    # Copy source archives to the RPM builddir
     rpm_dir = tempfile.mkdtemp(prefix='virtio-win-rpm-dir-')
     CLEAN_DIRS.append(rpm_dir)
-
-    shellcomm("mv %s/*.tar.gz %s" % (script_dir, rpm_dir))
     shellcomm("cp %s/*-sources.zip %s" % (new_builds, rpm_dir))
+    shellcomm("cp %s/*.src.rpm %s" % (new_builds, rpm_dir))
+
+    # Create a temporary new_builds/mingw-qemu-ga-win directory,
+    # extract the qemu-ga-win RPM to it, rename the .msi files
+    # and zip them up into the form virtio-win.spec is expecting.
+    # Yeah this is rediculous...
+    qemu_ga_extractdir = tempfile.mkdtemp(prefix='mingw-qemu-ga-win-dir-')
+    CLEAN_DIRS.append(qemu_ga_extractdir)
+    shellcomm("cd %s && rpm2cpio %s/qemu-ga-win*.noarch.rpm | cpio -idmv" %
+        (qemu_ga_extractdir, new_builds))
+    shellcomm("find %s -name qemu-ga-x86_64.msi "
+        "-exec mv '{}' %s/qemu-ga-x64.msi \;" %
+        (qemu_ga_extractdir, new_builds))
+    shellcomm("find %s -name qemu-ga-i386.msi "
+        "-exec mv '{}' %s/qemu-ga-x86.msi \;" %
+        (qemu_ga_extractdir, new_builds))
     shellcomm("cd %s && mkdir %s && cp *.msi %s && "
         "zip -9 -r %s/%s-installers.zip %s && rm -rf %s" %
         (new_builds, qemu_ga_str, qemu_ga_str, rpm_dir,
          qemu_ga_str, qemu_ga_str, qemu_ga_str))
+
+
+    # Call public scripts to generate the virtio .zip
+    make_virtio_win_rpm_archive(new_builds, virtio_str)
+    # Move the build virtio-win archive to the rpm build dir
+    shellcomm("mv %s/*.tar.gz %s" % (script_dir, rpm_dir))
 
     # A detailed changelog for virtio-win is listed in the -sources.zip
     # Pull it out for reference when editing the RPM changelog
@@ -479,6 +500,8 @@ def _copy_rpms_to_local_tree(rpms):
     for path in rpms:
         filename = os.path.basename(path)
         if filename.endswith(".src.rpm"):
+            if filename.startswith("mingw-qemu-ga"):
+                continue
             dest = os.path.join(local_repodir, "srpms", filename)
         else:
             dest = os.path.join(local_repodir, "rpms", filename)

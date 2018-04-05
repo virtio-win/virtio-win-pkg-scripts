@@ -10,7 +10,7 @@
 # spec file.
 
 %global virtio_win_prewhql_build virtio-win-prewhql-0.1-149
-%global qemu_ga_win_build qemu-ga-win-7.4.5-1
+%global qemu_ga_win_build qemu-ga-win-7.5.0-2.el7ev
 %global qxl_build qxl-win-unsigned-0.1-24
 # qxlwddm is fedora only for now
 %global qxlwddm_build spice-qxl-wddm-dod-0.18-0
@@ -18,7 +18,7 @@
 Summary: VirtIO para-virtualized drivers for Windows(R)
 Name: virtio-win
 Version: 0.1.149
-Release: 1
+Release: 2
 Group: Applications/System
 URL: http://www.redhat.com/
 BuildArch: noarch
@@ -43,7 +43,7 @@ Source2: %{qemu_ga_win_build}-installers.zip
 
 # Source files shipped in the srpm
 Source3: %{virtio_win_prewhql_build}-sources.zip
-Source4: %{qemu_ga_win_build}-sources.zip
+Source4: mingw-%{qemu_ga_win_build}.src.rpm
 Source5: %{qxl_build}-sources.zip
 %if 0%{?fedora}
 Source6: %{qxlwddm_build}-sources.zip
@@ -95,5 +95,7 @@ Windows(R) guests.
 %{_datadir}/%{name}/*.vfd
 %{_datadir}/%{name}/drivers
 %{_datadir}/%{name}/guest-agent
+%{_datadir}/%{name}/guest-agent/qemu-ga-x64.msi
+%{_datadir}/%{name}/guest-agent/qemu-ga-x86.msi
 
 
