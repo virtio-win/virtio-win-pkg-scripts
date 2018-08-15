@@ -1,4 +1,8 @@
 %changelog
+* Wed Aug 15 2018 Cole Robinson <crobinso@redhat.com> - 0.1.160-1
+- Update to virtio-win-prewhql-0.1-160
+- Update to qemu-ga-win-7.6.2-2.el7ev
+
 * Thu Apr 05 2018 Cole Robinson <crobinso@redhat.com> - 0.1.149-2
 - Update to mingw-qemu-ga-win-7.5.0-2.el7ev
 - qemu guest agent builds based on qemu 2.9.0
