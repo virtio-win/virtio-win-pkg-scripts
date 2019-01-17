@@ -66,7 +66,7 @@ Windows(R) guests.
 %{__mv} %{qemu_ga_win_build} guest-agent
 
 # Generate .iso
-/usr/bin/mkisofs -m vfddrivers -o %{name}-%{version}.iso -r -J \
+/usr/bin/mkisofs -m 'virtio-win*.vfd' -m vfddrivers -o %{name}-%{version}.iso -r -J \
   -input-charset iso8859-1 -V "%{name}-%{version}" .
 
 
