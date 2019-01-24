@@ -77,11 +77,19 @@ Windows(R) guests.
 %{__install} -p -m0644 %{name}-%{version}.iso %{buildroot}%{_datadir}/%{name}
 %{__ln_s} %{name}-%{version}.iso %{buildroot}%{_datadir}/%{name}/%{name}.iso
 
+# RHEL-8 does not support vfd images
+%if 0%{?rhel} <= 7
 # Install .vfd files, create non-versioned symlinks
 %{__install} -p -m0644 %{name}-%{version}_x86.vfd  %{buildroot}%{_datadir}/%{name}
 %{__ln_s} %{name}-%{version}_x86.vfd %{buildroot}%{_datadir}/%{name}/%{name}_x86.vfd
 %{__install} -p -m0644 %{name}-%{version}_amd64.vfd  %{buildroot}%{_datadir}/%{name}
 %{__ln_s} %{name}-%{version}_amd64.vfd %{buildroot}%{_datadir}/%{name}/%{name}_amd64.vfd
+
+%{__install} -p -m0644 %{name}-%{version}_servers_x86.vfd  %{buildroot}%{_datadir}/%{name}
+%{__ln_s} %{name}-%{version}_servers__x86.vfd %{buildroot}%{_datadir}/%{name}/%{name}_servers_x86.vfd
+%{__install} -p -m0644 %{name}-%{version}_servers_amd64.vfd  %{buildroot}%{_datadir}/%{name}
+%{__ln_s} %{name}-%{version}_servers_amd64.vfd %{buildroot}%{_datadir}/%{name}/%{name}_servers_amd64.vfd
+%endif
 
 %{__cp} -a vfddrivers %{buildroot}/%{_datadir}/%{name}/drivers
 %{__cp} -a guest-agent %{buildroot}/%{_datadir}/%{name}
@@ -92,7 +100,9 @@ Windows(R) guests.
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/%{name}-%{version}.iso
 %{_datadir}/%{name}/%{name}.iso
+%if 0%{?rhel} <= 7
 %{_datadir}/%{name}/*.vfd
+%endif
 %{_datadir}/%{name}/drivers
 %{_datadir}/%{name}/guest-agent
 %{_datadir}/%{name}/guest-agent/qemu-ga-x64.msi
