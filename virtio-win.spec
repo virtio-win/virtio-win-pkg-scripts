@@ -61,6 +61,15 @@ Windows(R) guests.
 %setup -q -T -b 1 -n %{name}-%{version}
 %setup -q -T -a 2 -n %{name}-%{version} -D
 
+%if 0%{?rhel} > 7
+# Dropping unsupported Windows versions.
+# It's done here to fix two issues at the same time: do not
+# release them in iso AND as binary drivers.
+%{__rm} */2k8/ vfddrivers/*/Win2008/ -rf
+%{__rm} */2k3/ vfddrivers/*/Win2003 -rf
+%{__rm} */xp/ vfddrivers/*/WinXP -rf
+%{__rm} smbus -rf
+%endif
 
 %build
 %{__mv} %{qemu_ga_win_build} guest-agent
