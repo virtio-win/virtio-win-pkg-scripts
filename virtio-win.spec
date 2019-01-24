@@ -10,10 +10,12 @@
 # spec file.
 
 %global virtio_win_prewhql_build virtio-win-prewhql-0.1-160
-%global qemu_ga_win_build qemu-ga-win-7.6.2-2.el7ev
+%global qemu_ga_win_build qemu-ga-win-100.0.0.0-3.el7ev
 %global qxl_build qxl-win-unsigned-0.1-24
 # qxlwddm is fedora only for now
+%if 0%{?fedora}
 %global qxlwddm_build spice-qxl-wddm-dod-0.18-0
+%endif
 
 Summary: VirtIO para-virtualized drivers for Windows(R)
 Name: virtio-win
@@ -39,7 +41,7 @@ License: BSD and Apache and GPLv2
 
 # Already built files
 Source1: %{name}-%{version}-bin-for-rpm.tar.gz
-Source2: %{qemu_ga_win_build}-installers.zip
+Source2: %{qemu_ga_win_build}.noarch.rpm
 
 # Source files shipped in the srpm
 Source3: %{virtio_win_prewhql_build}-sources.zip
@@ -48,6 +50,7 @@ Source5: %{qxl_build}-sources.zip
 %if 0%{?fedora}
 Source6: %{qxlwddm_build}-sources.zip
 %endif
+
 
 BuildRequires: /usr/bin/mkisofs
 
@@ -59,7 +62,14 @@ Windows(R) guests.
 
 %prep
 %setup -q -T -b 1 -n %{name}-%{version}
-%setup -q -T -a 2 -n %{name}-%{version} -D
+
+mkdir -p guest-agent
+mkdir -p %{qemu_ga_win_build}
+pushd %{qemu_ga_win_build}/ && rpm2cpio %{SOURCE2} | cpio -idmv
+popd
+
+%{__mv} %{qemu_ga_win_build}/usr/i686-w64-mingw32/sys-root/mingw/bin/qemu-ga-i386.msi guest-agent/
+%{__mv} %{qemu_ga_win_build}/usr/x86_64-w64-mingw32/sys-root/mingw/bin/qemu-ga-x86_64.msi guest-agent/
 
 %if 0%{?rhel} > 7
 # Dropping unsupported Windows versions.
@@ -72,12 +82,10 @@ Windows(R) guests.
 %endif
 
 %build
-%{__mv} %{qemu_ga_win_build} guest-agent
 
 # Generate .iso
-/usr/bin/mkisofs -m 'virtio-win*.vfd' -m vfddrivers -o %{name}-%{version}.iso -r -J \
+/usr/bin/mkisofs -m 'virtio-win*.vfd' -m vfddrivers -m %{qemu_ga_win_build} -o %{name}-%{version}.iso -r -J \
   -input-charset iso8859-1 -V "%{name}-%{version}" .
-
 
 %install
 %{__install} -d -m0755 %{buildroot}%{_datadir}/%{name}
@@ -85,6 +93,7 @@ Windows(R) guests.
 # Install .iso, create non-versioned symlink
 %{__install} -p -m0644 %{name}-%{version}.iso %{buildroot}%{_datadir}/%{name}
 %{__ln_s} %{name}-%{version}.iso %{buildroot}%{_datadir}/%{name}/%{name}.iso
+
 
 # RHEL-8 does not support vfd images
 %if 0%{?rhel} <= 7
@@ -100,8 +109,12 @@ Windows(R) guests.
 %{__ln_s} %{name}-%{version}_servers_amd64.vfd %{buildroot}%{_datadir}/%{name}/%{name}_servers_amd64.vfd
 %endif
 
+
+%{__mkdir} -p %{buildroot}%{_datadir}/%{name}/guest-agent/
+%{__install} -p -m0644 guest-agent/qemu-ga-i386.msi %{buildroot}%{_datadir}/%{name}/guest-agent/qemu-ga-i386.msi
+%{__install} -p -m0644 guest-agent/qemu-ga-x86_64.msi  %{buildroot}%{_datadir}/%{name}/guest-agent/qemu-ga-x86_64.msi
+
 %{__cp} -a vfddrivers %{buildroot}/%{_datadir}/%{name}/drivers
-%{__cp} -a guest-agent %{buildroot}/%{_datadir}/%{name}
 
 
 %files
@@ -113,8 +126,4 @@ Windows(R) guests.
 %{_datadir}/%{name}/*.vfd
 %endif
 %{_datadir}/%{name}/drivers
-%{_datadir}/%{name}/guest-agent
-%{_datadir}/%{name}/guest-agent/qemu-ga-x64.msi
-%{_datadir}/%{name}/guest-agent/qemu-ga-x86.msi
-
-
+%{_datadir}/%{name}/guest-agent/*.msi
