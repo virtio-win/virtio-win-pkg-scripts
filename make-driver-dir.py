@@ -103,7 +103,7 @@ def copy_virtio_drivers(input_dir, outdir, flavor):
     # Create a flat list of every leaf directory in the virtio-win directory
     alldirs = []
     for dirpath, dirnames, files in os.walk(input_dir):
-        ignore = files
+        dummy = files
         if dirnames:
             continue
 
@@ -218,7 +218,7 @@ def check_remaining_files(input_dir, seenfiles, flavor):
 
     remaining = []
     for dirpath, dirnames, files in os.walk(input_dir):
-        ignore = dirnames
+        dummy = dirnames
         for f in files:
             remaining.append(os.path.join(dirpath, f))
 

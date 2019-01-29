@@ -154,7 +154,7 @@ class CertTrustList(univ.Sequence):
 
 
 def parseNameValue(attr):
-    nv, ignore = decode(attr, asn1Spec=CatalogNameValue())
+    nv, dummy = decode(attr, asn1Spec=CatalogNameValue())
     strtype = type(u'')    # python2/3 compat
     name, value = str(strtype(nv['name'])), str(strtype(nv['value']))
     assert value[-1] == '\x00'
@@ -174,7 +174,7 @@ digestAlgoMap = {
 
 
 def parseSpcIndirectData(attr):
-    sid, ignore = decode(attr, asn1Spec=SpcIndirectData())
+    sid, dummy = decode(attr, asn1Spec=SpcIndirectData())
     spcKind, digest = sid['spcKind'], sid['digest']
     algo = digestAlgoMap[digest['digestAlgorithm']['algorithm']]
     return 'signature', {
@@ -200,9 +200,9 @@ def parseCatMember(member):
 
 
 def parsePKCS7SignedData(data):
-    container, ignore = decode(data, asn1Spec=rfc2315.ContentInfo())
+    container, dummy = decode(data, asn1Spec=rfc2315.ContentInfo())
     assert container['contentType'] == rfc2315.signedData
-    content, ignore = decode(container['content'], SignedData())
+    content, dummy = decode(container['content'], SignedData())
     return content
 
 
@@ -227,13 +227,13 @@ def parseTimeChoice(timeChoice):
 
 
 def getSigningTimeAuthenticode(data):
-    signerInfo, ignore = decode(data, asn1Spec=rfc2315.SignerInfo())
+    signerInfo, dummy = decode(data, asn1Spec=rfc2315.SignerInfo())
     attrs = signerInfo['authenticatedAttributes']
     if not attrs:
         return
     for attr in attrs:
         if attr['type'] == univ.ObjectIdentifier('1.2.840.113549.1.9.5'):
-            signingTime, ignore = decode(attr['values'][0],
+            signingTime, dummy = decode(attr['values'][0],
                                          asn1Spec=TimeChoice())
             return parseTimeChoice(signingTime)
 
@@ -244,8 +244,8 @@ def getSigningTimeRFC3161(data):
     contentType = contentInfo['contentType']
     assert (contentType ==
             univ.ObjectIdentifier('1.2.840.113549.1.9.16.1.4'))
-    ostr, ignore = decode(contentInfo['content'], asn1Spec=univ.OctetString())
-    tSTInfo, ignore = decode(ostr, asn1Spec=TSTInfo())
+    ostr, dummy = decode(contentInfo['content'], asn1Spec=univ.OctetString())
+    tSTInfo, dummy = decode(ostr, asn1Spec=TSTInfo())
     return parseGeneralizedTime(tSTInfo['genTime'])
 
 
@@ -270,7 +270,7 @@ def parseCat(fname):
     assert (contentInfo['contentType'] ==
             univ.ObjectIdentifier('1.3.6.1.4.1.311.10.1'))
 
-    ctl, ignore = decode(contentInfo['content'], asn1Spec=CertTrustList())
+    ctl, dummy = decode(contentInfo['content'], asn1Spec=CertTrustList())
     assert (ctl['catalogList']['oid'] ==
             univ.ObjectIdentifier('1.3.6.1.4.1.311.12.1.1'))
     assert (ctl['catalogListMemberId']['oid'] in (

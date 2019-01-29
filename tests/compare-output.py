@@ -69,7 +69,7 @@ def extract_files(filename):
     # Find .vfd files
     mediafiles = []
     for root, dirs, files in os.walk(output_dir):
-        ignore = dirs
+        dummy = dirs
         mediafiles += [os.path.join(root, name) for name in files
                        if name.endswith(".vfd") or name.endswith(".iso")]
 

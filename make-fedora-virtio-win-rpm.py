@@ -197,7 +197,7 @@ def _comm(comm, systemcompat, quiet=False, exc=False, **kwargs):
 
         proc = subprocess.Popen(comm, **kwargs)
         try:
-            output, ignore = proc.communicate()
+            output, dummy = proc.communicate()
             sts = proc.wait()
 
             if output is not None:

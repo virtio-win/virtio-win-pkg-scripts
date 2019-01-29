@@ -231,7 +231,7 @@ def hardlink_identical_files(outdir):
 
     hashmap = {}
     for root, dirs, files in os.walk(outdir):
-        ignore = dirs
+        dummy = dirs
         for f in files:
             path = os.path.join(root, f)
             md5 = hashlib.md5(open(path, 'rb').read()).hexdigest()

@@ -178,7 +178,7 @@ def cpRecursive(src, dst):
 def isCatNewer(catfile, timestamp):
     if not os.path.exists(catfile):
         return False
-    attributes, ignore = parsecat.parseCat(catfile)
+    attributes, dummy = parsecat.parseCat(catfile)
     return maxTimestamp(attributes) > timestamp
 
 
@@ -214,7 +214,7 @@ def updateMode(climode, clidry):
 def copyDrivers(srcroot, dstroot, climode, clidry):
     updateMode(climode, clidry)
     for root, dirs, files in os.walk(srcroot):
-        ignore = dirs
+        dummy = dirs
         for f in files:
             fn, fe = os.path.splitext(f)
             if fe.lower() == ".inf":
