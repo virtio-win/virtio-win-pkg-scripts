@@ -97,15 +97,15 @@ class Spec(object):
 
     def _replace_global(self, pkgname, newvalue):
         patternstub = "%%global %s " % pkgname
-        origpattern = patternstub + "([\w\.\d-]+)"
+        origpattern = patternstub + r"([\w\.\d-]+)"
         origvalue = re.findall(origpattern, self.newcontent)[0]
         self.newcontent = re.sub(origpattern, patternstub + newvalue,
             self.newcontent, count=1)
         return origvalue
 
     def _set_new_version(self):
-        version_pattern = "Version: ([\w\.]+)"
-        release_pattern = "Release: ([\w\.]+)"
+        version_pattern = r"Version: ([\w\.]+)"
+        release_pattern = r"Release: ([\w\.]+)"
         origrelease = re.findall(release_pattern, self.newcontent)[0]
         origversion = re.findall(version_pattern, self.newcontent)[0]
 
@@ -290,7 +290,7 @@ def make_virtio_win_rpm_archive(zip_dir, versionstr):
         # settle down we can permanently adjust
         zipbasename = os.path.basename(zipfile)
         unzipdir = os.path.join(input_dir, os.path.splitext(zipbasename)[0])
-        if re.match("^spice-qxl-wddm-dod-\d+\.\d+.zip$", zipbasename):
+        if re.match(r"^spice-qxl-wddm-dod-\d+\.\d+.zip$", zipbasename):
             shellcomm("rsync --archive %s/* %s/Win10/" % (unzipdir, input_dir))
             shutil.rmtree(unzipdir)
         if re.match("^spice-qxl-wddm-dod-.*8.1-compatible.zip$", zipbasename):
@@ -354,12 +354,12 @@ def _build_latest_rpm():
     shellcomm("cd %s && rpm2cpio %s/qemu-ga-win*.noarch.rpm | cpio -idmv" %
         (qemu_ga_extractdir, new_builds))
     shellcomm("find %s -name qemu-ga-x86_64.msi "
-        "-exec mv '{}' %s/qemu-ga-x64.msi \;" %
+        r"-exec mv '{}' %s/qemu-ga-x64.msi \;" %
         (qemu_ga_extractdir, new_builds))
     shellcomm("find %s -name qemu-ga-i386.msi "
-        "-exec mv '{}' %s/qemu-ga-x86.msi \;" %
+        r"-exec mv '{}' %s/qemu-ga-x86.msi \;" %
         (qemu_ga_extractdir, new_builds))
-    shellcomm("cd %s && mkdir %s && cp *.msi %s && "
+    shellcomm(r"cd %s && mkdir %s && cp *.msi %s && "
         "zip -9 -r %s/%s-installers.zip %s && rm -rf %s" %
         (new_builds, qemu_ga_str, qemu_ga_str, rpm_dir,
          qemu_ga_str, qemu_ga_str, qemu_ga_str))

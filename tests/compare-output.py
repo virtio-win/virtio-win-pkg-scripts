@@ -130,7 +130,7 @@ def main():
         print
         print
         print "file diff:"
-        run("diff -rup --exclude \*.vfd --exclude \*.iso %s %s" %
+        run(r"diff -rup --exclude \*.vfd --exclude \*.iso %s %s" %
             (origdir, newdir))
 
     return 0

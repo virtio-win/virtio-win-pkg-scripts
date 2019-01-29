@@ -165,7 +165,7 @@ def check_remaining_files(input_dir, seenfiles, flavor):
     whitelist = [
         # vadim confirmed these files should _not_ be shipped
         # (private mail May 2015)
-        ".*DVL\.XML",
+        r".*DVL\.XML",
         ".*vioser-test.*",
 
         # These are files that are needed for the build process. They
