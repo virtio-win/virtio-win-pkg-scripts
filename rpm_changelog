@@ -1,4 +1,9 @@
 %changelog
+* Mon Feb 04 2019 Cole Robinson <crobinso@redhat.com> - 0.1.164-1
+- Update to virtio-win-prewhql-0.1-164
+- Update to qemu-ga-win-100.0.0.0-3.el7ev
+- Add win10 arm64 experimental drivers
+
 * Wed Aug 15 2018 Cole Robinson <crobinso@redhat.com> - 0.1.160-1
 - Update to virtio-win-prewhql-0.1-160
 - Update to qemu-ga-win-7.6.2-2.el7ev
