@@ -313,18 +313,18 @@ DRIVER_OS_MAP = {
 
 
     'vioscsi': {
-        'Wlh/x86': ['2k8/x86'],
-        'Wlh/amd64': ['2k8/amd64'],
+        'Wlh/x86': ['2k8/x86', '../i386/2k8'],
+        'Wlh/amd64': ['2k8/amd64', '../amd64/2k8'],
 
-        'Win7/x86': ['w7/x86'],
-        'Win7/amd64': ['w7/amd64', '2k8R2/amd64'],
+        'Win7/x86': ['w7/x86', '../i386/w7'],
+        'Win7/amd64': ['w7/amd64', '2k8R2/amd64', '../amd64/w7'],
 
-        'Win8/x86': ['w8/x86', 'w8.1/x86'],
-        'Win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+        'Win8/x86': ['w8/x86', 'w8.1/x86', '../i386/w8'],
+        'Win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64', '../amd64/w8'],
 
-        'Win10/x86': ['w10/x86'],
-        'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64'],
-        'Win10/ARM64': ['w10/ARM64'],
+        'Win10/x86': ['w10/x86', '../i386/w10'],
+        'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64', '../amd64/w10'],
+        'Win10/ARM64': ['w10/ARM64','../ARM64/w10'],
     },
 
 
@@ -355,18 +355,18 @@ DRIVER_OS_MAP = {
         'Wnet/x86': ['2k3/x86'],
         'Wnet/amd64': ['2k3/amd64'],
 
-        'Wlh/x86': ['2k8/x86'],
-        'Wlh/amd64': ['2k8/amd64'],
+        'Wlh/x86': ['2k8/x86', '../i386/2k8'],
+        'Wlh/amd64': ['2k8/amd64', '../amd64/2k8'],
 
-        'Win7/x86': ['w7/x86'],
-        'Win7/amd64': ['w7/amd64', '2k8R2/amd64'],
+        'Win7/x86': ['w7/x86', '../i386/w7'],
+        'Win7/amd64': ['w7/amd64', '2k8R2/amd64', '../amd64/w7'],
 
-        'Win8/x86': ['w8/x86', 'w8.1/x86'],
-        'Win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+        'Win8/x86': ['w8/x86', 'w8.1/x86', '../i386/w8'],
+        'Win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64', '../i386/w8'],
 
-        'Win10/x86': ['w10/x86'],
-        'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64'],
-        'Win10/ARM64': ['w10/ARM64'],
+        'Win10/x86': ['w10/x86', '../i386/w10'],
+        'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64', '../amd64/w10'],
+        'Win10/ARM64': ['w10/ARM64', '../ARM64/w10'],
     },
 
     'qemupciserial': {
