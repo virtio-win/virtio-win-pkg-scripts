@@ -135,14 +135,13 @@ def run(cmd, shell=False):
     """
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=shell,
                             stderr=subprocess.STDOUT, close_fds=True)
+    output, dummy = proc.communicate()
     ret = proc.wait()
-    output = proc.stdout.read()
     if ret != 0:
         print 'Command had a bad exit code: %s' % ret
         print 'Command run: %s' % cmd
         print 'Output:\n%s' % output
         sys.exit(ret)
-    print (output)
     return ret, output
 
 
