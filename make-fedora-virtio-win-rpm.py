@@ -343,7 +343,7 @@ def _build_latest_rpm():
     rpm_dir = tempfile.mkdtemp(prefix='virtio-win-rpm-dir-')
     CLEAN_DIRS.append(rpm_dir)
     shellcomm("cp %s/*-sources.zip %s" % (new_builds, rpm_dir))
-    shellcomm("cp %s/*.src.rpm %s" % (new_builds, rpm_dir))
+    shellcomm("cp %s/*.rpm %s" % (new_builds, rpm_dir))
 
     # Create a temporary new_builds/mingw-qemu-ga-win directory,
     # extract the qemu-ga-win RPM to it, rename the .msi files
@@ -409,8 +409,8 @@ def _build_latest_rpm():
         (rpm_dir, os.path.basename(newspecpath)))
 
     rpms = []
-    rpms += glob.glob(os.path.join(rpm_dir, "*.rpm"))
-    rpms += glob.glob(os.path.join(rpm_dir, "noarch", "*.rpm"))
+    rpms += glob.glob("%s/virtio-win*.rpm" % rpm_dir)
+    rpms += glob.glob("%s/noarch/virtio-win*.rpm" % rpm_dir)
     return spec, rpms
 
 
