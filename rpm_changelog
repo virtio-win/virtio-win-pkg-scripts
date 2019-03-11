@@ -1,4 +1,8 @@
 %changelog
+* Mon Mar 11 2019 Cole Robinson <crobinso@redhat.com> - 0.1.164-2
+- Add ISO layout for windows install driver detection.
+  viostor and vioscsi only, for now. (Yuri Benditovich)
+
 * Mon Feb 04 2019 Cole Robinson <crobinso@redhat.com> - 0.1.164-1
 - Update to virtio-win-prewhql-0.1-164
 - Update to qemu-ga-win-100.0.0.0-3.el7ev
