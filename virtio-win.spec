@@ -6,8 +6,7 @@
 # https://github.com/crobinso/virtio-win-pkg-scripts
 #
 # If you make any changes to this file that affect the RPM content (but not
-# version numbers or changelogs, etc), submit a patch them to the upstream
-# spec file.
+# version numbers or changelogs, etc), submit a patch to the upstream spec.
 
 %global virtio_win_prewhql_build virtio-win-prewhql-0.1-164
 %global qemu_ga_win_build qemu-ga-win-100.0.0.0-3.el7ev
