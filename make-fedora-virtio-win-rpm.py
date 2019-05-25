@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 #
 # Wrapper to build a new RPM and upload contents to fedora repo
 # See --help and README for more details
@@ -12,7 +12,7 @@ import os
 import re
 import shlex
 import shutil
-import StringIO
+import io
 import subprocess
 import sys
 import tempfile
@@ -70,8 +70,8 @@ class Spec(object):
     def __init__(self, newvirtio, newqxl, newqemuga, newqxlwddm):
         self._specpath = os.path.join(TOP_DIR, "virtio-win.spec")
         self._clogpath = os.path.join(TOP_DIR, "rpm_changelog")
-        self.newcontent = file(self._specpath).read()
-        self.newclog = file(self._clogpath).read()
+        self.newcontent = open(self._specpath).read()
+        self.newclog = open(self._clogpath).read()
         self._origfullcontent = self.get_final_content()
 
         self.newvirtio = newvirtio
@@ -158,8 +158,8 @@ class Spec(object):
             tofile="New spec"))
 
     def write_changes(self):
-        file(self._specpath, "w").write(self.newcontent)
-        file(self._clogpath, "w").write(self.newclog)
+        open(self._specpath, "w").write(self.newcontent)
+        open(self._clogpath, "w").write(self.newclog)
 
 
 #####################
@@ -171,20 +171,20 @@ def make_redirect(root, old, new):
 
 
 def fail(msg):
-    print "ERROR: %s" % msg
+    print("ERROR: %s" % msg)
     sys.exit(1)
 
 
 def _comm(comm, systemcompat, quiet=False, exc=False, **kwargs):
     try:
         if not quiet:
-            print "+ %s" % comm
+            print("+ %s" % comm)
 
         output = ""
         read = False
         if systemcompat:
             kwargs["shell"] = True
-            if isinstance(sys.stdout, StringIO.StringIO):
+            if isinstance(sys.stdout, io.StringIO):
                 read = True
         else:
             read = True
@@ -218,7 +218,7 @@ def _comm(comm, systemcompat, quiet=False, exc=False, **kwargs):
             fail(errmsg)
 
         return output, sts
-    except Exception, e:
+    except Exception as e:
         if exc:
             raise
         fail("Command failed:\n%s\n%s" % (comm, str(e)))
@@ -235,6 +235,7 @@ def runcomm(comm, **kwargs):
 def yes_or_no(msg):
     while 1:
         sys.stdout.write(msg)
+        sys.stdout.flush()
         inp = sys.stdin.readline()
         if inp.startswith("y"):
             return True
@@ -294,7 +295,8 @@ def make_virtio_win_rpm_archive(zip_dir, versionstr):
         # qxlwddm archive layout is in flux.
         #
         #  spice-qxl-wddm-dod-0.19.zip - > w10/*
-        #  spice-qxl-wddm-dod-8.1-compatible.zip -> spice-qxl-wddm-dod-8.1-compatible/*
+        #  spice-qxl-wddm-dod-8.1-compatible.zip ->
+        #   spice-qxl-wddm-dod-8.1-compatible/*
         #
         # Rename these to 'just work' with our scripts
         if is_qxl or is_qxl_compat:
@@ -325,7 +327,7 @@ def user_edit_clog_content(spec, virtiowin_clog, qxlwddm_clog):
     """
     Launch vim and let the user tweak the changelog if they want
     """
-    tmp = tempfile.NamedTemporaryFile()
+    tmp = tempfile.NamedTemporaryFile(mode="w+")
     tmp.write(spec.newclog)
     tmp.flush()
     tmp.seek(0)
@@ -347,7 +349,8 @@ def _build_latest_rpm():
     virtio_str = get_package_string("virtio-win-prewhql", NEW_BUILDS_DIR)
     qxl_str = get_package_string("qxl-win-unsigned", NEW_BUILDS_DIR)
     qxlwddm_str = get_package_string("spice-qxl-wddm-dod", NEW_BUILDS_DIR)
-    qemu_ga_str = get_package_string("mingw-qemu-ga-win", NEW_BUILDS_DIR, rpm=True)
+    qemu_ga_str = get_package_string(
+            "mingw-qemu-ga-win", NEW_BUILDS_DIR, rpm=True)
     qemu_ga_str = qemu_ga_str[len("mingw-"):]
 
     # Copy source archives to the RPM builddir
@@ -401,8 +404,8 @@ def _build_latest_rpm():
         user_edit_clog_content(spec, virtiowin_clog, wddm_clog)
         os.system("clear")
 
-        print spec.diff()
-        print
+        print(spec.diff())
+        print()
         if yes_or_no("Use this spec diff? (y/n, 'n' to edit changelog): "):
             break
 
@@ -411,7 +414,7 @@ def _build_latest_rpm():
     # Save the changes
     spec.write_changes()
     newspecpath = os.path.join(rpm_dir, "virtio-win.spec")
-    file(newspecpath, "w").write(spec.get_final_content())
+    open(newspecpath, "w").write(spec.get_final_content())
 
     # Build the RPM
     shellcomm("cd %s && rpmbuild -ba %s" %
@@ -475,7 +478,7 @@ def _copy_direct_download_content_to_tree(rpms,
     # Write .htaccess, redirecting symlinks to versioned files, so
     # nobody ends up with unversioned files locally, since that
     # will make for crappy bug reports
-    file(os.path.join(virtiodir, ".htaccess"), "w").write(htaccess)
+    open(os.path.join(virtiodir, ".htaccess"), "w").write(htaccess)
 
     # Make latest-qemu-ga, latest-virtio, and stable-virtio links
     def add_link(src, link):
@@ -496,15 +499,15 @@ def _copy_direct_download_content_to_tree(rpms,
     htaccess += add_link(
         "archive-virtio/virtio-win-%s" % STABLE_RPMS[0],
         "stable-virtio")
-    file(os.path.join(LOCAL_DIRECT_DIR, ".htaccess"), "w").write(htaccess)
+    open(os.path.join(LOCAL_DIRECT_DIR, ".htaccess"), "w").write(htaccess)
 
 
 def _copy_rpms_to_local_tree(rpms):
     """
     Copy RPMs to our local tree mirror, to get ready for repo creation
     """
-    print
-    print
+    print()
+    print()
     for path in rpms:
         filename = os.path.basename(path)
         if filename.endswith(".src.rpm"):
@@ -515,7 +518,7 @@ def _copy_rpms_to_local_tree(rpms):
             dest = os.path.join(LOCAL_REPO_DIR, "rpms", filename)
 
         shutil.move(path, dest)
-        print "Generated %s" % dest
+        print("Generated %s" % dest)
 
 
 def _generate_repos():
@@ -574,12 +577,12 @@ def _push_repos():
     """
     rsync the changes to fedorapeople.org
     """
-    print
-    print
+    print()
+    print()
     _run_rsync(dry=True)
 
-    print
-    print
+    print()
+    print()
     if not yes_or_no("Review the --dry-run changes. "
         "Do you want to push? (y/n): "):
         sys.exit(1)
@@ -623,14 +626,14 @@ def main():
         _push_repos()
 
     if do_everything:
-        print
-        print
-        print "Don't forget to:"
-        print "- Commit all the spec file changes"
-        print "- If this is a stable build, update the STABLE_RPMS list in"
-        print "  this scripts code and re-run with --repo-only"
-        print "- Delete any local tmp* dirs"
-        print
+        print()
+        print()
+        print("Don't forget to:")
+        print("- Commit all the spec file changes")
+        print("- If this is a stable build, update the STABLE_RPMS list in")
+        print("  this scripts code and re-run with --repo-only")
+        print("- Delete any local tmp* dirs")
+        print()
 
     return 0
 

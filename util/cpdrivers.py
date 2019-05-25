@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 #
 # Copyright 2016 Parallels IP Holdings GmbH
 #
@@ -22,7 +22,7 @@ import shutil
 import struct
 import sys
 
-import parsecat  # pylint: disable=relative-import
+from . import parsecat  # pylint: disable=relative-import
 
 
 osMap = {
@@ -133,13 +133,13 @@ cp = None
 
 
 def doMkdir(d):
-    print("mkdir -p \"%s\"" % d)
+    print(("mkdir -p \"%s\"" % d))
     if not dryrun and not os.path.isdir(d):
         os.makedirs(d)
 
 
 def doCopy(src, dst):
-    print("cp -f \"%s\" \"%s\"" % (src, dst))
+    print(("cp -f \"%s\" \"%s\"" % (src, dst)))
     if not dryrun:
         if os.path.exists(dst):
             os.unlink(dst)
@@ -147,7 +147,7 @@ def doCopy(src, dst):
 
 
 def doLink(src, dst):
-    print("ln -f \"%s\" \"%s\"" % (src, dst))
+    print(("ln -f \"%s\" \"%s\"" % (src, dst)))
     if not dryrun:
         if os.path.exists(dst):
             os.unlink(dst)
@@ -157,7 +157,7 @@ def doLink(src, dst):
 def doSymlink(src, dst):
     if not os.path.isabs(src):
         src = os.path.relpath(src, os.path.dirname(dst))
-    print("ln -sf \"%s\" \"%s\"" % (src, dst))
+    print(("ln -sf \"%s\" \"%s\"" % (src, dst)))
     if not dryrun:
         if os.path.exists(dst):
             os.unlink(dst)
@@ -183,14 +183,14 @@ def isCatNewer(catfile, timestamp):
 
 
 def copyDriver(drvdir, pkgname, dstroot):
-    print("# processing %s" % drvdir)
+    print(("# processing %s" % drvdir))
     dstsubdirs, timestamp = processCat(drvdir, pkgname + ".cat")
     for d in dstsubdirs:
         dstdir = os.path.join(dstroot, d)
         doMkdir(dstdir)
         pkgdir = os.path.join(dstdir, pkgname)
         if isCatNewer(os.path.join(pkgdir, pkgname + ".cat"), timestamp):
-            print("# %s is newer than %s: skipping" % (pkgdir, drvdir))
+            print(("# %s is newer than %s: skipping" % (pkgdir, drvdir)))
         else:
             cpTree(drvdir, pkgdir)
 
@@ -230,7 +230,7 @@ def main():
     parser.add_argument('dstroot',
                         help='where to lay out drivers canonically')
     parser.add_argument("-m", "--mode",
-                        choices=modes.keys(),
+                        choices=list(modes.keys()),
                         default='copy',
                         help="how to put data in destination")
     parser.add_argument("-n", "--dry-run", action="store_true", default=False,

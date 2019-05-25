@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 #
 # Copyright 2015 Red Hat, Inc.
 #
@@ -23,12 +23,12 @@ import tempfile
 ###################
 
 def fail(msg):
-    print msg
+    print(msg)
     sys.exit(1)
 
 
 def run(cmd):
-    print "+ %s" % cmd
+    print("+ %s" % cmd)
     os.system(cmd)
 
 
@@ -120,16 +120,16 @@ def main():
     origdir = extract_files(os.path.abspath(options.orig))
     newdir = extract_files(os.path.abspath(options.new))
 
-    print
-    print
-    print "tree diff:"
+    print()
+    print()
+    print("tree diff:")
     run("""bash -c 'diff -rup <(cd %s; tree) <(cd %s; tree)'""" %
         (origdir, newdir))
 
     if not options.treeonly:
-        print
-        print
-        print "file diff:"
+        print()
+        print()
+        print("file diff:")
         run(r"diff -rup --exclude \*.vfd --exclude \*.iso %s %s" %
             (origdir, newdir))
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 #
 # Copyright 2015 Red Hat, Inc.
 #
@@ -30,15 +30,15 @@ def run(cmd, shell=False):
     ret = proc.wait()
     output = proc.stdout.read()
     if ret != 0:
-        print 'Command had a bad exit code: %s' % ret
-        print 'Command run: %s' % cmd
-        print 'Output:\n%s' % output
+        print('Command had a bad exit code: %s' % ret)
+        print('Command run: %s' % cmd)
+        print('Output:\n%s' % output)
         sys.exit(ret)
     return ret, output
 
 
 def fail(msg):
-    print "ERROR: %s" % msg
+    print("ERROR: %s" % msg)
     sys.exit(1)
 
 
@@ -49,7 +49,7 @@ def fail(msg):
 def download_virtio_win_license(outdir):
     # The license isn't distributed with the built sources. Just download
     # an approximation from git.
-    print "Downloading license from kvm-guest-drivers-windows.git"
+    print("Downloading license from kvm-guest-drivers-windows.git")
     destfile = os.path.join(outdir, "virtio-win_license.txt")
     os.system("wget -qO- https://raw.githubusercontent.com/virtio-win/"
               "kvm-guest-drivers-windows/master/LICENSE > %s" % destfile)
@@ -111,7 +111,7 @@ def copy_virtio_drivers(input_dir, outdir, flavor):
         if ostuple not in alldirs:
             alldirs.append(ostuple)
 
-    drivers = filemap.DRIVER_OS_MAP.keys()[:]
+    drivers = list(filemap.DRIVER_OS_MAP.keys())[:]
     copymap = {}
     missing_patterns = []
     qemupciserial_ostuple = "./rhel" if flavor == "rhel" else "./"
@@ -146,7 +146,7 @@ def copy_virtio_drivers(input_dir, outdir, flavor):
         fail(msg)
 
     # Actually copy the files, and track the ones we've seen
-    for srcfile, dests in copymap.items():
+    for srcfile, dests in list(copymap.items()):
         for d in dests:
             d = os.path.join(outdir, d)
             if not os.path.exists(d):
@@ -154,7 +154,7 @@ def copy_virtio_drivers(input_dir, outdir, flavor):
             shutil.copy2(srcfile, d)
 
     # The keys here are all a list of files we actually copied
-    return copymap.keys()
+    return list(copymap.keys())
 
 
 def check_remaining_files(input_dir, seenfiles, flavor):
@@ -307,7 +307,7 @@ def main():
     # Verify that there is nothing left over that we missed
     check_remaining_files(options.input_dir, seenfiles, flavor)
 
-    print "Generated %s" % outdir
+    print("Generated %s" % outdir)
     return 0
 
 

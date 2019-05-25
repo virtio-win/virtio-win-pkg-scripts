@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 #
 # Copyright 2015 Red Hat, Inc.
 #
@@ -138,9 +138,9 @@ def run(cmd, shell=False):
     output, dummy = proc.communicate()
     ret = proc.wait()
     if ret != 0:
-        print 'Command had a bad exit code: %s' % ret
-        print 'Command run: %s' % cmd
-        print 'Output:\n%s' % output
+        print('Command had a bad exit code: %s' % ret)
+        print('Command run: %s' % cmd)
+        print('Output:\n%s' % output)
         sys.exit(ret)
     return ret, output
 
@@ -151,7 +151,7 @@ def run(cmd, shell=False):
 
 def build_vfd(fname, dmap, driverdir, rootdir, finaldir):
     """construct the VFD from the checkout"""
-    print 'building a VFD: ' + fname
+    print('building a VFD: ' + fname)
 
     # The temp directory where we stage the files that will go on the vfd
     floppydir = os.path.join(rootdir, "drivers")
@@ -167,19 +167,19 @@ def build_vfd(fname, dmap, driverdir, rootdir, finaldir):
     full_fname = os.path.join(finaldir, fname)
     run(('mkdosfs', '-C', full_fname, '2880'))
 
-    for vfd_map_src, vfd_map_dest in dmap.items():
+    for vfd_map_src, vfd_map_dest in list(dmap.items()):
         src = os.path.join(driverdir, vfd_map_src)
         dest_vfd = os.path.join(floppydir, vfd_map_dest)
         dest_archive = os.path.join(archive_vfd_dir, vfd_map_dest)
 
         try:
             os.makedirs(dest_vfd)
-        except OSError, e:
+        except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
         try:
             os.makedirs(dest_archive)
-        except OSError, e:
+        except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
 
@@ -224,7 +224,7 @@ def build_vfd(fname, dmap, driverdir, rootdir, finaldir):
 
 
 def hardlink_identical_files(outdir):
-    print "Hardlinking identical files..."
+    print("Hardlinking identical files...")
 
     hashmap = {}
     for root, dirs, files in os.walk(outdir):
@@ -247,7 +247,7 @@ def archive(nvr, finaldir):
     """
 
     # Generate .tar.gz
-    print 'archiving the results'
+    print('archiving the results')
     archivefile = os.path.join(os.path.dirname(finaldir),
         "%s-bin-for-rpm.tar.gz" % nvr)
     run('cd %s && tar -czvf %s %s' %
@@ -256,7 +256,7 @@ def archive(nvr, finaldir):
     # Copy results to cwd
     newarchive = os.path.join(os.getcwd(), os.path.basename(archivefile))
     shutil.copy2(archivefile, newarchive)
-    print 'archive successfully built: %s' % newarchive
+    print('archive successfully built: %s' % newarchive)
 
 
 ###################
