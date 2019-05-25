@@ -4,7 +4,6 @@
 # See --help and README for more details
 
 import argparse
-import atexit
 import datetime
 import difflib
 import getpass
@@ -21,6 +20,7 @@ import tempfile
 
 TOP_DIR = os.path.dirname(os.path.abspath(__file__))
 NEW_BUILDS_DIR = os.path.join(TOP_DIR, "new-builds")
+TOP_TEMP_DIR = None
 
 LOCAL_ROOT_DIR = os.path.expanduser("~/src/fedora/virt-group-repos/virtio-win")
 LOCAL_REPO_DIR = os.path.join(LOCAL_ROOT_DIR, "repo")
@@ -41,23 +41,21 @@ STABLE_RPMS = [
 ]
 
 
-# Directories added here are removed on exit
-CLEAN_DIRS = []
-NO_CLEANUP = False
+os.chdir(TOP_DIR)
 
 
-def _atexit_cleanup():
-    if NO_CLEANUP:
-        if CLEAN_DIRS:
-            print "Not cleaning up dirs: %s" % " ".join(CLEAN_DIRS)
-        return
+def _tempdir(dirname):
+    global TOP_TEMP_DIR
+    if TOP_TEMP_DIR is None:
+        datestr = re.sub(" |:", "_",
+                str(datetime.datetime.today()).split(".")[0])
+        TOP_TEMP_DIR = os.path.join(TOP_DIR, "tmp-" + datestr)
+        os.mkdir(TOP_TEMP_DIR)
+        print("Using tmpdir ./%s" % os.path.basename(TOP_TEMP_DIR))
 
-    for d in CLEAN_DIRS:
-        print "Removing %s" % d
-        shutil.rmtree(d)
-
-
-atexit.register(_atexit_cleanup)
+    ret = os.path.join(TOP_TEMP_DIR, dirname)
+    os.mkdir(ret)
+    return ret
 
 
 #########################
@@ -269,10 +267,8 @@ def make_virtio_win_rpm_archive(zip_dir, versionstr):
     Call the public virtio-win scripts to organize the driver input for
     the RPM
     """
-    input_dir = tempfile.mkdtemp(prefix='virtio-win-input-dir-')
-    CLEAN_DIRS.append(input_dir)
-    output_dir = tempfile.mkdtemp(prefix='virtio-win-driver-dir-')
-    CLEAN_DIRS.append(output_dir)
+    input_dir = _tempdir('make-driver-dir-input')
+    output_dir = _tempdir('make-driver-dir-output')
 
     # Change virtio-win-prewhql-0.1-100 to virtio-win-0.1.100, since it's
     # what we want for making RPM version happy
@@ -355,8 +351,7 @@ def _build_latest_rpm():
     qemu_ga_str = qemu_ga_str[len("mingw-"):]
 
     # Copy source archives to the RPM builddir
-    rpm_dir = tempfile.mkdtemp(prefix='virtio-win-rpm-dir-')
-    CLEAN_DIRS.append(rpm_dir)
+    rpm_dir = _tempdir('rpmbuild-root')
     shellcomm("cp %s/*-sources.zip %s" % (NEW_BUILDS_DIR, rpm_dir))
     shellcomm("cp %s/*.rpm %s" % (NEW_BUILDS_DIR, rpm_dir))
 
@@ -364,8 +359,7 @@ def _build_latest_rpm():
     # extract the qemu-ga-win RPM to it, rename the .msi files
     # and zip them up into the form virtio-win.spec is expecting.
     # Yeah this is rediculous...
-    qemu_ga_extractdir = tempfile.mkdtemp(prefix='mingw-qemu-ga-win-dir-')
-    CLEAN_DIRS.append(qemu_ga_extractdir)
+    qemu_ga_extractdir = _tempdir('mingw-qemu-ga-rpm-extracted')
     shellcomm("cd %s && rpm2cpio %s/qemu-ga-win*.noarch.rpm | cpio -idmv" %
         (qemu_ga_extractdir, NEW_BUILDS_DIR))
     shellcomm("find %s -name qemu-ga-x86_64.msi "
@@ -438,8 +432,7 @@ def _copy_direct_download_content_to_tree(rpms,
     Also generate root dir .htaccess redirects
     """
     rpmpath = [r for r in rpms if r.endswith(".noarch.rpm")][0]
-    extract_dir = tempfile.mkdtemp(prefix='virtio-win-rpm-extract-')
-    CLEAN_DIRS.append(extract_dir)
+    extract_dir = _tempdir('virtio-win-rpm-extract')
 
     # Extract RPM contents
     shellcomm("cd %s && rpm2cpio %s | cpio -idmv &> /dev/null" %
@@ -607,18 +600,12 @@ def parse_args():
         help="Only build RPM and move it to cwd.")
     parser.add_argument("--repo-only", action="store_true",
         help="Only regenerate repo and push changes")
-    parser.add_argument("--no-cleanup", action="store_true",
-        help="Don't clean up extracted/generated output (for debugging)")
 
     return parser.parse_args()
 
 
 def main():
     options = parse_args()
-    global NO_CLEANUP
-    NO_CLEANUP = options.no_cleanup
-
-    os.chdir(TOP_DIR)
     do_everything = (not options.rpm_only and not options.repo_only)
 
     if options.rpm_only or do_everything:
@@ -636,14 +623,13 @@ def main():
         _push_repos()
 
     if do_everything:
-        shutil.rmtree(NEW_BUILDS_DIR)
-
         print
         print
         print "Don't forget to:"
         print "- Commit all the spec file changes"
         print "- If this is a stable build, update the STABLE_RPMS list in"
         print "  this scripts code and re-run with --repo-only"
+        print "- Delete any local tmp* dirs"
         print
 
     return 0
