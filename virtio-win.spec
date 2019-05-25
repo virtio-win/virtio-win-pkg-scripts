@@ -103,7 +103,7 @@ popd
 %{__ln_s} %{name}-%{version}_amd64.vfd %{buildroot}%{_datadir}/%{name}/%{name}_amd64.vfd
 
 %{__install} -p -m0644 %{name}-%{version}_servers_x86.vfd  %{buildroot}%{_datadir}/%{name}
-%{__ln_s} %{name}-%{version}_servers__x86.vfd %{buildroot}%{_datadir}/%{name}/%{name}_servers_x86.vfd
+%{__ln_s} %{name}-%{version}_servers_x86.vfd %{buildroot}%{_datadir}/%{name}/%{name}_servers_x86.vfd
 %{__install} -p -m0644 %{name}-%{version}_servers_amd64.vfd  %{buildroot}%{_datadir}/%{name}
 %{__ln_s} %{name}-%{version}_servers_amd64.vfd %{buildroot}%{_datadir}/%{name}/%{name}_servers_amd64.vfd
 %endif
