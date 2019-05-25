@@ -281,21 +281,34 @@ def make_virtio_win_rpm_archive(zip_dir, versionstr):
     for zipfile in glob.glob(os.path.join(zip_dir, "*.zip")):
         if zipfile.endswith("-sources.zip"):
             continue
-        shellcomm("unzip %s -d %s" % (zipfile, input_dir))
 
-        # qxlwddm archive layout is in flux. 0.17 has two directories
-        #  * 10/ : Contains Win10 binaries
-        #  * 10-base/ : Contains Win8 binaries
-        # Rename these to 'just work' with our scripts. When the changes
-        # settle down we can permanently adjust
         zipbasename = os.path.basename(zipfile)
-        unzipdir = os.path.join(input_dir, os.path.splitext(zipbasename)[0])
-        if re.match(r"^spice-qxl-wddm-dod-\d+\.\d+.zip$", zipbasename):
-            shellcomm("rsync --archive %s/* %s/Win10/" % (unzipdir, input_dir))
-            shutil.rmtree(unzipdir)
-        if re.match("^spice-qxl-wddm-dod-.*8.1-compatible.zip$", zipbasename):
-            shellcomm("rsync --archive %s/* %s/Win8/" % (unzipdir, input_dir))
-            shutil.rmtree(unzipdir)
+        is_qxl = bool(re.match(
+            r"^spice-qxl-wddm-dod-\d+\.\d+.zip$", zipbasename))
+        is_qxl_compat = bool(re.match(
+            "^spice-qxl-wddm-dod-.*8.1-compatible.zip$", zipbasename))
+
+        unzipdest = input_dir
+        if is_qxl or is_qxl_compat:
+            unzipdest = os.path.join(unzipdest, zipbasename)
+        shellcomm("unzip %s -d %s" % (zipfile, unzipdest))
+
+        # qxlwddm archive layout is in flux.
+        #
+        #  spice-qxl-wddm-dod-0.19.zip - > w10/*
+        #  spice-qxl-wddm-dod-8.1-compatible.zip -> spice-qxl-wddm-dod-8.1-compatible/*
+        #
+        # Rename these to 'just work' with our scripts
+        if is_qxl or is_qxl_compat:
+            qxlfiles = os.listdir(unzipdest)
+            qxlrootdir = os.path.join(unzipdest, qxlfiles[0])
+            if len(qxlfiles) != 1 or not os.path.isdir(qxlrootdir):
+                fail("Expected only a single dir in %s, but found: %s" %
+                    (unzipdest, qxlfiles))
+            destver = is_qxl and "Win10" or "Win8"
+            shellcomm("rsync --archive %s/* %s/%s/" %
+                (qxlrootdir, input_dir, destver))
+            shutil.rmtree(unzipdest)
 
     # Copy static old-drivers/ content into place
     shellcomm("cp -r old-drivers/xp-viostor/* %s" % input_dir)

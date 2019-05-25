@@ -167,6 +167,9 @@ def check_remaining_files(input_dir, seenfiles, flavor):
         # (private mail May 2015)
         r".*DVL\.XML",
         ".*vioser-test.*",
+        # Added in 171 build in May 2019, similar to above XML so I
+        # presume it shouldn't be shipped
+        r".*DVL-compat\.XML",
 
         # These are files that are needed for the build process. They
         # were added to the prewhql sources in July 2015.
