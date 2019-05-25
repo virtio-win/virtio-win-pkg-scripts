@@ -19,25 +19,27 @@ import sys
 import tempfile
 
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
-new_builds = os.path.join(script_dir, "new-builds")
-local_root = os.path.expanduser("~/src/fedora/virt-group-repos/virtio-win")
-local_repodir = os.path.join(local_root, "repo")
-local_directdir = os.path.join(local_root, "direct-downloads")
-http_directdir = "/groups/virt/virtio-win/direct-downloads"
-hosteduser = os.environ.get("FAS_USERNAME", None) or getpass.getuser()
+TOP_DIR = os.path.dirname(os.path.abspath(__file__))
+NEW_BUILDS_DIR = os.path.join(TOP_DIR, "new-builds")
+
+LOCAL_ROOT_DIR = os.path.expanduser("~/src/fedora/virt-group-repos/virtio-win")
+LOCAL_REPO_DIR = os.path.join(LOCAL_ROOT_DIR, "repo")
+LOCAL_DIRECT_DIR = os.path.join(LOCAL_ROOT_DIR, "direct-downloads")
+HTTP_DIRECT_DIR = "/groups/virt/virtio-win/direct-downloads"
+HOSTED_USERNAME = os.environ.get("FAS_USERNAME", None) or getpass.getuser()
 
 # List of stable versions. Keep the newest version first.
 #
 # Note, if you update this, --repo-only doesn't currently handle
 # the .htacess updating. Do it by hand or fix this script :)
-stable_rpms = [
+STABLE_RPMS = [
     "0.1.141-1",  # RHEL7.4 zstream
     "0.1.126-2",  # RHEL7.3 and RHEL6.9
     "0.1.110-1",  # RHEL7.2 and RHEL6.8
     "0.1.102-1",  # RHEL6.7 version
     "0.1.96-1",  # RHEL7.1 version
 ]
+
 
 # Directories added here are removed on exit
 CLEAN_DIRS = []
@@ -68,8 +70,8 @@ class Spec(object):
     """
 
     def __init__(self, newvirtio, newqxl, newqemuga, newqxlwddm):
-        self._specpath = os.path.join(script_dir, "virtio-win.spec")
-        self._clogpath = os.path.join(script_dir, "rpm_changelog")
+        self._specpath = os.path.join(TOP_DIR, "virtio-win.spec")
+        self._clogpath = os.path.join(TOP_DIR, "rpm_changelog")
         self.newcontent = file(self._specpath).read()
         self.newclog = file(self._clogpath).read()
         self._origfullcontent = self.get_final_content()
@@ -247,7 +249,7 @@ def yes_or_no(msg):
 
 def get_package_string(package, zip_dir, rpm=False):
     """
-    Find the latest packages by parsing filenames from new_builds
+    Find the latest packages by parsing filenames from NEW_BUILDS_DIR
     """
     suffix = "-sources.zip"
     if rpm:
@@ -316,11 +318,11 @@ def make_virtio_win_rpm_archive(zip_dir, versionstr):
 
     # Build the driver dir
     shellcomm("%s/make-driver-dir.py %s --outdir %s" %
-        (script_dir, input_dir, output_dir))
+        (TOP_DIR, input_dir, output_dir))
 
     # Generate archive
     shellcomm("%s/make-virtio-win-rpm-archive.py %s %s" %
-        (script_dir, versionstr, output_dir))
+        (TOP_DIR, versionstr, output_dir))
 
 
 def user_edit_clog_content(spec, virtiowin_clog, qxlwddm_clog):
@@ -346,55 +348,55 @@ def _build_latest_rpm():
     Extract new-builds/, build the driver dir, build the RPM archive,
     edit the spec, build the RPM, copy it into place
     """
-    virtio_str = get_package_string("virtio-win-prewhql", new_builds)
-    qxl_str = get_package_string("qxl-win-unsigned", new_builds)
-    qxlwddm_str = get_package_string("spice-qxl-wddm-dod", new_builds)
-    qemu_ga_str = get_package_string("mingw-qemu-ga-win", new_builds, rpm=True)
+    virtio_str = get_package_string("virtio-win-prewhql", NEW_BUILDS_DIR)
+    qxl_str = get_package_string("qxl-win-unsigned", NEW_BUILDS_DIR)
+    qxlwddm_str = get_package_string("spice-qxl-wddm-dod", NEW_BUILDS_DIR)
+    qemu_ga_str = get_package_string("mingw-qemu-ga-win", NEW_BUILDS_DIR, rpm=True)
     qemu_ga_str = qemu_ga_str[len("mingw-"):]
 
     # Copy source archives to the RPM builddir
     rpm_dir = tempfile.mkdtemp(prefix='virtio-win-rpm-dir-')
     CLEAN_DIRS.append(rpm_dir)
-    shellcomm("cp %s/*-sources.zip %s" % (new_builds, rpm_dir))
-    shellcomm("cp %s/*.rpm %s" % (new_builds, rpm_dir))
+    shellcomm("cp %s/*-sources.zip %s" % (NEW_BUILDS_DIR, rpm_dir))
+    shellcomm("cp %s/*.rpm %s" % (NEW_BUILDS_DIR, rpm_dir))
 
-    # Create a temporary new_builds/mingw-qemu-ga-win directory,
+    # Create a temporary NEW_BUILDS_DIR/mingw-qemu-ga-win directory,
     # extract the qemu-ga-win RPM to it, rename the .msi files
     # and zip them up into the form virtio-win.spec is expecting.
     # Yeah this is rediculous...
     qemu_ga_extractdir = tempfile.mkdtemp(prefix='mingw-qemu-ga-win-dir-')
     CLEAN_DIRS.append(qemu_ga_extractdir)
     shellcomm("cd %s && rpm2cpio %s/qemu-ga-win*.noarch.rpm | cpio -idmv" %
-        (qemu_ga_extractdir, new_builds))
+        (qemu_ga_extractdir, NEW_BUILDS_DIR))
     shellcomm("find %s -name qemu-ga-x86_64.msi "
         r"-exec mv '{}' %s/qemu-ga-x64.msi \;" %
-        (qemu_ga_extractdir, new_builds))
+        (qemu_ga_extractdir, NEW_BUILDS_DIR))
     shellcomm("find %s -name qemu-ga-i386.msi "
         r"-exec mv '{}' %s/qemu-ga-x86.msi \;" %
-        (qemu_ga_extractdir, new_builds))
+        (qemu_ga_extractdir, NEW_BUILDS_DIR))
     shellcomm(r"cd %s && mkdir %s && cp *.msi %s && "
         "zip -9 -r %s/%s-installers.zip %s && rm -rf %s" %
-        (new_builds, qemu_ga_str, qemu_ga_str, rpm_dir,
+        (NEW_BUILDS_DIR, qemu_ga_str, qemu_ga_str, rpm_dir,
          qemu_ga_str, qemu_ga_str, qemu_ga_str))
 
 
     # Call public scripts to generate the virtio .zip
-    make_virtio_win_rpm_archive(new_builds, virtio_str)
+    make_virtio_win_rpm_archive(NEW_BUILDS_DIR, virtio_str)
     # Move the build virtio-win archive to the rpm build dir
-    shellcomm("mv %s/*.tar.gz %s" % (script_dir, rpm_dir))
+    shellcomm("mv %s/*.tar.gz %s" % (TOP_DIR, rpm_dir))
 
     # A detailed changelog for virtio-win is listed in the -sources.zip
     # Pull it out for reference when editing the RPM changelog
     virtiowin_clog = os.path.join(rpm_dir, "virtio-win-changelog.txt")
     shellcomm("unzip -p %s/%s-sources.zip "
         "internal-kvm-guest-drivers-windows/status.txt > %s" %
-        (new_builds, virtio_str, virtiowin_clog))
+        (NEW_BUILDS_DIR, virtio_str, virtiowin_clog))
 
     # Same with the qxl wddm changelog
     wddm_clog = os.path.join(rpm_dir, "qxlwwdm-changelog.txt")
     shellcomm("unzip -p %s/%s-sources.zip "
         "spice-qxl-wddm-dod/Changelog > %s" %
-        (new_builds, qxlwddm_str, wddm_clog))
+        (NEW_BUILDS_DIR, qxlwddm_str, wddm_clog))
 
     # Just creating the Spec will queue up all expected changes.
     spec = Spec(virtio_str, qxl_str, qemu_ga_str, qxlwddm_str)
@@ -446,7 +448,7 @@ def _copy_direct_download_content_to_tree(rpms,
 
     # Move qemu-ga .msis
     qemuga_basedir = os.path.join("archive-qemu-ga", newqemuga)
-    qemugadir = os.path.join(local_directdir, qemuga_basedir)
+    qemugadir = os.path.join(LOCAL_DIRECT_DIR, qemuga_basedir)
     if not os.path.exists(qemugadir):
         os.mkdir(qemugadir)
         shellcomm("mv %s/* %s" %
@@ -456,7 +458,7 @@ def _copy_direct_download_content_to_tree(rpms,
     virtioversion = "virtio-win-%s" % newversion
     virtio_basedir = os.path.join("archive-virtio",
         virtioversion + "-%s" % newrelease)
-    virtiodir = os.path.join(local_directdir, virtio_basedir)
+    virtiodir = os.path.join(LOCAL_DIRECT_DIR, virtio_basedir)
     if os.path.exists(virtiodir):
         fail("dir=%s already exists? Make sure we aren't "
              "overwriting anything." % virtiodir)
@@ -467,7 +469,7 @@ def _copy_direct_download_content_to_tree(rpms,
         shellcomm("mv %s/%s %s" % (sharedir, versionfile, virtiodir))
         shellcomm("mv %s/%s %s" % (sharedir, symlink, virtiodir))
         return make_redirect(
-            os.path.join(http_directdir, virtio_basedir),
+            os.path.join(HTTP_DIRECT_DIR, virtio_basedir),
             symlink, versionfile)
 
     htaccess = ""
@@ -484,8 +486,8 @@ def _copy_direct_download_content_to_tree(rpms,
 
     # Make latest-qemu-ga, latest-virtio, and stable-virtio links
     def add_link(src, link):
-        fullsrc = os.path.join(local_directdir, src)
-        linkpath = os.path.join(local_directdir, link)
+        fullsrc = os.path.join(LOCAL_DIRECT_DIR, src)
+        linkpath = os.path.join(LOCAL_DIRECT_DIR, link)
 
         if not os.path.exists(fullsrc):
             fail("Nonexistent link src=%s for target=%s" % (fullsrc, linkpath))
@@ -493,15 +495,15 @@ def _copy_direct_download_content_to_tree(rpms,
             os.unlink(linkpath)
 
         shellcomm("ln -s %s %s" % (src, linkpath))
-        return make_redirect(http_directdir, link, src)
+        return make_redirect(HTTP_DIRECT_DIR, link, src)
 
     htaccess = ""
     htaccess += add_link(qemuga_basedir, "latest-qemu-ga")
     htaccess += add_link(virtio_basedir, "latest-virtio")
     htaccess += add_link(
-        "archive-virtio/virtio-win-%s" % stable_rpms[0],
+        "archive-virtio/virtio-win-%s" % STABLE_RPMS[0],
         "stable-virtio")
-    file(os.path.join(local_directdir, ".htaccess"), "w").write(htaccess)
+    file(os.path.join(LOCAL_DIRECT_DIR, ".htaccess"), "w").write(htaccess)
 
 
 def _copy_rpms_to_local_tree(rpms):
@@ -515,9 +517,9 @@ def _copy_rpms_to_local_tree(rpms):
         if filename.endswith(".src.rpm"):
             if filename.startswith("mingw-qemu-ga"):
                 continue
-            dest = os.path.join(local_repodir, "srpms", filename)
+            dest = os.path.join(LOCAL_REPO_DIR, "srpms", filename)
         else:
-            dest = os.path.join(local_repodir, "rpms", filename)
+            dest = os.path.join(LOCAL_REPO_DIR, "rpms", filename)
 
         shutil.move(path, dest)
         print "Generated %s" % dest
@@ -528,35 +530,35 @@ def _generate_repos():
     Create repo trees, run createrepo_c
     """
     # Generate stable symlinks
-    shellcomm("rm -rf %s/*" % os.path.join(local_repodir, "stable"))
-    for stablever in stable_rpms:
+    shellcomm("rm -rf %s/*" % os.path.join(LOCAL_REPO_DIR, "stable"))
+    for stablever in STABLE_RPMS:
         filename = "virtio-win-%s.noarch.rpm" % stablever
-        fullpath = os.path.join(local_repodir, "rpms", filename)
+        fullpath = os.path.join(LOCAL_REPO_DIR, "rpms", filename)
         if not os.path.exists(fullpath):
             fail("Didn't find stable RPM path %s" % fullpath)
 
         shellcomm("ln -s ../rpms/%s %s" % (filename,
-            os.path.join(local_repodir, "stable",
+            os.path.join(LOCAL_REPO_DIR, "stable",
                          os.path.basename(fullpath))))
 
     # Generate latest symlinks
-    shellcomm("rm -rf %s/*" % os.path.join(local_repodir, "latest"))
-    for fullpath in glob.glob(os.path.join(local_repodir, "rpms", "*.rpm")):
+    shellcomm("rm -rf %s/*" % os.path.join(LOCAL_REPO_DIR, "latest"))
+    for fullpath in glob.glob(os.path.join(LOCAL_REPO_DIR, "rpms", "*.rpm")):
         filename = os.path.basename(fullpath)
         shellcomm("ln -s ../rpms/%s %s" % (filename,
-            os.path.join(local_repodir, "latest", os.path.basename(fullpath))))
+            os.path.join(LOCAL_REPO_DIR, "latest", os.path.basename(fullpath))))
 
     # Generate repodata
     for rpmdir in ["latest", "stable", "srpms"]:
         shellcomm("rm -rf %s" %
-            os.path.join(local_repodir, rpmdir, "repodata"))
+            os.path.join(LOCAL_REPO_DIR, rpmdir, "repodata"))
         shellcomm("createrepo_c %s > /dev/null" %
-            os.path.join(local_repodir, rpmdir))
+            os.path.join(LOCAL_REPO_DIR, rpmdir))
 
     # Put the repo file in place
-    shellcomm("cp -f virtio-win.repo %s" % local_root)
+    shellcomm("cp -f virtio-win.repo %s" % LOCAL_ROOT_DIR)
     # Use the RPM changelog as a changelog file for the whole tree
-    shellcomm("cp -f rpm_changelog %s/CHANGELOG" % local_root)
+    shellcomm("cp -f rpm_changelog %s/CHANGELOG" % LOCAL_ROOT_DIR)
 
 
 def _run_rsync(dry):
@@ -567,12 +569,12 @@ def _run_rsync(dry):
     # Put the RPMs in place
     shellcomm("%s --exclude repodata %s/ "
         "%s@fedorapeople.org:~/virtgroup/virtio-win" %
-        (rsync, local_root, hosteduser))
+        (rsync, LOCAL_ROOT_DIR, HOSTED_USERNAME))
 
     # Overwrite the repodata and remove stale files
     shellcomm("%s --delete %s/ "
         "%s@fedorapeople.org:~/virtgroup/virtio-win" %
-        (rsync, local_root, hosteduser))
+        (rsync, LOCAL_ROOT_DIR, HOSTED_USERNAME))
 
 
 def _push_repos():
@@ -598,7 +600,7 @@ def _push_repos():
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Scoop up the downloaded "
-        "builds from new_builds, generate the RPM using the public scripts "
+        "builds from NEW_BUILDS_DIR, generate the RPM using the public scripts "
         "and drop the output in $CWD.")
 
     parser.add_argument("--rpm-only", action="store_true",
@@ -616,7 +618,7 @@ def main():
     global NO_CLEANUP
     NO_CLEANUP = options.no_cleanup
 
-    os.chdir(script_dir)
+    os.chdir(TOP_DIR)
     do_everything = (not options.rpm_only and not options.repo_only)
 
     if options.rpm_only or do_everything:
@@ -634,13 +636,13 @@ def main():
         _push_repos()
 
     if do_everything:
-        shutil.rmtree(new_builds)
+        shutil.rmtree(NEW_BUILDS_DIR)
 
         print
         print
         print "Don't forget to:"
         print "- Commit all the spec file changes"
-        print "- If this is a stable build, update the stable_rpms list in"
+        print "- If this is a stable build, update the STABLE_RPMS list in"
         print "  this scripts code and re-run with --repo-only"
         print
 
