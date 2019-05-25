@@ -17,19 +17,7 @@ import shutil
 import sys
 import tempfile
 
-
-###################
-# Utility helpers #
-###################
-
-def fail(msg):
-    print(msg)
-    sys.exit(1)
-
-
-def run(cmd):
-    print("+ %s" % cmd)
-    os.system(cmd)
+from .utils import fail, shellcomm
 
 
 ######################
@@ -55,11 +43,12 @@ def extract_files(filename):
     if os.path.isdir(filename):
         pass
     elif filename.endswith(".zip"):
-        run("unzip %s -d %s > /dev/null" % (filename, extract_dir))
+        shellcomm("unzip %s -d %s > /dev/null" % (filename, extract_dir))
     elif filename.endswith(".tar.gz"):
-        run("tar -xvf %s --directory %s > /dev/null" % (filename, extract_dir))
+        shellcomm("tar -xvf %s --directory %s > /dev/null" %
+                (filename, extract_dir))
     elif filename.endswith(".rpm"):
-        run("cd %s && rpm2cpio %s | cpio -idm --quiet" %
+        shellcomm("cd %s && rpm2cpio %s | cpio -idm --quiet" %
             (extract_dir, filename))
     else:
         fail("Unexpected filename %s, only expecting .zip, *.tar.gz, .rpm, "
@@ -80,9 +69,10 @@ def extract_files(filename):
         media_out_dir = os.path.join(output_dir, os.path.basename(mediafile))
         os.mkdir(media_out_dir)
 
-        run("guestfish --ro --add %s --mount /dev/sda:/ glob copy-out '/*' %s"
+        shellcomm(
+            "guestfish --ro --add %s --mount /dev/sda:/ glob copy-out '/*' %s"
             " > /dev/null" % (mediafile, media_out_dir))
-        run("chmod -R 777 %s" % media_out_dir)
+        shellcomm("chmod -R 777 %s" % media_out_dir)
 
     return output_dir
 
@@ -97,10 +87,10 @@ Helper for comparing the output of make-virtio-win-rpm-archive.py. Can
 either compare the raw .tar.gz output, a virtio-win .rpm file,
 or two directories for make-driver-dir.py output. Example:
 
-- Run make-virtio-win-rpm-archive.py ...
-- Run make-virtio-win-rpm-archive.py, then move $OUTPUT.tar.gz to orig.tar.gz
+- shellcomm make-virtio-win-rpm-archive.py ...
+- shellcomm make-virtio-win-rpm-archive.py, then move $OUTPUT.tar.gz to orig.tar.gz
 - Make your changes to make-virtio-win-rpm-archive.py
-- Re-run make-virtio-win-rpm-archive.py, then move $OUTPUT.tar.gz to new.tar.gz
+- Re-shellcomm make-virtio-win-rpm-archive.py, then move $OUTPUT.tar.gz to new.tar.gz
 - Review changes: %(prog)s orig.tar.gz new.tar.gz
 """
     parser = argparse.ArgumentParser(description=desc,
@@ -123,14 +113,14 @@ def main():
     print()
     print()
     print("tree diff:")
-    run("""bash -c 'diff -rup <(cd %s; tree) <(cd %s; tree)'""" %
+    shellcomm("""bash -c 'diff -rup <(cd %s; tree) <(cd %s; tree)'""" %
         (origdir, newdir))
 
     if not options.treeonly:
         print()
         print()
         print("file diff:")
-        run(r"diff -rup --exclude \*.vfd --exclude \*.iso %s %s" %
+        shellcomm(r"diff -rup --exclude \*.vfd --exclude \*.iso %s %s" %
             (origdir, newdir))
 
     return 0

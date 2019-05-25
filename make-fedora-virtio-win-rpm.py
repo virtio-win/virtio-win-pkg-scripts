@@ -10,12 +10,11 @@ import getpass
 import glob
 import os
 import re
-import shlex
 import shutil
-import io
-import subprocess
 import sys
 import tempfile
+
+from util.utils import yes_or_no, fail, shellcomm
 
 
 TOP_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -160,86 +159,6 @@ class Spec(object):
     def write_changes(self):
         open(self._specpath, "w").write(self.newcontent)
         open(self._clogpath, "w").write(self.newclog)
-
-
-#####################
-# utility functions #
-#####################
-
-def make_redirect(root, old, new):
-    return "redirect permanent %s/%s %s/%s\n" % (root, old, root, new)
-
-
-def fail(msg):
-    print("ERROR: %s" % msg)
-    sys.exit(1)
-
-
-def _comm(comm, systemcompat, quiet=False, exc=False, **kwargs):
-    try:
-        if not quiet:
-            print("+ %s" % comm)
-
-        output = ""
-        read = False
-        if systemcompat:
-            kwargs["shell"] = True
-            if isinstance(sys.stdout, io.StringIO):
-                read = True
-        else:
-            read = True
-            if not isinstance(comm, list):
-                comm = shlex.split(comm)
-
-        if read:
-            kwargs["stdout"] = subprocess.PIPE
-            kwargs["stderr"] = subprocess.STDOUT
-
-        proc = subprocess.Popen(comm, **kwargs)
-        try:
-            output, dummy = proc.communicate()
-            sts = proc.wait()
-
-            if output is not None:
-                output = output.strip()
-        except (KeyboardInterrupt, SystemExit):
-            os.system("stty echo")
-            raise
-
-        if read and systemcompat:
-            output = output.strip()
-            sys.stdout.write(output)
-
-        if sts != 0:
-            errmsg = ("Command failed:\ncmd=%s\ncode=%s\nout=\n%s" %
-                      (comm, sts, output))
-            if exc:
-                raise RuntimeError(errmsg)
-            fail(errmsg)
-
-        return output, sts
-    except Exception as e:
-        if exc:
-            raise
-        fail("Command failed:\n%s\n%s" % (comm, str(e)))
-
-
-def shellcomm(comm, **kwargs):
-    return _comm(comm, True, **kwargs)[1]
-
-
-def runcomm(comm, **kwargs):
-    return _comm(comm, False, **kwargs)[0]
-
-
-def yes_or_no(msg):
-    while 1:
-        sys.stdout.write(msg)
-        sys.stdout.flush()
-        inp = sys.stdin.readline()
-        if inp.startswith("y"):
-            return True
-        return False
 
 
 ######################
@@ -434,6 +353,9 @@ def _copy_direct_download_content_to_tree(rpms,
 
     Also generate root dir .htaccess redirects
     """
+    def make_redirect(root, old, new):
+        return "redirect permanent %s/%s %s/%s\n" % (root, old, root, new)
+
     rpmpath = [r for r in rpms if r.endswith(".noarch.rpm")][0]
     extract_dir = _tempdir('virtio-win-rpm-extract')
 

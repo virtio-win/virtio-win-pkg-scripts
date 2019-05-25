@@ -10,36 +10,11 @@ import glob
 import os
 import re
 import shutil
-import subprocess
 import sys
 import textwrap
 
 from util import filemap
-
-
-###################
-# Utility helpers #
-###################
-
-def run(cmd, shell=False):
-    """
-    Run a command and collect the output and return value
-    """
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=shell,
-                            stderr=subprocess.STDOUT, close_fds=True)
-    ret = proc.wait()
-    output = proc.stdout.read()
-    if ret != 0:
-        print('Command had a bad exit code: %s' % ret)
-        print('Command run: %s' % cmd)
-        print('Output:\n%s' % output)
-        sys.exit(ret)
-    return ret, output
-
-
-def fail(msg):
-    print("ERROR: %s" % msg)
-    sys.exit(1)
+from util.utils import fail
 
 
 ######################
