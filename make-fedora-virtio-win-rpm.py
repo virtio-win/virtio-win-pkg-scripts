@@ -6,7 +6,6 @@
 import argparse
 import datetime
 import difflib
-import getpass
 import glob
 import os
 import re
@@ -20,24 +19,6 @@ from util.utils import yes_or_no, fail, shellcomm
 TOP_DIR = os.path.dirname(os.path.abspath(__file__))
 NEW_BUILDS_DIR = os.path.join(TOP_DIR, "new-builds")
 TOP_TEMP_DIR = None
-
-LOCAL_ROOT_DIR = os.path.expanduser("~/src/fedora/virt-group-repos/virtio-win")
-LOCAL_REPO_DIR = os.path.join(LOCAL_ROOT_DIR, "repo")
-LOCAL_DIRECT_DIR = os.path.join(LOCAL_ROOT_DIR, "direct-downloads")
-HTTP_DIRECT_DIR = "/groups/virt/virtio-win/direct-downloads"
-HOSTED_USERNAME = os.environ.get("FAS_USERNAME", None) or getpass.getuser()
-
-# List of stable versions. Keep the newest version first.
-#
-# Note, if you update this, --repo-only doesn't currently handle
-# the .htacess updating. Do it by hand or fix this script :)
-STABLE_RPMS = [
-    "0.1.141-1",  # RHEL7.4 zstream
-    "0.1.126-2",  # RHEL7.3 and RHEL6.9
-    "0.1.110-1",  # RHEL7.2 and RHEL6.8
-    "0.1.102-1",  # RHEL6.7 version
-    "0.1.96-1",  # RHEL7.1 version
-]
 
 
 os.chdir(TOP_DIR)
@@ -273,7 +254,9 @@ def _build_latest_rpm():
     qemu_ga_str = qemu_ga_str[len("mingw-"):]
 
     # Copy source archives to the RPM builddir
-    rpm_dir = _tempdir('rpmbuild-root')
+    rpm_dir = _tempdir('rpmbuild-src')
+    rpm_build_dir = _tempdir('rpmbuild-buildroot')
+    rpm_output_dir = _tempdir('rpmbuild-output')
     shellcomm("cp %s/*-sources.zip %s" % (NEW_BUILDS_DIR, rpm_dir))
     shellcomm("cp %s/*.rpm %s" % (NEW_BUILDS_DIR, rpm_dir))
 
@@ -336,180 +319,19 @@ def _build_latest_rpm():
     open(newspecpath, "w").write(spec.get_final_content())
 
     # Build the RPM
-    shellcomm("cd %s && rpmbuild -ba %s" %
-        (rpm_dir, os.path.basename(newspecpath)))
+    shellcomm("cd {topdir} && rpmbuild -ba --noclean "
+        "--define '_topdir {topdir}' "
+        "--define '_sourcedir {topdir}' "
+        "--define '_specdir {topdir}' "
+        "--define '_builddir {builddir}' "
+        "--define '_buildrootdir {builddir}' "
+        "--define '_rpmdir {outputdir}' "
+        "--define '_srcrpmdir {outputdir}' {spec}".format(
+            topdir=rpm_dir, builddir=rpm_build_dir,
+            outputdir=rpm_output_dir,
+            spec=os.path.basename(newspecpath)))
 
-    rpms = []
-    rpms += glob.glob("%s/virtio-win*.rpm" % rpm_dir)
-    rpms += glob.glob("%s/noarch/virtio-win*.rpm" % rpm_dir)
-    return spec, rpms
-
-
-def _copy_direct_download_content_to_tree(rpms,
-        newversion, newrelease, newqemuga):
-    """
-    Unpack the RPM we just made, copy certain bits like iso, vfd,
-    and agents to the direct download portion of the tree.
-
-    Also generate root dir .htaccess redirects
-    """
-    def make_redirect(root, old, new):
-        return "redirect permanent %s/%s %s/%s\n" % (root, old, root, new)
-
-    rpmpath = [r for r in rpms if r.endswith(".noarch.rpm")][0]
-    extract_dir = _tempdir('virtio-win-rpm-extract')
-
-    # Extract RPM contents
-    shellcomm("cd %s && rpm2cpio %s | cpio -idmv &> /dev/null" %
-        (extract_dir, rpmpath))
-    sharedir = extract_dir + "/usr/share/virtio-win/"
-
-    # Move qemu-ga .msis
-    qemuga_basedir = os.path.join("archive-qemu-ga", newqemuga)
-    qemugadir = os.path.join(LOCAL_DIRECT_DIR, qemuga_basedir)
-    if not os.path.exists(qemugadir):
-        os.mkdir(qemugadir)
-        shellcomm("mv %s/* %s" %
-            (os.path.join(sharedir, "guest-agent"), qemugadir))
-
-    # Move virtio .iso and .vfds
-    virtioversion = "virtio-win-%s" % newversion
-    virtio_basedir = os.path.join("archive-virtio",
-        virtioversion + "-%s" % newrelease)
-    virtiodir = os.path.join(LOCAL_DIRECT_DIR, virtio_basedir)
-    if os.path.exists(virtiodir):
-        fail("dir=%s already exists? Make sure we aren't "
-             "overwriting anything." % virtiodir)
-
-    os.mkdir(virtiodir)
-
-    def move_data(versionfile, symlink):
-        shellcomm("mv %s/%s %s" % (sharedir, versionfile, virtiodir))
-        shellcomm("mv %s/%s %s" % (sharedir, symlink, virtiodir))
-        return make_redirect(
-            os.path.join(HTTP_DIRECT_DIR, virtio_basedir),
-            symlink, versionfile)
-
-    htaccess = ""
-    htaccess += move_data("%s.iso" % virtioversion, "virtio-win.iso")
-    htaccess += move_data("%s_x86.vfd" % virtioversion,
-                          "virtio-win_x86.vfd")
-    htaccess += move_data("%s_amd64.vfd" % virtioversion,
-                          "virtio-win_amd64.vfd")
-
-    # Write .htaccess, redirecting symlinks to versioned files, so
-    # nobody ends up with unversioned files locally, since that
-    # will make for crappy bug reports
-    open(os.path.join(virtiodir, ".htaccess"), "w").write(htaccess)
-
-    # Make latest-qemu-ga, latest-virtio, and stable-virtio links
-    def add_link(src, link):
-        fullsrc = os.path.join(LOCAL_DIRECT_DIR, src)
-        linkpath = os.path.join(LOCAL_DIRECT_DIR, link)
-
-        if not os.path.exists(fullsrc):
-            fail("Nonexistent link src=%s for target=%s" % (fullsrc, linkpath))
-        if os.path.exists(linkpath):
-            os.unlink(linkpath)
-
-        shellcomm("ln -s %s %s" % (src, linkpath))
-        return make_redirect(HTTP_DIRECT_DIR, link, src)
-
-    htaccess = ""
-    htaccess += add_link(qemuga_basedir, "latest-qemu-ga")
-    htaccess += add_link(virtio_basedir, "latest-virtio")
-    htaccess += add_link(
-        "archive-virtio/virtio-win-%s" % STABLE_RPMS[0],
-        "stable-virtio")
-    open(os.path.join(LOCAL_DIRECT_DIR, ".htaccess"), "w").write(htaccess)
-
-
-def _copy_rpms_to_local_tree(rpms):
-    """
-    Copy RPMs to our local tree mirror, to get ready for repo creation
-    """
-    print()
-    print()
-    for path in rpms:
-        filename = os.path.basename(path)
-        if filename.endswith(".src.rpm"):
-            if filename.startswith("mingw-qemu-ga"):
-                continue
-            dest = os.path.join(LOCAL_REPO_DIR, "srpms", filename)
-        else:
-            dest = os.path.join(LOCAL_REPO_DIR, "rpms", filename)
-
-        shutil.move(path, dest)
-        print("Generated %s" % dest)
-
-
-def _generate_repos():
-    """
-    Create repo trees, run createrepo_c
-    """
-    # Generate stable symlinks
-    shellcomm("rm -rf %s/*" % os.path.join(LOCAL_REPO_DIR, "stable"))
-    for stablever in STABLE_RPMS:
-        filename = "virtio-win-%s.noarch.rpm" % stablever
-        fullpath = os.path.join(LOCAL_REPO_DIR, "rpms", filename)
-        if not os.path.exists(fullpath):
-            fail("Didn't find stable RPM path %s" % fullpath)
-
-        shellcomm("ln -s ../rpms/%s %s" % (filename,
-            os.path.join(LOCAL_REPO_DIR, "stable",
-                         os.path.basename(fullpath))))
-
-    # Generate latest symlinks
-    shellcomm("rm -rf %s/*" % os.path.join(LOCAL_REPO_DIR, "latest"))
-    for fullpath in glob.glob(os.path.join(LOCAL_REPO_DIR, "rpms", "*.rpm")):
-        filename = os.path.basename(fullpath)
-        shellcomm("ln -s ../rpms/%s %s" % (filename,
-            os.path.join(LOCAL_REPO_DIR, "latest", os.path.basename(fullpath))))
-
-    # Generate repodata
-    for rpmdir in ["latest", "stable", "srpms"]:
-        shellcomm("rm -rf %s" %
-            os.path.join(LOCAL_REPO_DIR, rpmdir, "repodata"))
-        shellcomm("createrepo_c %s > /dev/null" %
-            os.path.join(LOCAL_REPO_DIR, rpmdir))
-
-    # Put the repo file in place
-    shellcomm("cp -f virtio-win.repo %s" % LOCAL_ROOT_DIR)
-    # Use the RPM changelog as a changelog file for the whole tree
-    shellcomm("cp -f rpm_changelog %s/CHANGELOG" % LOCAL_ROOT_DIR)
-
-
-def _run_rsync(dry):
-    rsync = "rsync --archive --verbose --compress --progress "
-    if dry:
-        rsync += "--dry-run "
-
-    # Put the RPMs in place
-    shellcomm("%s --exclude repodata %s/ "
-        "%s@fedorapeople.org:~/virtgroup/virtio-win" %
-        (rsync, LOCAL_ROOT_DIR, HOSTED_USERNAME))
-
-    # Overwrite the repodata and remove stale files
-    shellcomm("%s --delete %s/ "
-        "%s@fedorapeople.org:~/virtgroup/virtio-win" %
-        (rsync, LOCAL_ROOT_DIR, HOSTED_USERNAME))
-
-
-def _push_repos():
-    """
-    rsync the changes to fedorapeople.org
-    """
-    print()
-    print()
-    _run_rsync(dry=True)
-
-    print()
-    print()
-    if not yes_or_no("Review the --dry-run changes. "
-        "Do you want to push? (y/n): "):
-        sys.exit(1)
-
-    _run_rsync(dry=False)
+    return rpm_output_dir, rpm_build_dir
 
 
 ###################
@@ -522,40 +344,30 @@ def parse_args():
         "and drop the output in $CWD.")
 
     parser.add_argument("--rpm-only", action="store_true",
-        help="Only build RPM and move it to cwd.")
-    parser.add_argument("--repo-only", action="store_true",
-        help="Only regenerate repo and push changes")
+        help="Only build RPM and exit.")
 
     return parser.parse_args()
 
 
 def main():
     options = parse_args()
-    do_everything = (not options.rpm_only and not options.repo_only)
 
-    if options.rpm_only or do_everything:
-        spec, rpms = _build_latest_rpm()
-        if options.rpm_only:
-            shellcomm("mv %s ." %
-                [r for r in rpms if r.endswith("noarch.rpm")][0])
-        else:
-            _copy_direct_download_content_to_tree(rpms,
-                    spec.newversion, spec.newrelease, spec.newqemuga)
-            _copy_rpms_to_local_tree(rpms)
+    rpm_output_dir, rpm_build_dir = _build_latest_rpm()
+    if options.rpm_only:
+        print("RPMs can be found in: %s" % rpm_output_dir)
+        return 0
 
-    if options.repo_only or do_everything:
-        _generate_repos()
-        _push_repos()
+    shellcomm("./make-repo.py --rpm-output %s --rpm-buildroot %s" %
+        (rpm_output_dir, rpm_build_dir))
 
-    if do_everything:
-        print()
-        print()
-        print("Don't forget to:")
-        print("- Commit all the spec file changes")
-        print("- If this is a stable build, update the STABLE_RPMS list in")
-        print("  this scripts code and re-run with --repo-only")
-        print("- Delete any local tmp* dirs")
-        print()
+    print()
+    print()
+    print("Don't forget to:")
+    print("- Commit all the spec file changes")
+    print("- If this is a stable build, update the STABLE_RPMS list in")
+    print("  this scripts code and re-run with --repo-only")
+    print("- Delete any local tmp* dirs")
+    print()
 
     return 0
 
