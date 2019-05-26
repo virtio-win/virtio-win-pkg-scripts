@@ -10,6 +10,7 @@ import glob
 import os
 import re
 import shutil
+import subprocess
 import sys
 import tempfile
 
@@ -23,6 +24,10 @@ TOP_TEMP_DIR = None
 
 os.chdir(TOP_DIR)
 
+
+##################
+# util functions #
+##################
 
 def _tempdir(dirname):
     global TOP_TEMP_DIR
@@ -98,7 +103,8 @@ class Spec(object):
     """
 
     def __init__(self, buildversions):
-        self._specpath = os.path.join(TOP_DIR, "virtio-win.spec")
+        self.basename = "virtio-win.spec"
+        self._specpath = os.path.join(TOP_DIR, self.basename)
         self._clogpath = os.path.join(TOP_DIR, "rpm_changelog")
         self.newcontent = open(self._specpath).read()
         self.newclog = open(self._clogpath).read()
@@ -187,23 +193,22 @@ class Spec(object):
             fromfile="Orig spec",
             tofile="New spec"))
 
-    def write_changes(self):
+    def write_changes(self, rpm_src_dir):
         open(self._specpath, "w").write(self.newcontent)
         open(self._clogpath, "w").write(self.newclog)
+        newspecpath = os.path.join(rpm_src_dir, self.basename)
+        open(newspecpath, "w").write(self.get_final_content())
 
 
 ######################
 # Functional helpers #
 ######################
 
-def make_virtio_win_rpm_archive(buildversions):
+def _prep_driver_dir_input(driver_input_dir):
     """
-    Call the public virtio-win scripts to organize the driver input for
-    the RPM
+    Extrace NEW_BUILDS_DIR/ content, apply some fix ups, so
+    we can run make-driver-dir.py against it
     """
-    input_dir = _tempdir('make-driver-dir-input')
-    output_dir = _tempdir('make-driver-dir-output')
-
     # Extract virtio/qxl/... build archives
     for zipfile in glob.glob(os.path.join(NEW_BUILDS_DIR, "*.zip")):
         if zipfile.endswith("-sources.zip"):
@@ -215,7 +220,7 @@ def make_virtio_win_rpm_archive(buildversions):
         is_qxl_compat = bool(re.match(
             "^spice-qxl-wddm-dod-.*8.1-compatible.zip$", zipbasename))
 
-        unzipdest = input_dir
+        unzipdest = driver_input_dir
         if is_qxl or is_qxl_compat:
             unzipdest = os.path.join(unzipdest, zipbasename)
         shellcomm("unzip %s -d %s" % (zipfile, unzipdest))
@@ -235,51 +240,27 @@ def make_virtio_win_rpm_archive(buildversions):
                     (unzipdest, qxlfiles))
             destver = is_qxl and "Win10" or "Win8"
             shellcomm("rsync --archive %s/* %s/%s/" %
-                (qxlrootdir, input_dir, destver))
+                (qxlrootdir, driver_input_dir, destver))
             shutil.rmtree(unzipdest)
 
     # Copy static old-drivers/ content into place
-    shellcomm("cp -r old-drivers/xp-viostor/* %s" % input_dir)
-    shellcomm("cp -r old-drivers/xp-qxl/* %s" % input_dir)
-
-    # Build the driver dir
-    shellcomm("./make-driver-dir.py %s --outdir %s" %
-        (input_dir, output_dir))
-
-    # Generate archive
-    shellcomm("./make-virtio-win-rpm-archive.py %s %s" %
-        (buildversions.virtio_rpm_str, output_dir))
-
-
-def user_edit_clog_content(spec, virtiowin_clog, qxlwddm_clog):
-    """
-    Launch vim and let the user tweak the changelog if they want
-    """
-    tmp = tempfile.NamedTemporaryFile(mode="w+")
-    tmp.write(spec.newclog)
-    tmp.flush()
-    tmp.seek(0)
-
-    os.system("vim -p %s %s %s" % (virtiowin_clog, qxlwddm_clog, tmp.name))
-    spec.newclog = tmp.read()
-    tmp.close()
+    shellcomm("cp -r old-drivers/xp-viostor/* %s" % driver_input_dir)
+    shellcomm("cp -r old-drivers/xp-qxl/* %s" % driver_input_dir)
 
 
 ##################
 # main() helpers #
 ##################
 
-def _build_latest_rpm(buildversions):
+def _prep_rpm_src_dir(buildversions, rpm_src_dir):
     """
-    Extract new-builds/, build the driver dir, build the RPM archive,
-    edit the spec, build the RPM, copy it into place
+    Do our fedora specific RPM buildroot preparation, like renaming
+    some content to match the spec file, and moving NEW_BUILDS_DIR content
+    into place.
     """
     # Copy source archives to the RPM builddir
-    rpm_dir = _tempdir('rpmbuild-src')
-    rpm_build_dir = _tempdir('rpmbuild-buildroot')
-    rpm_output_dir = _tempdir('rpmbuild-output')
-    shellcomm("cp %s/*-sources.zip %s" % (NEW_BUILDS_DIR, rpm_dir))
-    shellcomm("cp %s/*.rpm %s" % (NEW_BUILDS_DIR, rpm_dir))
+    shellcomm("cp %s/*-sources.zip %s" % (NEW_BUILDS_DIR, rpm_src_dir))
+    shellcomm("cp %s/*.rpm %s" % (NEW_BUILDS_DIR, rpm_src_dir))
 
     # Extract the qemu-ga-win RPM to a tempdir, rename the .msi files
     # and zip them up into the form virtio-win.spec is expecting.
@@ -296,34 +277,43 @@ def _build_latest_rpm(buildversions):
         "zip -9 -r {rpmdir}/{qemuga}-installers.zip {qemuga} && "
         "rm -rf {qemuga}".format(
             qemuga=buildversions.qemu_ga_str,
-            rpmdir=rpm_dir))
+            rpmdir=rpm_src_dir))
     os.chdir(TOP_DIR)
 
-    # Call public scripts to generate the virtio .zip
-    make_virtio_win_rpm_archive(buildversions)
-    # Move the build virtio-win archive to the rpm build dir
-    shellcomm("mv %s/*.tar.gz %s" % (TOP_DIR, rpm_dir))
 
-    # A detailed changelog for virtio-win is listed in the -sources.zip
-    # Pull it out for reference when editing the RPM changelog
-    virtiowin_clog = os.path.join(rpm_dir, "virtio-win-changelog.txt")
-    shellcomm("unzip -p %s/%s-sources.zip "
-        "internal-kvm-guest-drivers-windows/status.txt > %s" %
-        (NEW_BUILDS_DIR, buildversions.virtio_prewhql_str, virtiowin_clog))
+def _prompt_for_rpm_changelog(buildversions, spec):
+    """
+    Interactively edit the rpm changelog, and confirm it
+    """
+    def _editable_tempfile(prefix, content):
+        _tmp = tempfile.NamedTemporaryFile(prefix=prefix, mode="w+")
+        _tmp.write(content)
+        _tmp.flush()
+        _tmp.seek(0)
+        return _tmp
 
-    # Same with the qxl wddm changelog
-    wddm_clog = os.path.join(rpm_dir, "qxlwwdm-changelog.txt")
-    shellcomm("unzip -p %s/%s-sources.zip "
-        "spice-qxl-wddm-dod/Changelog > %s" %
-        (NEW_BUILDS_DIR, buildversions.qxlwddm_str, wddm_clog))
+    # Save package changelogs to temporary files
+    voutput = subprocess.check_output(
+        "unzip -p %s/%s-sources.zip "
+        "internal-kvm-guest-drivers-windows/status.txt | cat" %
+        (NEW_BUILDS_DIR, buildversions.virtio_prewhql_str),
+        shell=True, text=True)
+    vtmp = _editable_tempfile("virtio-clog", voutput)
 
-    # Just creating the Spec will queue up all expected changes.
-    spec = Spec(buildversions)
+    qoutput = subprocess.check_output(
+        "unzip -p %s/%s-sources.zip "
+        "spice-qxl-wddm-dod/Changelog | cat" %
+        (NEW_BUILDS_DIR, buildversions.qxlwddm_str),
+        shell=True, text=True)
+    qtmp = _editable_tempfile("qxldod-clog", qoutput)
 
     # Confirm with the user that everything looks good
     while True:
         os.system("clear")
-        user_edit_clog_content(spec, virtiowin_clog, wddm_clog)
+        tmp = _editable_tempfile("rpm_changelog", spec.newclog)
+        os.system("vim -p %s %s %s" % (vtmp.name, qtmp.name, tmp.name))
+        spec.newclog = tmp.read()
+        tmp.close()
         os.system("clear")
 
         print(spec.diff())
@@ -331,14 +321,11 @@ def _build_latest_rpm(buildversions):
         if yes_or_no("Use this spec diff? (y/n, 'n' to edit changelog): "):
             break
 
-    os.unlink(virtiowin_clog)
 
-    # Save the changes
-    spec.write_changes()
-    newspecpath = os.path.join(rpm_dir, "virtio-win.spec")
-    open(newspecpath, "w").write(spec.get_final_content())
-
-    # Build the RPM
+def _rpmbuild(spec, rpm_src_dir, rpm_build_dir, rpm_output_dir):
+    """
+    Perform the rpmbuild command
+    """
     shellcomm("cd {topdir} && rpmbuild -ba --noclean "
         "--define '_topdir {topdir}' "
         "--define '_sourcedir {topdir}' "
@@ -347,11 +334,9 @@ def _build_latest_rpm(buildversions):
         "--define '_buildrootdir {builddir}' "
         "--define '_rpmdir {outputdir}' "
         "--define '_srcrpmdir {outputdir}' {spec}".format(
-            topdir=rpm_dir, builddir=rpm_build_dir,
+            topdir=rpm_src_dir, builddir=rpm_build_dir,
             outputdir=rpm_output_dir,
-            spec=os.path.basename(newspecpath)))
-
-    return rpm_output_dir, rpm_build_dir
+            spec=spec.basename))
 
 
 ###################
@@ -360,8 +345,8 @@ def _build_latest_rpm(buildversions):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Scoop up the downloaded "
-        "builds from NEW_BUILDS_DIR, generate the RPM using the public scripts "
-        "and drop the output in $CWD.")
+        "builds from NEW_BUILDS_DIR, generate the RPM using the public "
+        "scripts and drop the output in $CWD.")
 
     parser.add_argument("--rpm-only", action="store_true",
         help="Only build RPM and exit.")
@@ -372,13 +357,42 @@ def parse_args():
 def main():
     options = parse_args()
 
+    # Parse new package versions
     buildversions = BuildVersions()
 
-    rpm_output_dir, rpm_build_dir = _build_latest_rpm(buildversions)
+    # Do some RPM buildroot prep
+    rpm_src_dir = _tempdir('rpmbuild-src')
+    _prep_rpm_src_dir(buildversions, rpm_src_dir)
+
+    # Call public scripts to generate the virtio .zip
+    driver_input_dir = _tempdir("make-driver-dir-input")
+    _prep_driver_dir_input(driver_input_dir)
+
+    # Build the driver dir/iso dir layout
+    driver_output_dir = _tempdir("make-driver-dir-output")
+    shellcomm("./make-driver-dir.py %s --outdir %s" %
+        (driver_input_dir, driver_output_dir))
+
+    # Generate RPM input archive + vfd + iso
+    shellcomm("./make-virtio-win-rpm-archive.py %s %s" %
+        (buildversions.virtio_rpm_str, driver_output_dir))
+    shellcomm("mv *.tar.gz %s" % rpm_src_dir)
+
+    # Alter and save spec + changelog
+    spec = Spec(buildversions)
+    _prompt_for_rpm_changelog(buildversions, spec)
+    spec.write_changes(rpm_src_dir)
+
+    # Call rpmbuild
+    rpm_build_dir = _tempdir('rpmbuild-buildroot')
+    rpm_output_dir = _tempdir('rpmbuild-output')
+    _rpmbuild(spec, rpm_src_dir, rpm_build_dir, rpm_output_dir)
+
     if options.rpm_only:
         print("RPMs can be found in: %s" % rpm_output_dir)
         return 0
 
+    # Trigger make-repo.py
     shellcomm("./make-repo.py --rpm-output %s --rpm-buildroot %s" %
         (rpm_output_dir, rpm_build_dir))
 
