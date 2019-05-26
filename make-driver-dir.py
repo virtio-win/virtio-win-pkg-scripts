@@ -21,16 +21,16 @@ from util.utils import fail
 # Functional helpers #
 ######################
 
-def copy_license(input_dir, outdir):
+def copy_license(input_dir, output_dir):
     srcfile = os.path.join(input_dir, "LICENSE")
-    destfile = os.path.join(outdir, "virtio-win_license.txt")
+    destfile = os.path.join(output_dir, "virtio-win_license.txt")
     shutil.copy(srcfile, destfile)
     return [srcfile]
 
 
-def copy_inf_cat_driver(input_dir, outdir, drivername):
+def copy_inf_cat_driver(input_dir, output_dir, drivername):
     # Copies a driver consisting of just an .inf and .cat file
-    destdir = os.path.join(outdir, drivername)
+    destdir = os.path.join(output_dir, drivername)
     os.mkdir(destdir)
 
     seenfiles = [
@@ -71,7 +71,7 @@ def _update_copymap_for_driver(input_dir, ostuple, drivername, copymap):
     return missing_patterns
 
 
-def copy_virtio_drivers(input_dir, outdir, flavor):
+def copy_virtio_drivers(input_dir, output_dir, flavor):
     # Create a flat list of every leaf directory in the virtio-win directory
     alldirs = []
     for dirpath, dirnames, files in os.walk(input_dir):
@@ -120,7 +120,7 @@ def copy_virtio_drivers(input_dir, outdir, flavor):
     # Actually copy the files, and track the ones we've seen
     for srcfile, dests in list(copymap.items()):
         for d in dests:
-            d = os.path.join(outdir, d)
+            d = os.path.join(output_dir, d)
             if not os.path.exists(d):
                 os.makedirs(d)
             shutil.copy2(srcfile, d)
@@ -235,7 +235,7 @@ def check_remaining_files(input_dir, seenfiles, flavor):
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Copy built windows drivers to --outdir "
+        description="Copy built windows drivers to --output_dir "
                     "with the file layout expected by "
                     "make-virtio-win-rpm-archive.py. "
                     "See README.md for details.")
@@ -243,9 +243,10 @@ def parse_args():
     parser.add_argument("input_dir", help="Directory containing "
         "virtio-win and qxl-win build output")
 
-    default_outdir = os.path.join(os.getcwd(), "drivers_output")
-    parser.add_argument("--outdir", help="Directory to output the organized "
-        "drivers. Default=%s" % default_outdir, default=default_outdir)
+    default_output_dir = os.path.join(os.getcwd(), "drivers_output")
+    parser.add_argument("--output-dir", "--outdir",
+        help="Directory to output the organized drivers. "
+        "Default=%s" % default_output_dir, default=default_output_dir)
 
     parser.add_argument("--flavor", help="Flavor of drivers to use if more "
         "than one is available. Default is fedora.", default="fedora")
@@ -255,13 +256,13 @@ def parse_args():
 
 def main():
     options = parse_args()
-    outdir = options.outdir
+    output_dir = options.output_dir
     flavor = options.flavor
 
-    if not os.path.exists(outdir):
-        os.mkdir(outdir)
-    if os.listdir(outdir):
-        fail("%s is not empty." % outdir)
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
+    if os.listdir(output_dir):
+        fail("%s is not empty." % output_dir)
 
     if flavor != "fedora" and flavor != "rhel":
         fail("%s is not a known flavor." % flavor)
@@ -270,13 +271,13 @@ def main():
 
     # Actually move the files
     seenfiles = []
-    seenfiles += copy_virtio_drivers(options.input_dir, outdir, flavor)
-    seenfiles += copy_license(options.input_dir, outdir)
+    seenfiles += copy_virtio_drivers(options.input_dir, output_dir, flavor)
+    seenfiles += copy_license(options.input_dir, output_dir)
 
     # Verify that there is nothing left over that we missed
     check_remaining_files(options.input_dir, seenfiles, flavor)
 
-    print("Generated %s" % outdir)
+    print("Generated %s" % output_dir)
     return 0
 
 

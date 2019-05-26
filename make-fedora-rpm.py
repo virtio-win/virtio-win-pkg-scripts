@@ -370,7 +370,7 @@ def main():
 
     # Build the driver dir/iso dir layout
     driver_output_dir = _tempdir("make-driver-dir-output")
-    shellcomm("./make-driver-dir.py %s --outdir %s" %
+    shellcomm("./make-driver-dir.py %s --output-dir %s" %
         (driver_input_dir, driver_output_dir))
 
     # Generate RPM input archive + vfd + iso
