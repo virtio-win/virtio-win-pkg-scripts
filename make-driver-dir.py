@@ -28,21 +28,6 @@ def copy_license(input_dir, output_dir):
     return [srcfile]
 
 
-def copy_inf_cat_driver(input_dir, output_dir, drivername):
-    # Copies a driver consisting of just an .inf and .cat file
-    destdir = os.path.join(output_dir, drivername)
-    os.mkdir(destdir)
-
-    seenfiles = [
-        os.path.join(input_dir, drivername + ".inf"),
-        os.path.join(input_dir, drivername + ".cat"),
-    ]
-
-    for f in seenfiles:
-        shutil.copy2(f, destdir)
-    return seenfiles
-
-
 def _update_copymap_for_driver(input_dir, ostuple, drivername, copymap):
     destdirs = filemap.DRIVER_OS_MAP[drivername][ostuple]
     missing_patterns = []
