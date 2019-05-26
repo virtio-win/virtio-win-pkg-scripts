@@ -38,6 +38,56 @@ def _tempdir(dirname):
     return ret
 
 
+##########################
+# Version string parsing #
+##########################
+
+def parse_filename_version(pattern):
+    """
+    Find the latest packages by parsing filenames from NEW_BUILDS_DIR
+    """
+    paths = glob.glob(os.path.join(NEW_BUILDS_DIR, pattern))
+    if not paths:
+        fail("Didn't find any matches for %s\n"
+            "That directory should contain the downloaded output "
+            "from virtio-win-get-latest-builds.py" % pattern)
+
+    if len(paths) > 1:
+        fail("Unexpectedly found multiple matches: %s" % paths)
+
+    base = os.path.basename(paths[0])
+    suffixes = ["-sources.zip", ".src.rpm"]
+    for suffix in suffixes:
+        if base.endswith(suffix):
+            return base[:-len(suffix)]
+    fail("Didn't find any known suffix on %s: %s\nExtend the list!" %
+        (base, suffixes))
+
+
+class BuildVersions:
+    """
+    Helper class for inspecting NEW_BUILDS_DIR content and parsing
+    out various version strings we need to know
+    """
+    def __init__(self):
+        self.virtio_prewhql_str = parse_filename_version(
+                "virtio-win-prewhql*sources.zip")
+        self.qxl_str = parse_filename_version(
+                "qxl-win-unsigned*sources.zip")
+        self.qxlwddm_str = parse_filename_version(
+                "spice-qxl-wddm-dod*sources.zip")
+        self.mingw_qemu_ga_str = parse_filename_version(
+                "mingw-qemu-ga-win*src.rpm")
+        self.qemu_ga_str = self.mingw_qemu_ga_str[len("mingw-"):]
+
+        # Change virtio-win-prewhql-0.1-100 to virtio-win-0.1.100, since it's
+        # what we want for making RPM version happy
+        self.virtio_rpm_str = (
+            self.virtio_prewhql_str.rsplit(".", 1)[0] + "." +
+            self.virtio_prewhql_str.rsplit(".", 1)[1].replace("-", ".")
+            ).replace("-prewhql", "")
+
+
 #########################
 # specfile helper class #
 #########################
@@ -47,17 +97,17 @@ class Spec(object):
     Helper class for handling all the spec file editing.
     """
 
-    def __init__(self, newvirtio, newqxl, newqemuga, newqxlwddm):
+    def __init__(self, buildversions):
         self._specpath = os.path.join(TOP_DIR, "virtio-win.spec")
         self._clogpath = os.path.join(TOP_DIR, "rpm_changelog")
         self.newcontent = open(self._specpath).read()
         self.newclog = open(self._clogpath).read()
         self._origfullcontent = self.get_final_content()
 
-        self.newvirtio = newvirtio
-        self.newqxl = newqxl
-        self.newqxlwddm = newqxlwddm
-        self.newqemuga = newqemuga
+        self.newvirtio = buildversions.virtio_prewhql_str
+        self.newqxl = buildversions.qxl_str
+        self.newqemuga = buildversions.qemu_ga_str
+        self.newqxlwddm = buildversions.qxlwddm_str
 
         self.origvirtio = self._replace_global("virtio_win_prewhql_build",
             self.newvirtio)
@@ -146,29 +196,7 @@ class Spec(object):
 # Functional helpers #
 ######################
 
-def parse_filename_version(pattern):
-    """
-    Find the latest packages by parsing filenames from NEW_BUILDS_DIR
-    """
-    paths = glob.glob(os.path.join(NEW_BUILDS_DIR, pattern))
-    if not paths:
-        fail("Didn't find any matches for %s\n"
-            "That directory should contain the downloaded output "
-            "from virtio-win-get-latest-builds.py" % pattern)
-
-    if len(paths) > 1:
-        fail("Unexpectedly found multiple matches: %s" % paths)
-
-    base = os.path.basename(paths[0])
-    suffixes = ["-sources.zip", ".src.rpm"]
-    for suffix in suffixes:
-        if base.endswith(suffix):
-            return base[:-len(suffix)]
-    fail("Didn't find any known suffix on %s: %s\nExtend the list!" %
-        (base, suffixes))
-
-
-def make_virtio_win_rpm_archive(zip_dir, versionstr):
+def make_virtio_win_rpm_archive(buildversions):
     """
     Call the public virtio-win scripts to organize the driver input for
     the RPM
@@ -176,13 +204,8 @@ def make_virtio_win_rpm_archive(zip_dir, versionstr):
     input_dir = _tempdir('make-driver-dir-input')
     output_dir = _tempdir('make-driver-dir-output')
 
-    # Change virtio-win-prewhql-0.1-100 to virtio-win-0.1.100, since it's
-    # what we want for making RPM version happy
-    versionstr = (versionstr.rsplit(".", 1)[0] + "." +
-        versionstr.rsplit(".", 1)[1].replace("-", ".")).replace("-prewhql", "")
-
     # Extract virtio/qxl/... build archives
-    for zipfile in glob.glob(os.path.join(zip_dir, "*.zip")):
+    for zipfile in glob.glob(os.path.join(NEW_BUILDS_DIR, "*.zip")):
         if zipfile.endswith("-sources.zip"):
             continue
 
@@ -220,12 +243,12 @@ def make_virtio_win_rpm_archive(zip_dir, versionstr):
     shellcomm("cp -r old-drivers/xp-qxl/* %s" % input_dir)
 
     # Build the driver dir
-    shellcomm("%s/make-driver-dir.py %s --outdir %s" %
-        (TOP_DIR, input_dir, output_dir))
+    shellcomm("./make-driver-dir.py %s --outdir %s" %
+        (input_dir, output_dir))
 
     # Generate archive
-    shellcomm("%s/make-virtio-win-rpm-archive.py %s %s" %
-        (TOP_DIR, versionstr, output_dir))
+    shellcomm("./make-virtio-win-rpm-archive.py %s %s" %
+        (buildversions.virtio_rpm_str, output_dir))
 
 
 def user_edit_clog_content(spec, virtiowin_clog, qxlwddm_clog):
@@ -246,17 +269,11 @@ def user_edit_clog_content(spec, virtiowin_clog, qxlwddm_clog):
 # main() helpers #
 ##################
 
-def _build_latest_rpm():
+def _build_latest_rpm(buildversions):
     """
     Extract new-builds/, build the driver dir, build the RPM archive,
     edit the spec, build the RPM, copy it into place
     """
-    virtio_str = parse_filename_version("virtio-win-prewhql*sources.zip")
-    qxl_str = parse_filename_version("qxl-win-unsigned*sources.zip")
-    qxlwddm_str = parse_filename_version("spice-qxl-wddm-dod*sources.zip")
-    qemu_ga_str = parse_filename_version("mingw-qemu-ga-win*src.rpm")
-    qemu_ga_str = qemu_ga_str[len("mingw-"):]
-
     # Copy source archives to the RPM builddir
     rpm_dir = _tempdir('rpmbuild-src')
     rpm_build_dir = _tempdir('rpmbuild-buildroot')
@@ -264,27 +281,26 @@ def _build_latest_rpm():
     shellcomm("cp %s/*-sources.zip %s" % (NEW_BUILDS_DIR, rpm_dir))
     shellcomm("cp %s/*.rpm %s" % (NEW_BUILDS_DIR, rpm_dir))
 
-    # Create a temporary NEW_BUILDS_DIR/mingw-qemu-ga-win directory,
-    # extract the qemu-ga-win RPM to it, rename the .msi files
+    # Extract the qemu-ga-win RPM to a tempdir, rename the .msi files
     # and zip them up into the form virtio-win.spec is expecting.
     # Yeah this is rediculous...
     qemu_ga_extractdir = _tempdir('mingw-qemu-ga-rpm-extracted')
-    shellcomm("cd %s && rpm2cpio %s/qemu-ga-win*.noarch.rpm | cpio -idmv" %
-        (qemu_ga_extractdir, NEW_BUILDS_DIR))
-    shellcomm("find %s -name qemu-ga-x86_64.msi "
-        r"-exec mv '{}' %s/qemu-ga-x64.msi \;" %
-        (qemu_ga_extractdir, NEW_BUILDS_DIR))
-    shellcomm("find %s -name qemu-ga-i386.msi "
-        r"-exec mv '{}' %s/qemu-ga-x86.msi \;" %
-        (qemu_ga_extractdir, NEW_BUILDS_DIR))
-    shellcomm(r"cd %s && mkdir %s && cp *.msi %s && "
-        "zip -9 -r %s/%s-installers.zip %s && rm -rf %s" %
-        (NEW_BUILDS_DIR, qemu_ga_str, qemu_ga_str, rpm_dir,
-         qemu_ga_str, qemu_ga_str, qemu_ga_str))
-
+    os.chdir(qemu_ga_extractdir)
+    shellcomm("rpm2cpio %s/qemu-ga-win*.noarch.rpm | cpio -idmv" %
+        NEW_BUILDS_DIR)
+    shellcomm("find . -name qemu-ga-x86_64.msi "
+        r"-exec mv '{}' qemu-ga-x64.msi \;")
+    shellcomm("find . -name qemu-ga-i386.msi "
+        r"-exec mv '{}' qemu-ga-x86.msi \;")
+    shellcomm(r"mkdir {qemuga} && cp *.msi {qemuga} && "
+        "zip -9 -r {rpmdir}/{qemuga}-installers.zip {qemuga} && "
+        "rm -rf {qemuga}".format(
+            qemuga=buildversions.qemu_ga_str,
+            rpmdir=rpm_dir))
+    os.chdir(TOP_DIR)
 
     # Call public scripts to generate the virtio .zip
-    make_virtio_win_rpm_archive(NEW_BUILDS_DIR, virtio_str)
+    make_virtio_win_rpm_archive(buildversions)
     # Move the build virtio-win archive to the rpm build dir
     shellcomm("mv %s/*.tar.gz %s" % (TOP_DIR, rpm_dir))
 
@@ -293,16 +309,16 @@ def _build_latest_rpm():
     virtiowin_clog = os.path.join(rpm_dir, "virtio-win-changelog.txt")
     shellcomm("unzip -p %s/%s-sources.zip "
         "internal-kvm-guest-drivers-windows/status.txt > %s" %
-        (NEW_BUILDS_DIR, virtio_str, virtiowin_clog))
+        (NEW_BUILDS_DIR, buildversions.virtio_prewhql_str, virtiowin_clog))
 
     # Same with the qxl wddm changelog
     wddm_clog = os.path.join(rpm_dir, "qxlwwdm-changelog.txt")
     shellcomm("unzip -p %s/%s-sources.zip "
         "spice-qxl-wddm-dod/Changelog > %s" %
-        (NEW_BUILDS_DIR, qxlwddm_str, wddm_clog))
+        (NEW_BUILDS_DIR, buildversions.qxlwddm_str, wddm_clog))
 
     # Just creating the Spec will queue up all expected changes.
-    spec = Spec(virtio_str, qxl_str, qemu_ga_str, qxlwddm_str)
+    spec = Spec(buildversions)
 
     # Confirm with the user that everything looks good
     while True:
@@ -356,7 +372,9 @@ def parse_args():
 def main():
     options = parse_args()
 
-    rpm_output_dir, rpm_build_dir = _build_latest_rpm()
+    buildversions = BuildVersions()
+
+    rpm_output_dir, rpm_build_dir = _build_latest_rpm(buildversions)
     if options.rpm_only:
         print("RPMs can be found in: %s" % rpm_output_dir)
         return 0
