@@ -233,9 +233,11 @@ def _generate_repos():
             os.path.join(LOCAL_REPO_DIR, rpmdir))
 
     # Put the repo file in place
-    shellcomm("cp -f virtio-win.repo %s" % LocalRepo.LOCAL_ROOT_DIR)
+    shellcomm("cp -f data/virtio-win.repo %s" %
+            LocalRepo.LOCAL_ROOT_DIR)
     # Use the RPM changelog as a changelog file for the whole tree
-    shellcomm("cp -f rpm_changelog %s/CHANGELOG" % LocalRepo.LOCAL_ROOT_DIR)
+    shellcomm("cp -f data/rpm_changelog %s/CHANGELOG" %
+            LocalRepo.LOCAL_ROOT_DIR)
 
 
 def _run_rsync(dry):

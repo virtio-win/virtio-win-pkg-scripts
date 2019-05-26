@@ -105,7 +105,7 @@ class Spec(object):
     def __init__(self, buildversions):
         self.basename = "virtio-win.spec"
         self._specpath = os.path.join(TOP_DIR, self.basename)
-        self._clogpath = os.path.join(TOP_DIR, "rpm_changelog")
+        self._clogpath = os.path.join(TOP_DIR, "data", "rpm_changelog")
         self.newcontent = open(self._specpath).read()
         self.newclog = open(self._clogpath).read()
         self._origfullcontent = self.get_final_content()
@@ -243,9 +243,9 @@ def _prep_driver_dir_input(driver_input_dir):
                 (qxlrootdir, driver_input_dir, destver))
             shutil.rmtree(unzipdest)
 
-    # Copy static old-drivers/ content into place
-    shellcomm("cp -r old-drivers/xp-viostor/* %s" % driver_input_dir)
-    shellcomm("cp -r old-drivers/xp-qxl/* %s" % driver_input_dir)
+    # Copy static data/old-drivers/ content into place
+    shellcomm("cp -r data/old-drivers/xp-viostor/* %s" % driver_input_dir)
+    shellcomm("cp -r data/old-drivers/xp-qxl/* %s" % driver_input_dir)
 
 
 ##################

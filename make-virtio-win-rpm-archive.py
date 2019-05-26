@@ -205,13 +205,14 @@ def build_vfd(fname, dmap, driverdir, rootdir, finaldir):
             shutil.copy2(os.path.join(src, src_file), dest_archive)
 
     # These files only land in the VFDs
-    diskstub = os.path.join(script_dir, "vfd-data", "disk1")
+    vfd_dir = os.path.join(script_dir, "data", "vfd-data")
+    diskstub = os.path.join(vfd_dir, "disk1")
     shutil.copy2(diskstub, floppydir)
     if fname.endswith('x86.vfd'):
-        txtsetup32 = os.path.join(script_dir, "vfd-data", "txtsetup-i386.oem")
+        txtsetup32 = os.path.join(vfd_dir, "txtsetup-i386.oem")
         shutil.copy2(txtsetup32, os.path.join(floppydir, 'txtsetup.oem'))
     elif fname.endswith('amd64.vfd'):
-        txtsetup64 = os.path.join(script_dir, "vfd-data", "txtsetup-amd64.oem")
+        txtsetup64 = os.path.join(vfd_dir, "txtsetup-amd64.oem")
         shutil.copy2(txtsetup64, os.path.join(floppydir, 'txtsetup.oem'))
 
     # Copy files into the floppy image

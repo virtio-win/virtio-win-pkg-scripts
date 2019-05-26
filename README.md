@@ -68,7 +68,7 @@ The spec requires an additional bit to build: a .zip file containing
 qemu-guest-agent .msi builds.
 
 
-### vfd-data/
+### data/vfd-data/
 
 These are support files for building the .vfd images for windows. These
 files are copies of files from the kvm-guest-drivers-windows git repo
