@@ -146,21 +146,26 @@ class Spec(object):
 # Functional helpers #
 ######################
 
-def get_package_string(package, zip_dir, rpm=False):
+def parse_filename_version(pattern):
     """
     Find the latest packages by parsing filenames from NEW_BUILDS_DIR
     """
-    suffix = "-sources.zip"
-    if rpm:
-        suffix = ".src.rpm"
-    pattern = os.path.join(zip_dir, package + "*" + suffix)
-    sources_files = glob.glob(pattern)
-    if not sources_files:
+    paths = glob.glob(os.path.join(NEW_BUILDS_DIR, pattern))
+    if not paths:
         fail("Didn't find any matches for %s\n"
             "That directory should contain the downloaded output "
             "from virtio-win-get-latest-builds.py" % pattern)
 
-    return os.path.basename(sources_files[0])[:-len(suffix)]
+    if len(paths) > 1:
+        fail("Unexpectedly found multiple matches: %s" % paths)
+
+    base = os.path.basename(paths[0])
+    suffixes = ["-sources.zip", ".src.rpm"]
+    for suffix in suffixes:
+        if base.endswith(suffix):
+            return base[:-len(suffix)]
+    fail("Didn't find any known suffix on %s: %s\nExtend the list!" %
+        (base, suffixes))
 
 
 def make_virtio_win_rpm_archive(zip_dir, versionstr):
@@ -246,11 +251,10 @@ def _build_latest_rpm():
     Extract new-builds/, build the driver dir, build the RPM archive,
     edit the spec, build the RPM, copy it into place
     """
-    virtio_str = get_package_string("virtio-win-prewhql", NEW_BUILDS_DIR)
-    qxl_str = get_package_string("qxl-win-unsigned", NEW_BUILDS_DIR)
-    qxlwddm_str = get_package_string("spice-qxl-wddm-dod", NEW_BUILDS_DIR)
-    qemu_ga_str = get_package_string(
-            "mingw-qemu-ga-win", NEW_BUILDS_DIR, rpm=True)
+    virtio_str = parse_filename_version("virtio-win-prewhql*sources.zip")
+    qxl_str = parse_filename_version("qxl-win-unsigned*sources.zip")
+    qxlwddm_str = parse_filename_version("spice-qxl-wddm-dod*sources.zip")
+    qemu_ga_str = parse_filename_version("mingw-qemu-ga-win*src.rpm")
     qemu_ga_str = qemu_ga_str[len("mingw-"):]
 
     # Copy source archives to the RPM builddir
