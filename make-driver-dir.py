@@ -21,14 +21,11 @@ from util.utils import fail
 # Functional helpers #
 ######################
 
-def download_virtio_win_license(outdir):
-    # The license isn't distributed with the built sources. Just download
-    # an approximation from git.
-    print("Downloading license from kvm-guest-drivers-windows.git")
+def copy_license(input_dir, outdir):
+    srcfile = os.path.join(input_dir, "LICENSE")
     destfile = os.path.join(outdir, "virtio-win_license.txt")
-    os.system("wget -qO- https://raw.githubusercontent.com/virtio-win/"
-              "kvm-guest-drivers-windows/master/LICENSE > %s" % destfile)
-    return [destfile]
+    shutil.copy(srcfile, destfile)
+    return [srcfile]
 
 
 def copy_inf_cat_driver(input_dir, outdir, drivername):
@@ -146,16 +143,13 @@ def check_remaining_files(input_dir, seenfiles, flavor):
         # presume it shouldn't be shipped
         r".*DVL-compat\.XML",
 
-        # These are files that are needed for the build process. They
+        # These are files that are needed for the vfd build process. They
         # were added to the prewhql sources in July 2015.
         # See: https://bugzilla.redhat.com/show_bug.cgi?id=1217799
         #
-        # However we still need to rework this script to use those files,
-        # rather than grab licenses from http, and carry local vfd copies.
-        # It might take some coordination with the internal RHEL process
-        # though.
+        # We could possibly use them in this repo, but it's a bit
+        # difficult because of the RHEL build process sharing.
         # Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1251770
-        ".*/LICENSE",
         ".*/disk1",
         ".*/txtsetup-i386.oem",
         ".*/txtsetup-amd64.oem",
@@ -277,7 +271,7 @@ def main():
     # Actually move the files
     seenfiles = []
     seenfiles += copy_virtio_drivers(options.input_dir, outdir, flavor)
-    seenfiles += download_virtio_win_license(outdir)
+    seenfiles += copy_license(options.input_dir, outdir)
 
     # Verify that there is nothing left over that we missed
     check_remaining_files(options.input_dir, seenfiles, flavor)
