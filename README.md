@@ -45,18 +45,26 @@ It will output an archive virtio-win-$version-bin-for-rpm.zip in the current
 directory that is then used in the specfile.
 
 
-### make-fedora-virtio-win-rpm.py
+### make-repo.py
+
+Populates my local mirror of the fedorapeople.org virtio-win tree, moving
+direct downloads and RPMs into place, updating some convenience redirects,
+and then syncing the content up to fedorapeople.org
+
+
+### make-fedora-rpm.py
 
 Fedora-specific script that ties it all together. Run it like:
 
-    ./make-fedora-virtio-win-rpm.py
+    ./make-fedora-rpm.py
 
-What it does:
+What it does roughly:
 
 * Extracts all the .zip files in $scriptdir/new-builds/ to a temporary directory. The .zip files should contain all the build input for make-driver-dir.py. This needs to be prepopulated.
 * Runs make-driver-dir.py on the unzipped output
 * Runs make-virtio-win-rpm-archive.py on the make-driver-dir.py output
 * Updates the virtio-win.spec
+* Runs ./make-repo.py
 * Uploads output to the Fedora repo
 
 In my usage, the .zip files are downloaded from Red Hat's internal build system by a private cron script.
@@ -73,9 +81,3 @@ qemu-guest-agent .msi builds.
 These are support files for building the .vfd images for windows. These
 files are copies of files from the kvm-guest-drivers-windows git repo
 mentioned above.
-
-
-### tests/
-
-Compare two runs of the output .zip, .rpm, or directory with
-./tests/compare-output.py, see the --help output for details.
