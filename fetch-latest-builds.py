@@ -8,11 +8,11 @@ import argparse
 import configparser
 import difflib
 import distutils.version
+import io
 import os
 import re
 import shutil
 import subprocess
-import io
 import sys
 
 
@@ -24,39 +24,6 @@ INTERNAL_URL = None
 # Utility helpers #
 ###################
 
-def run(cmd, shell=False):
-    """run a command and collect the output and return value"""
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=shell,
-                            stderr=subprocess.STDOUT, close_fds=True,
-                            text=True)
-    ret = proc.wait()
-    output = proc.stdout.read()
-    if ret != 0:
-        print('Command had a bad exit code: %s' % ret)
-        print('Command run: %s' % cmd)
-        print('Output:\n%s' % output)
-        sys.exit(ret)
-    return ret, output
-
-
-def runshell(cmd):
-    ret = os.system(cmd)
-    if ret != 0:
-        print('Command had a bad exit code: %s' % ret)
-        print('Command run: %s' % cmd)
-        sys.exit(ret)
-    return ret
-
-
-def yes_or_no(msg):
-    while 1:
-        sys.stdout.write(msg)
-        inp = sys.stdin.readline()
-        if inp.startswith("y"):
-            return True
-        return False
-
-
 def fail(msg):
     print("ERROR: %s" % msg)
     sys.exit(1)
@@ -64,7 +31,7 @@ def fail(msg):
 
 def geturl(url):
     url = url.format(internalurl=INTERNAL_URL)
-    return run("wget -qO- %s" % url, shell=True)[1]
+    return subprocess.check_output("wget -qO- %s" % url, shell=True, text=True)
 
 
 def get_cfg_content(cfg):
@@ -324,7 +291,8 @@ def main():
     for url in urls:
         print("Downloading %s" % os.path.basename(url))
         url = url.format(internalurl=INTERNAL_URL)
-        runshell("cd %s && wget -q %s" % (output_dir, url))
+        subprocess.check_call(
+                "cd %s && wget -q %s" % (output_dir, url), shell=True)
     cfg.write(open(current_cfgpath, "w"))
 
     print()
