@@ -1,18 +1,18 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 #
 # Script that watches for internal virtio-win/qxl/qemu-ga windows builds
 # and downloads them for eventual distribution via fedora virtio-win.
 # See README and --help output for more details
 
 import argparse
-import ConfigParser
+import configparser
 import difflib
 import distutils.version
 import os
 import re
 import shutil
 import subprocess
-import StringIO
+import io
 import sys
 
 
@@ -27,13 +27,14 @@ INTERNAL_URL = None
 def run(cmd, shell=False):
     """run a command and collect the output and return value"""
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=shell,
-                            stderr=subprocess.STDOUT, close_fds=True)
+                            stderr=subprocess.STDOUT, close_fds=True,
+                            text=True)
     ret = proc.wait()
     output = proc.stdout.read()
     if ret != 0:
-        print 'Command had a bad exit code: %s' % ret
-        print 'Command run: %s' % cmd
-        print 'Output:\n%s' % output
+        print('Command had a bad exit code: %s' % ret)
+        print('Command run: %s' % cmd)
+        print('Output:\n%s' % output)
         sys.exit(ret)
     return ret, output
 
@@ -41,8 +42,8 @@ def run(cmd, shell=False):
 def runshell(cmd):
     ret = os.system(cmd)
     if ret != 0:
-        print 'Command had a bad exit code: %s' % ret
-        print 'Command run: %s' % cmd
+        print('Command had a bad exit code: %s' % ret)
+        print('Command run: %s' % cmd)
         sys.exit(ret)
     return ret
 
@@ -57,7 +58,7 @@ def yes_or_no(msg):
 
 
 def fail(msg):
-    print "ERROR: %s" % msg
+    print("ERROR: %s" % msg)
     sys.exit(1)
 
 
@@ -67,7 +68,7 @@ def geturl(url):
 
 
 def get_cfg_content(cfg):
-    buf = StringIO.StringIO()
+    buf = io.StringIO()
     cfg.write(buf)
     return buf.getvalue()
 
@@ -77,7 +78,7 @@ def find_links(url, extension):
     Scrape the passed URL for any links with the passed file extension
     """
     content = geturl(url)
-    rx = re.compile('href="(.*\.%s)"' % extension, re.IGNORECASE)
+    rx = re.compile(r'href="(.*\.%s)"' % extension, re.IGNORECASE)
     return [v for v in rx.findall(content)]
 
 
@@ -86,23 +87,19 @@ def find_links(url, extension):
 ###################
 
 def _find_latest_version_dir(url, regex):
-    def compare_version_number(num1, num2):
-        return (distutils.version.LooseVersion(num1) >
-                distutils.version.LooseVersion(num2))
-
     contents = geturl(url)
     rx = re.compile(regex, re.IGNORECASE)
     versions = [v for v in rx.findall(contents)]
-    versions.sort(cmp=compare_version_number)
+    versions.sort(key=distutils.version.LooseVersion)
     return versions[-1]
 
 
 def _check_mingw_qemu_ga_win():
     pkgurl = "{internalurl}/mingw-qemu-ga-win/"
-    regex = 'href="([\d\.]+)/"'
+    regex = r'href="([\d\.]+)/"'
     version = _find_latest_version_dir(pkgurl, regex)
 
-    regex = 'href="([\d\.]+\..*)\/"'
+    regex = r'href="([\d\.]+\..*)\/"'
     pkgurl += version + "/"
     release = _find_latest_version_dir(pkgurl, regex)
     url = pkgurl + release + "/"
@@ -111,7 +108,7 @@ def _check_mingw_qemu_ga_win():
 
 def _check_virtio_win_prewhql():
     pkgurl = "{internalurl}/virtio-win-prewhql/"
-    regex = 'href="([\d\.]+)/"'
+    regex = r'href="([\d\.]+)/"'
     version = _find_latest_version_dir(pkgurl, regex)
     pkgurl += version + "/"
     release = _find_latest_version_dir(pkgurl, regex)
@@ -121,7 +118,7 @@ def _check_virtio_win_prewhql():
 
 def _check_qxl():
     pkgurl = "https://www.spice-space.org/download/windows/qxl/"
-    regex = 'href="qxl-([\d\.-]+)/"'
+    regex = r'href="qxl-([\d\.-]+)/"'
     version = _find_latest_version_dir(pkgurl, regex)
     url = pkgurl + "qxl-" + version + "/"
     return url, version
@@ -129,7 +126,7 @@ def _check_qxl():
 
 def _check_qxlwddm():
     pkgurl = "https://www.spice-space.org/download/windows/qxl-wddm-dod/"
-    regex = 'href="qxl-wddm-dod-([\d\.-]+)/"'
+    regex = r'href="qxl-wddm-dod-([\d\.-]+)/"'
     version = _find_latest_version_dir(pkgurl, regex)
     url = pkgurl + "qxl-wddm-dod-" + version + "/"
     return url, version
@@ -196,7 +193,7 @@ def _get_virtio_urls(baseurl, version):
 
 
 def _get_qxl_urls(baseurl, version):
-    ignore = version
+    dummy = version
     want = [
         "qxl_w7_x64.zip",
         "qxl_w7_x86.zip",
@@ -264,7 +261,7 @@ def set_internal_url():
     if not os.path.exists(config_path):
         fail("Config file not found, see the docs: %s" % config_path)
 
-    script_cfg = ConfigParser.ConfigParser()
+    script_cfg = configparser.ConfigParser()
     script_cfg.read(config_path)
     global INTERNAL_URL
     INTERNAL_URL = script_cfg.get("config", "internal_url")
@@ -289,10 +286,10 @@ def main():
 
     current_cfgpath = os.path.join(script_dir, "latest-pkgs.ini")
     if not os.path.exists(current_cfgpath):
-        file(current_cfgpath, "w").write("")
+        open(current_cfgpath, "w").write("")
 
-    cfg = ConfigParser.ConfigParser()
-    oldcontent = file(current_cfgpath).read()
+    cfg = configparser.ConfigParser()
+    oldcontent = open(current_cfgpath).read()
     if not options.recheck:
         cfg.read(current_cfgpath)
 
@@ -306,11 +303,11 @@ def main():
         if get_cfg_content(cfg) == oldcontent:
             if (os.path.exists(output_dir) and
                 os.listdir(output_dir)):
-                print "%s is not empty" % (output_dir)
-                print reminder_msg
+                print("%s is not empty" % (output_dir))
+                print(reminder_msg)
                 return 1
 
-            print "Did not detect any new URLs"
+            print("Did not detect any new URLs")
             return 0
 
     urls = find_urls_to_download(cfg)
@@ -319,26 +316,26 @@ def main():
         shutil.rmtree(output_dir)
     os.mkdir(output_dir)
 
-    print
-    print "New builds found. Downloading them..."
-    print
+    print()
+    print("New builds found. Downloading them...")
+    print()
 
     # Download the latest bits
     for url in urls:
-        print "Downloading %s" % os.path.basename(url)
+        print("Downloading %s" % os.path.basename(url))
         url = url.format(internalurl=INTERNAL_URL)
         runshell("cd %s && wget -q %s" % (output_dir, url))
-    cfg.write(file(current_cfgpath, "w"))
+    cfg.write(open(current_cfgpath, "w"))
 
-    print
-    print ".ini diff is:"
-    print "".join(difflib.unified_diff(
+    print()
+    print(".ini diff is:")
+    print("".join(difflib.unified_diff(
             oldcontent.splitlines(1),
             get_cfg_content(cfg).splitlines(1),
             fromfile=os.path.basename(current_cfgpath),
-            tofile="new content"))
+            tofile="new content")))
 
-    print reminder_msg
+    print(reminder_msg)
     return 1
 
 
