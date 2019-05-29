@@ -344,8 +344,12 @@ def main():
         return 0
 
     # Trigger make-repo.py
-    shellcomm("./make-repo.py --rpm-output %s --rpm-buildroot %s" %
+    cmd = ("./make-repo.py --rpm-output %s --rpm-buildroot %s" %
         (rpm_output_dir, rpm_build_dir))
+    print("\n\n")
+    print(cmd)
+    if yes_or_no("Run that make-repo.py command? (y/n): "):
+        shellcomm(cmd)
 
     print()
     print()
