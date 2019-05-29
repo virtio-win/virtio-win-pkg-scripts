@@ -8,6 +8,7 @@ import argparse
 import configparser
 import difflib
 import distutils.version
+import json
 import os
 import re
 import shutil
@@ -43,6 +44,7 @@ def find_links(url, extension):
 #############################
 
 def _find_latest_version_dir(url, regex):
+    print("Checking: %s" % url)
     contents = geturl(url)
     rx = re.compile(regex, re.IGNORECASE)
     versions = [v for v in rx.findall(contents)]
@@ -223,6 +225,32 @@ def set_internal_url():
     INTERNAL_URL = script_cfg.get("config", "internal_url")
 
 
+def download_latest_buildversions():
+    """
+    Grab buildversions.json for the latest virtio-win build from the
+    fedorapeople site.
+    """
+    url = "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/virtio-win-pkg-scripts-input/latest-build/buildversions.json"  # pylint: disable=line-too-long
+    return geturl(url)
+
+
+def check_new_builds_is_same(buildversions_data):
+    if not os.path.exists(BuildVersions.NEW_BUILDS_JSON):
+        return False
+
+    orig = open(BuildVersions.NEW_BUILDS_JSON).read()
+    new = BuildVersions.dump(buildversions_data)
+    diff = "".join(difflib.unified_diff(
+            orig.splitlines(1), new.splitlines(1)))
+    if diff:
+        print("buildversions diff vs %s/:\n%s" % (
+            os.path.basename(BuildVersions.NEW_BUILDS_DIR), diff))
+        return False
+    print("%s already has the latest content. Exiting." %
+          BuildVersions.NEW_BUILDS_DIR)
+    return True
+
+
 def parse_args():
     parser = argparse.ArgumentParser(description="Check for any new internal "
         "builds that will require a virtio-win RPM respin, and download the "
@@ -240,19 +268,16 @@ def main():
 
     set_internal_url()
 
-    if options.redownload:
-        # XXX get buildversions from public URL, document it
-        pass
-    else:
+    if not options.redownload:
         buildversions_data = find_latest_buildversions()
 
         # If we already have the latest builds downloaded, just exit
-        if (os.path.exists(BuildVersions.NEW_BUILDS_JSON) and
-            (BuildVersions.dump(buildversions_data) ==
-             open(BuildVersions.NEW_BUILDS_JSON).read())):
-            print("%s already has the latest content. Exiting." %
-                  BuildVersions.NEW_BUILDS_DIR)
+        if check_new_builds_is_same(buildversions_data):
             return 0
+
+    public_buildversions_str = download_latest_buildversions()
+    if options.redownload:
+        buildversions_data = json.loads(public_buildversions_str)
 
     if os.path.exists(BuildVersions.NEW_BUILDS_DIR):
         shutil.rmtree(BuildVersions.NEW_BUILDS_DIR)
@@ -261,7 +286,6 @@ def main():
     print()
     print("New builds found. Downloading them...")
     print()
-    buildversions_str = BuildVersions.dump(buildversions_data)
 
     # Download the latest bits
     for data in buildversions_data.values():
@@ -273,18 +297,16 @@ def main():
                     shell=True)
 
     # Write the json content to NEW_BUILDS_DIR
-    BuildVersions.write(buildversions_str)
+    BuildVersions.write(buildversions_data)
+    buildversions_str = BuildVersions.dump(buildversions_data)
 
-    # XXX need to diff against published bits
-    """
     print()
-    print(".ini diff is:")
-    print("".join(difflib.unified_diff(
-            oldcontent.splitlines(1),
-            get_cfg_content(cfg).splitlines(1),
-            fromfile=os.path.basename(current_cfgpath),
-            tofile="new content")))
-    """
+    diff = "".join(difflib.unified_diff(
+            public_buildversions_str.splitlines(1),
+            buildversions_str.splitlines(1),
+            fromfile="orig buildversions.json",
+            tofile="published buildversions.json"))
+    print("buildversions diff from latest-build:\n%s" % diff)
 
     return 1
 

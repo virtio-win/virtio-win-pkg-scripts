@@ -21,8 +21,8 @@ class BuildVersions:
 
     @staticmethod
     def write(data):
-        open(BuildVersions.NEW_BUILDS_JSON, "w").write(
-                BuildVersions.dump(data))
+        datastr = BuildVersions.dump(data)
+        open(BuildVersions.NEW_BUILDS_JSON, "w").write(datastr)
 
     def __init__(self):
         self._data = json.load(open(self.NEW_BUILDS_JSON))

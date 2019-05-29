@@ -44,7 +44,7 @@ class LocalRepo():
     Helps contain the various repo tweaking logic
     """
     LOCAL_ROOT_DIR = os.path.expanduser(
-            "~/src/fedora/virt-group-repos/virtio-win-bak")
+            "~/src/fedora/virt-group-repos/virtio-win")
     LOCAL_REPO_DIR = os.path.join(LOCAL_ROOT_DIR, "repo")
     LOCAL_DIRECT_DIR = os.path.join(LOCAL_ROOT_DIR, "direct-downloads")
     HTTP_DIRECT_DIR = "/groups/virt/virtio-win/direct-downloads"
@@ -263,29 +263,36 @@ def _generate_repos():
             LocalRepo.LOCAL_ROOT_DIR)
 
 
-def _run_rsync(dry):
+def _run_rsync(reverse, dry):
     rsync = "rsync --archive --verbose --compress --progress "
     if dry:
         rsync += "--dry-run "
 
+    remote = ("%s@fedorapeople.org:~/virtgroup/virtio-win" %
+            LocalRepo.HOSTED_USERNAME)
+    local = LocalRepo.LOCAL_ROOT_DIR
+
+    if reverse:
+        src = remote
+        dst = local
+    else:
+        src = local
+        dst = remote
+
     # Put the RPMs in place
-    shellcomm("%s --exclude repodata %s/ "
-        "%s@fedorapeople.org:~/virtgroup/virtio-win" %
-        (rsync, LocalRepo.LOCAL_ROOT_DIR, LocalRepo.HOSTED_USERNAME))
+    shellcomm("%s --exclude repodata %s/ %s""" % (rsync, src, dst))
 
     # Overwrite the repodata and remove stale files
-    shellcomm("%s --delete %s/ "
-        "%s@fedorapeople.org:~/virtgroup/virtio-win" %
-        (rsync, LocalRepo.LOCAL_ROOT_DIR, LocalRepo.HOSTED_USERNAME))
+    shellcomm("%s --delete %s/ %s" % (rsync, src, dst))
 
 
-def _push_repos():
+def _push_repos(reverse):
     """
     rsync the changes to fedorapeople.org
     """
     print()
     print()
-    _run_rsync(dry=True)
+    _run_rsync(reverse=reverse, dry=True)
 
     print()
     print()
@@ -293,7 +300,7 @@ def _push_repos():
         "Do you want to push? (y/n): "):
         sys.exit(1)
 
-    _run_rsync(dry=False)
+    _run_rsync(reverse=reverse, dry=False)
 
 
 ###################
@@ -311,6 +318,9 @@ def parse_args():
         help="Directory containing RPM buildroot content")
     parser.add_argument("--regenerate-only", action="store_true",
         help="Only regenerate and push the repo contents")
+    parser.add_argument("--resync", action="store_true",
+        help="rsync fedorapeople contents back to the local machine,"
+             "to reset the local mirror.")
 
     return parser.parse_args()
 
@@ -318,7 +328,7 @@ def parse_args():
 def main():
     options = parse_args()
 
-    if not options.regenerate_only:
+    if not options.regenerate_only and not options.resync:
         if not options.rpm_output or not options.rpm_buildroot:
             fail("--rpm-output and --rpm-buildroot must both "
                     "be specified, or pass --regenerate-only to "
@@ -327,8 +337,9 @@ def main():
         _populate_local_tree(buildversions,
                 options.rpm_output, options.rpm_buildroot)
 
-    _generate_repos()
-    _push_repos()
+    if not options.resync:
+        _generate_repos()
+    _push_repos(reverse=options.resync)
 
     return 0
 
