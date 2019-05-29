@@ -6,6 +6,7 @@ import os
 import re
 import sys
 
+from util.buildversions import BuildVersions
 from util.utils import fail, shellcomm, yes_or_no
 
 
@@ -142,8 +143,27 @@ class LocalRepo():
         open(os.path.join(
             self.LOCAL_DIRECT_DIR, ".htaccess"), "w").write(htaccess)
 
+    def add_pkg_build_input(self, buildversions):
+        """
+        Upload the NEW_BUILDS_DIR content we used, so people can
+        reproduce the build if they need to
+        """
+        pkg_input_topdir = os.path.join(self.LOCAL_DIRECT_DIR,
+                "virtio-win-pkg-scripts-input")
+        pkg_input_dir = os.path.join(pkg_input_topdir, self.virtio_release_str)
+        if os.path.exists(pkg_input_dir):
+            print("%s exists, not changing content." % pkg_input_dir)
+            return
 
-def _populate_local_tree(rpm_output, rpm_buildroot):
+        os.mkdir(pkg_input_dir)
+        for filename in glob.glob(buildversions.NEW_BUILDS_DIR + "/*"):
+            shellcomm("cp %s %s" % (filename, pkg_input_dir))
+
+        shellcomm("ln -sf %s %s/latest-build " % (
+            os.path.basename(pkg_input_dir), pkg_input_topdir))
+
+
+def _populate_local_tree(buildversions, rpm_output, rpm_buildroot):
     """
     Copy all the built bits into our local repo tree to get it
     ready for syncing: vfd, iso, unpacked qemu-ga msis, etc.
@@ -190,6 +210,9 @@ def _populate_local_tree(rpm_output, rpm_buildroot):
 
     # Link htaccess latest-X/stable-X to latest media
     localrepo.add_htaccess_stable_links()
+
+    # Copy build input content to the tree
+    localrepo.add_pkg_build_input(buildversions)
 
     # Copy RPMs to the tree
     rpms = _glob(rpm_output + "/*.rpm", recursive=True)
@@ -300,7 +323,9 @@ def main():
             fail("--rpm-output and --rpm-buildroot must both "
                     "be specified, or pass --regenerate-only to "
                     "regen just the repo.")
-        _populate_local_tree(options.rpm_output, options.rpm_buildroot)
+        buildversions = BuildVersions()
+        _populate_local_tree(buildversions,
+                options.rpm_output, options.rpm_buildroot)
 
     _generate_repos()
     _push_repos()

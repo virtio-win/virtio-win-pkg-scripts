@@ -8,15 +8,15 @@ import argparse
 import configparser
 import difflib
 import distutils.version
-import io
 import os
 import re
 import shutil
 import subprocess
 import sys
 
+from util.buildversions import BuildVersions
+from util.utils import fail
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
 INTERNAL_URL = None
 
 
@@ -24,20 +24,9 @@ INTERNAL_URL = None
 # Utility helpers #
 ###################
 
-def fail(msg):
-    print("ERROR: %s" % msg)
-    sys.exit(1)
-
-
 def geturl(url):
     url = url.format(internalurl=INTERNAL_URL)
     return subprocess.check_output("wget -qO- %s" % url, shell=True, text=True)
-
-
-def get_cfg_content(cfg):
-    buf = io.StringIO()
-    cfg.write(buf)
-    return buf.getvalue()
 
 
 def find_links(url, extension):
@@ -49,9 +38,9 @@ def find_links(url, extension):
     return [v for v in rx.findall(content)]
 
 
-###################
-# Find new builds #
-###################
+#############################
+# Find latest named URL dir #
+#############################
 
 def _find_latest_version_dir(url, regex):
     contents = geturl(url)
@@ -97,24 +86,6 @@ def _check_qxlwddm():
     version = _find_latest_version_dir(pkgurl, regex)
     url = pkgurl + "qxl-wddm-dod-" + version + "/"
     return url, version
-
-
-def update_cfg_with_latest_urls(cfg):
-    """
-    Update the passed cfg with the latest URL for each package
-    """
-    def _set_cfg(section, url, version):
-        if not cfg.has_section(section):
-            cfg.add_section(section)
-        cfg.set(section, "url", url)
-        cfg.set(section, "version", version)
-
-    _set_cfg("mingw-qemu-ga-win", *_check_mingw_qemu_ga_win())
-    _set_cfg("virtio-win-prewhql", *_check_virtio_win_prewhql())
-    _set_cfg("qxl", *_check_qxl())
-    _set_cfg("qxlwddm", *_check_qxlwddm())
-
-    return cfg
 
 
 ###########################
@@ -196,26 +167,44 @@ def _get_qemuga_urls(baseurl, version):
     return ret
 
 
-def find_urls_to_download(cfg):
+def find_latest_buildversions():
     """
-    Given the cfg with the latest baseurls, download all the expected
-    build output
+    Check for newest versioned baseurls for each project, then check
+    for all the zip/rpm content below those that match our known
+    whitelist/blacklists
+
+    Return a dict with mapping like
+
+    { $packagename : {
+        "url": $baseurl, "version": $version, "files": [...]},
+      ... }
     """
-    urls = []
-    for section in cfg.sections():
-        url = cfg.get(section, "url")
-        version = cfg.get(section, "version")
+    buildversions_data = {}
 
-        if section == "qxl":
-            urls += _get_qxl_urls(url, version)
-        elif section == "qxlwddm":
-            urls += _get_qxlwddm_urls(url, version)
-        elif section == "virtio-win-prewhql":
-            urls += _get_virtio_urls(url, version)
-        elif section == "mingw-qemu-ga-win":
-            urls += _get_qemuga_urls(url, version)
+    def _check(packagename):
+        if packagename == "mingw-qemu-ga-win":
+            baseurl, version = _check_mingw_qemu_ga_win()
+            urls = _get_qemuga_urls(baseurl, version)
+        if packagename == "qxl":
+            baseurl, version = _check_qxl()
+            urls = _get_qxl_urls(baseurl, version)
+        if packagename == "qxlwddm":
+            baseurl, version = _check_qxlwddm()
+            urls = _get_qxlwddm_urls(baseurl, version)
+        if packagename == "virtio-win-prewhql":
+            baseurl, version = _check_virtio_win_prewhql()
+            urls = _get_virtio_urls(baseurl, version)
 
-    return urls
+        buildversions_data[packagename] = {}
+        buildversions_data[packagename]["version"] = version
+        buildversions_data[packagename]["urls"] = urls
+
+    _check("mingw-qemu-ga-win")
+    _check("qxl")
+    _check("qxlwddm")
+    _check("virtio-win-prewhql")
+
+    return buildversions_data
 
 
 ###################
@@ -242,8 +231,6 @@ def parse_args():
 
     parser.add_argument("--redownload", action="store_true",
         help="Redownload the latest packages")
-    parser.add_argument("--recheck", action="store_true",
-        help="Recheck for all versions and redownload")
 
     return parser.parse_args()
 
@@ -251,50 +238,45 @@ def parse_args():
 def main():
     options = parse_args()
 
-    current_cfgpath = os.path.join(script_dir, "latest-pkgs.ini")
-    if not os.path.exists(current_cfgpath):
-        open(current_cfgpath, "w").write("")
-
-    cfg = configparser.ConfigParser()
-    oldcontent = open(current_cfgpath).read()
-    if not options.recheck:
-        cfg.read(current_cfgpath)
-
-    output_dir = os.path.join(script_dir, "new-builds")
-    reminder_msg = "Run make-fedora-rpm.py"
     set_internal_url()
 
-    if not options.redownload:
-        update_cfg_with_latest_urls(cfg)
+    if options.redownload:
+        # XXX get buildversions from public URL, document it
+        pass
+    else:
+        buildversions_data = find_latest_buildversions()
 
-        if get_cfg_content(cfg) == oldcontent:
-            if (os.path.exists(output_dir) and
-                os.listdir(output_dir)):
-                print("%s is not empty" % (output_dir))
-                print(reminder_msg)
-                return 1
-
-            print("Did not detect any new URLs")
+        # If we already have the latest builds downloaded, just exit
+        if (os.path.exists(BuildVersions.NEW_BUILDS_JSON) and
+            (BuildVersions.dump(buildversions_data) ==
+             open(BuildVersions.NEW_BUILDS_JSON).read())):
+            print("%s already has the latest content. Exiting." %
+                  BuildVersions.NEW_BUILDS_DIR)
             return 0
 
-    urls = find_urls_to_download(cfg)
-
-    if os.path.exists(output_dir):
-        shutil.rmtree(output_dir)
-    os.mkdir(output_dir)
+    if os.path.exists(BuildVersions.NEW_BUILDS_DIR):
+        shutil.rmtree(BuildVersions.NEW_BUILDS_DIR)
+    os.mkdir(BuildVersions.NEW_BUILDS_DIR)
 
     print()
     print("New builds found. Downloading them...")
     print()
+    buildversions_str = BuildVersions.dump(buildversions_data)
 
     # Download the latest bits
-    for url in urls:
-        print("Downloading %s" % os.path.basename(url))
-        url = url.format(internalurl=INTERNAL_URL)
-        subprocess.check_call(
-                "cd %s && wget -q %s" % (output_dir, url), shell=True)
-    cfg.write(open(current_cfgpath, "w"))
+    for data in buildversions_data.values():
+        for url in data["urls"]:
+            print("Downloading %s" % url)
+            url = url.format(internalurl=INTERNAL_URL)
+            subprocess.check_call("cd %s && wget -q %s" %
+                    (BuildVersions.NEW_BUILDS_DIR, url),
+                    shell=True)
 
+    # Write the json content to NEW_BUILDS_DIR
+    BuildVersions.write(buildversions_str)
+
+    # XXX need to diff against published bits
+    """
     print()
     print(".ini diff is:")
     print("".join(difflib.unified_diff(
@@ -302,8 +284,8 @@ def main():
             get_cfg_content(cfg).splitlines(1),
             fromfile=os.path.basename(current_cfgpath),
             tofile="new content")))
+    """
 
-    print(reminder_msg)
     return 1
 
 

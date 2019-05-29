@@ -14,11 +14,12 @@ import subprocess
 import sys
 import tempfile
 
+from util.buildversions import BuildVersions
 from util.utils import yes_or_no, fail, shellcomm
 
 
-TOP_DIR = os.path.dirname(os.path.abspath(__file__))
-NEW_BUILDS_DIR = os.path.join(TOP_DIR, "new-builds")
+TOP_DIR = BuildVersions.TOP_DIR
+NEW_BUILDS_DIR = BuildVersions.NEW_BUILDS_DIR
 TOP_TEMP_DIR = None
 
 
@@ -41,56 +42,6 @@ def _tempdir(dirname):
     ret = os.path.join(TOP_TEMP_DIR, dirname)
     os.mkdir(ret)
     return ret
-
-
-##########################
-# Version string parsing #
-##########################
-
-def parse_filename_version(pattern):
-    """
-    Find the latest packages by parsing filenames from NEW_BUILDS_DIR
-    """
-    paths = glob.glob(os.path.join(NEW_BUILDS_DIR, pattern))
-    if not paths:
-        fail("Didn't find any matches for %s\n"
-            "That directory should contain the downloaded output "
-            "from virtio-win-get-latest-builds.py" % pattern)
-
-    if len(paths) > 1:
-        fail("Unexpectedly found multiple matches: %s" % paths)
-
-    base = os.path.basename(paths[0])
-    suffixes = ["-sources.zip", ".src.rpm"]
-    for suffix in suffixes:
-        if base.endswith(suffix):
-            return base[:-len(suffix)]
-    fail("Didn't find any known suffix on %s: %s\nExtend the list!" %
-        (base, suffixes))
-
-
-class BuildVersions:
-    """
-    Helper class for inspecting NEW_BUILDS_DIR content and parsing
-    out various version strings we need to know
-    """
-    def __init__(self):
-        self.virtio_prewhql_str = parse_filename_version(
-                "virtio-win-prewhql*sources.zip")
-        self.qxl_str = parse_filename_version(
-                "qxl-win-unsigned*sources.zip")
-        self.qxlwddm_str = parse_filename_version(
-                "spice-qxl-wddm-dod*sources.zip")
-        self.mingw_qemu_ga_str = parse_filename_version(
-                "mingw-qemu-ga-win*src.rpm")
-        self.qemu_ga_str = self.mingw_qemu_ga_str[len("mingw-"):]
-
-        # Change virtio-win-prewhql-0.1-100 to virtio-win-0.1.100, since it's
-        # what we want for making RPM version happy
-        self.virtio_rpm_str = (
-            self.virtio_prewhql_str.rsplit(".", 1)[0] + "." +
-            self.virtio_prewhql_str.rsplit(".", 1)[1].replace("-", ".")
-            ).replace("-prewhql", "")
 
 
 #########################
