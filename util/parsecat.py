@@ -216,7 +216,9 @@ def parseUTCTime(utcTime):
 
 
 def parseGeneralizedTime(genTime):
-    return datetime.datetime.strptime(str(genTime), '%Y%m%d%H%M%S.%fZ')
+    if "." in genTime:
+        return datetime.datetime.strptime(str(genTime), '%Y%m%d%H%M%S.%fZ')
+    return datetime.datetime.strptime(str(genTime), '%Y%m%d%H%M%SZ')
 
 
 def parseTimeChoice(timeChoice):
