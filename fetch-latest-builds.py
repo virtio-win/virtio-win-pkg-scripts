@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 #
-# Script that watches for internal virtio-win/qxl/qemu-ga windows builds
-# and downloads them for eventual distribution via fedora virtio-win.
-# See README and --help output for more details
+# This work is licensed under the terms of the GNU GPL, version 2 or later.
+# See the COPYING file in the top-level directory.
 
 import argparse
 import configparser
@@ -254,8 +253,7 @@ def check_new_builds_is_same(buildversions_data):
 def parse_args():
     parser = argparse.ArgumentParser(description="Check for any new internal "
         "builds that will require a virtio-win RPM respin, and download the "
-        "output to output_dir mentioned in config.ini. See README for "
-        "more details.")
+        "output to NEW_BUILDS_DIR. See README.md for more details.")
 
     parser.add_argument("--redownload", action="store_true",
         help="Redownload the latest packages")

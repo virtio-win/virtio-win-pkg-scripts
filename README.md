@@ -2,35 +2,48 @@ Scripts for packaging virtio-win drivers into VFDs, ISO, and an RPM. The goal
 here is to generate a virtio-win RPM that matches the same file layout as
 the RHEL virtio-win RPM.
 
-In theory it should be possible to use stock virtio-win and qxl-win build
-output to feed these scripts. In practice though, these scripts are only
-used on output from Red Hat's internal build systems. My understanding is
-that they match the upstream build output, but I've never personally tested
-so I could be wrong. If anyone actually tries reproducing with their own
-build output and hits issues, please send patches or file an issue report.
+The build process is fed by input from 4 sources:
 
-For more details about the RPM and yum repo's see:
+  * `virtio-win` builds from the internal redhat build system
+  * `qemu-guest-agent` builds from the internal redhat build system
+  * `qxl` builds from https://www.spice-space.org/download/windows/qxl/
+  * `qxlwddm` builds from https://www.spice-space.org/download/windows/qxl-wddm-dod/
 
-https://fedoraproject.org/wiki/Windows_Virtio_Drivers
+Build input is mirrored at: https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/virtio-win-pkg-scripts-input/
+
+To reproduce the build process, download a build directory contents from
+the above location and put it into ./new-build/ in this repo. Then run
+`make-fedora-rpm.py`.
+
+For more details about the RPM, repos, public direct-downloads layout, etc, see: https://docs.fedoraproject.org/en-US/quick-docs/creating-windows-virtual-machines-using-virtio-drivers/
+
+
+## Scripts
+
+### make-fedora-rpm.py
+
+Fedora-specific script that ties it all together. Run it like:
+
+    ./make-fedora-rpm.py
+
+What it does roughly:
+
+* Extracts all the .zip files in $scriptdir/new-builds/ to a temporary directory. The .zip files should contain all the build input for `make-driver-dir.py`. I prepopulate this with `fetch-latest-builds.py` but other people can use the build input mirror mentioned above.
+* Runs `make-driver-dir.py` on the unzipped output
+* Runs `make-virtio-win-rpm-archive.py` on the make-driver-dir.py output
+* Updates the virtio-win.spec
+* Runs `./make-repo.py`
 
 
 ### make-driver-dir.py
 
 Run the script like:
 
-    ./make-driver-dir.py \
-        /path/to/driver-build-output
+    ./make-driver-dir.py /path/to/extracted-new-builds
 
-It will copy the drivers to $PWD/drivers_output, with the file layout that
+It will copy the input to $PWD/drivers_output, with the file layout that
 make-virtio-win-rpm-archive.py expects, and what is largely shipped on the
-.iso file.
-
-driver-build-output is a directory containing the build output of
-virtio-win and qxl-win. They are separate projects, so you'll probably need
-to copy the output to a common directory in order for the script to work.
-
-* virtio-win comes from: https://github.com/virtio-win/kvm-guest-drivers-windows
-* qxl-win comes from: http://cgit.freedesktop.org/spice/win32/qxl
+.iso file. The input directory is set up by `make-fedora-rpm.py`
 
 
 ### make-virtio-win-rpm-archive.py
@@ -49,35 +62,10 @@ directory that is then used in the specfile.
 
 Populates my local mirror of the fedorapeople.org virtio-win tree, moving
 direct downloads and RPMs into place, updating some convenience redirects,
-and then syncing the content up to fedorapeople.org
+and then syncing the content up to fedorapeople.org.
 
 
-### make-fedora-rpm.py
+### fetch-latest-builds.py
 
-Fedora-specific script that ties it all together. Run it like:
-
-    ./make-fedora-rpm.py
-
-What it does roughly:
-
-* Extracts all the .zip files in $scriptdir/new-builds/ to a temporary directory. The .zip files should contain all the build input for make-driver-dir.py. This needs to be prepopulated.
-* Runs make-driver-dir.py on the unzipped output
-* Runs make-virtio-win-rpm-archive.py on the make-driver-dir.py output
-* Updates the virtio-win.spec
-* Runs ./make-repo.py
-* Uploads output to the Fedora repo
-
-In my usage, the .zip files are downloaded from Red Hat's internal build system by a private cron script.
-
-
-### qemu-guest-agent builds
-
-The spec requires an additional bit to build: a .zip file containing
-qemu-guest-agent .msi builds.
-
-
-### data/vfd-data/
-
-These are support files for building the .vfd images for windows. These
-files are copies of files from the kvm-guest-drivers-windows git repo
-mentioned above.
+Cron script I run to watch for latest builds at the sources listed at the
+top of this file. If new builds are found, it downloads them to ./new-builds.
