@@ -6,6 +6,12 @@
 # See the COPYING file in the top-level directory.
 """
 Parse relevant items in the ASN.1 structure of a Windows driver catalog file
+
+Mail from Roman describing the .cat format and some fields:
+https://www.redhat.com/archives/libguestfs/2015-November/msg00169.html
+
+OS version strings come from inf2cat:
+https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/inf2cat
 """
 
 import datetime
