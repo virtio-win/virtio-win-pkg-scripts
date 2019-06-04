@@ -140,8 +140,8 @@ def check_remaining_files(input_dir, seenfiles, flavor):
         ".*/txtsetup-amd64.oem",
 
         # qxlwddm changelogs
-        ".*/Win8/Changelog",
-        ".*/Win10/Changelog",
+        ".*/spice-qxl-wddm-dod/w10/Changelog",
+        ".*/spice-qxl-wddm-dod-8.1-compatible/Changelog",
 
         # virtio-win build system unconditionally builds every driver
         # for every windows platform that supports it. However, depending

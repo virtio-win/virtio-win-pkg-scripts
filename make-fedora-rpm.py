@@ -9,13 +9,12 @@ import difflib
 import glob
 import os
 import re
-import shutil
 import subprocess
 import sys
 import tempfile
 
 from util.buildversions import BuildVersions
-from util.utils import yes_or_no, fail, shellcomm
+from util.utils import yes_or_no, shellcomm
 
 
 TOP_DIR = BuildVersions.TOP_DIR
@@ -157,7 +156,7 @@ class Spec(object):
 
 def _prep_driver_dir_input(driver_input_dir):
     """
-    Extrace NEW_BUILDS_DIR/ content, apply some fix ups, so
+    Extract NEW_BUILDS_DIR/ content, apply some fix ups, so
     we can run make-driver-dir.py against it
     """
     # Extract virtio/qxl/... build archives
@@ -166,37 +165,26 @@ def _prep_driver_dir_input(driver_input_dir):
             continue
 
         zipbasename = os.path.basename(zipfile)
-        is_qxl = bool(re.match(
+        is_qxl_old = bool(re.match(r"^qxl_.*$", zipbasename))
+        is_qxl_dod = bool(re.match(
             r"^spice-qxl-wddm-dod-\d+\.\d+.zip$", zipbasename))
-        is_qxl_compat = bool(re.match(
-            "^spice-qxl-wddm-dod-.*8.1-compatible.zip$", zipbasename))
+
+        # Unpack qxl_* to $dir/qxl/
+        # Unpack latest qxlwddm to $dir/spice-qxl-wddm-dod/
+        # Unpack 8.1 compat qxlwddm to $dir/, which because of the
+        #   .zip layout becomes $dir/spice-qxl-wddm-dod-8.1-compatible/
 
         unzipdest = driver_input_dir
-        if is_qxl or is_qxl_compat:
-            unzipdest = os.path.join(unzipdest, zipbasename)
+        if is_qxl_old:
+            unzipdest = os.path.join(driver_input_dir, "qxl")
+        elif is_qxl_dod:
+            unzipdest = os.path.join(driver_input_dir, "spice-qxl-wddm-dod")
         shellcomm("unzip %s -d %s" % (zipfile, unzipdest))
 
-        # qxlwddm archive layout is in flux.
-        #
-        #  spice-qxl-wddm-dod-0.19.zip - > w10/*
-        #  spice-qxl-wddm-dod-8.1-compatible.zip ->
-        #   spice-qxl-wddm-dod-8.1-compatible/*
-        #
-        # Rename these to 'just work' with our scripts
-        if is_qxl or is_qxl_compat:
-            qxlfiles = os.listdir(unzipdest)
-            qxlrootdir = os.path.join(unzipdest, qxlfiles[0])
-            if len(qxlfiles) != 1 or not os.path.isdir(qxlrootdir):
-                fail("Expected only a single dir in %s, but found: %s" %
-                    (unzipdest, qxlfiles))
-            destver = is_qxl and "Win10" or "Win8"
-            shellcomm("rsync --archive %s/* %s/%s/" %
-                (qxlrootdir, driver_input_dir, destver))
-            shutil.rmtree(unzipdest)
 
     # Copy static data/old-drivers/ content into place
     shellcomm("cp -r data/old-drivers/xp-viostor/* %s" % driver_input_dir)
-    shellcomm("cp -r data/old-drivers/xp-qxl/* %s" % driver_input_dir)
+    shellcomm("cp -r data/old-drivers/xp-qxl/* %s/qxl" % driver_input_dir)
 
 
 ##################
