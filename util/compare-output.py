@@ -17,7 +17,10 @@ import shutil
 import sys
 import tempfile
 
-from .utils import fail, shellcomm
+UTIL_DIR = os.path.abspath(os.path.dirname(__file__))
+TOP_DIR = os.path.dirname(UTIL_DIR)
+sys.path.insert(0, TOP_DIR)
+from util.utils import fail, shellcomm
 
 
 ######################
