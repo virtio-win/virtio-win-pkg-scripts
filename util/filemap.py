@@ -208,7 +208,7 @@ DRIVER_OS_MAP = {
         'Wxp/x86': ['xp/x86'],
 
         'Wnet/x86' : ['2k3/x86'],
-        'Wnet/amd64': ['2k3/amd64'],
+        'Wnet/amd64': ['2k3/amd64', 'xp/amd64'],
 
         'Wlh/x86': ['2k8/x86'],
         'Wlh/amd64': ['2k8/amd64'],
@@ -229,7 +229,7 @@ DRIVER_OS_MAP = {
         'Wxp/x86': ['xp/x86'],
 
         'Wnet/x86' : ['2k3/x86'],
-        'Wnet/amd64': ['2k3/amd64'],
+        'Wnet/amd64': ['2k3/amd64', 'xp/amd64'],
 
         'Wlh/x86': ['2k8/x86'],
         'Wlh/amd64': ['2k8/amd64'],
@@ -315,7 +315,7 @@ DRIVER_OS_MAP = {
         'Wxp/x86': ['xp/x86'],
 
         'Wnet/x86' : ['2k3/x86'],
-        'Wnet/amd64': ['2k3/amd64'],
+        'Wnet/amd64': ['2k3/amd64', 'xp/amd64'],
 
         'Wlh/x86': ['2k8/x86'],
         'Wlh/amd64': ['2k8/amd64'],
@@ -336,7 +336,7 @@ DRIVER_OS_MAP = {
         'Wxp/x86': ['xp/x86'],
 
         'Wnet/x86': ['2k3/x86'],
-        'Wnet/amd64': ['2k3/amd64'],
+        'Wnet/amd64': ['2k3/amd64', 'xp/amd64'],
 
         'Wlh/x86': ['2k8/x86', '../i386/2k8'],
         'Wlh/amd64': ['2k8/amd64', '../amd64/2k8'],
