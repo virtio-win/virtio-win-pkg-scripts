@@ -12,7 +12,7 @@ The build process is fed by input from 4 sources:
 Build input is mirrored at: https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/virtio-win-pkg-scripts-input/
 
 To reproduce the build process, download a build directory contents from
-the above location and put it into ./new-build/ in this repo. Then run
+the above location and put it into ./new-builds/ in this repo. Then run
 `make-fedora-rpm.py`.
 
 For more details about the RPM, repos, public direct-downloads layout, etc, see: https://docs.fedoraproject.org/en-US/quick-docs/creating-windows-virtual-machines-using-virtio-drivers/
