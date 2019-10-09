@@ -125,6 +125,100 @@ vfd_dirs_servers_64 = {
 }
 
 
+# osinfo unattended installations add all the possible pre-installable
+# files into an unattended media.
+osinfo_dirs_32 = {
+    # Windows 7
+    'Balloon/w7/x86' : 'i386/Win7',
+    'NetKVM/w7/x86' : 'i386/Win7',
+    'pvpanic/w7/x86' : 'i386/Win7',
+    'qxl/w7/x86' : 'i386/Win7',
+    'vioinput/w7/x86' : 'i386/Win7',
+    'viorng/w7/x86' : 'i386/Win7',
+    'vioscsi/w7/x86' : 'i386/Win7',
+    'vioserial/w7/x86' : 'i386/Win7',
+    'viostor/w7/x86' : 'i386/Win7',
+
+    # Windows 8
+    'Balloon/w8/x86' : 'i386/Win8',
+    'NetKVM/w8/x86' : 'i386/Win8',
+    'pvpanic/w8/x86' : 'i386/Win8',
+    'qxldod/w8/x86' : 'i386/Win8',
+    'vioinput/w8/x86' : 'i386/Win8',
+    'viorng/w8/x86' : 'i386/Win8',
+    'vioscsi/w8/x86' : 'i386/Win8',
+    'vioserial/w8/x86' : 'i386/Win8',
+    'viostor/w8/x86' : 'i386/Win8',
+
+    # Windows 8.1
+    'Balloon/w8.1/x86' : 'i386/Win8.1',
+    'NetKVM/w8.1/x86' : 'i386/Win8.1',
+    'pvpanic/w8.1/x86' : 'i386/Win8.1',
+    'qxldod/w8.1/x86' : 'i386/Win8.1',
+    'vioinput/w8.1/x86' : 'i386/Win8.1',
+    'viorng/w8.1/x86' : 'i386/Win8.1',
+    'vioscsi/w8.1/x86' : 'i386/Win8.1',
+    'vioserial/w8.1/x86' : 'i386/Win8.1',
+    'viostor/w8.1/x86' : 'i386/Win8.1',
+
+    # Windows 10
+    'Balloon/w10/x86' : 'i386/Win10',
+    'NetKVM/w10/x86' : 'i386/Win10',
+    'pvpanic/w10/x86' : 'i386/Win10',
+    'qxldod/w10/x86' : 'i386/Win10',
+    'vioinput/w10/x86' : 'i386/Win10',
+    'viorng/w10/x86' : 'i386/Win10',
+    'vioscsi/w10/x86' : 'i386/Win10',
+    'vioserial/w10/x86' : 'i386/Win10',
+    'viostor/w10/x86' : 'i386/Win10',
+}
+
+osinfo_dirs_64 = {
+    # Windows 7
+    'Balloon/w7/amd64' : 'amd64/Win7',
+    'NetKVM/w7/amd64' : 'amd64/Win7',
+    'pvpanic/w7/amd64' : 'amd64/Win7',
+    'qxl/w7/amd64' : 'amd64/Win7',
+    'vioinput/w7/amd64' : 'amd64/Win7',
+    'viorng/w7/amd64' : 'amd64/Win7',
+    'vioscsi/w7/amd64' : 'amd64/Win7',
+    'vioserial/w7/amd64' : 'amd64/Win7',
+    'viostor/w7/amd64' : 'amd64/Win7',
+
+    # Windows 8
+    'Balloon/w8/amd64' : 'amd64/Win8',
+    'NetKVM/w8/amd64' : 'amd64/Win8',
+    'pvpanic/w8/amd64' : 'amd64/Win8',
+    'qxldod/w8/amd64' : 'amd64/Win8',
+    'vioinput/w8/amd64' : 'amd64/Win8',
+    'viorng/w8/amd64' : 'amd64/Win8',
+    'vioscsi/w8/amd64' : 'amd64/Win8',
+    'vioserial/w8/amd64' : 'amd64/Win8',
+    'viostor/w8/amd64' : 'amd64/Win8',
+
+    # Windows 8.1
+    'Balloon/w8.1/amd64' : 'amd64/Win8.1',
+    'NetKVM/w8.1/amd64' : 'amd64/Win8.1',
+    'pvpanic/w8.1/amd64' : 'amd64/Win8.1',
+    'qxldod/w8.1/amd64' : 'amd64/Win8.1',
+    'vioinput/w8.1/amd64' : 'amd64/Win8.1',
+    'viorng/w8.1/amd64' : 'amd64/Win8.1',
+    'vioscsi/w8.1/amd64' : 'amd64/Win8.1',
+    'vioserial/w8.1/amd64' : 'amd64/Win8.1',
+    'viostor/w8.1/amd64' : 'amd64/Win8.1',
+
+    # Windows 10
+    'Balloon/w10/amd64' : 'amd64/Win10',
+    'NetKVM/w10/amd64' : 'amd64/Win10',
+    'pvpanic/w10/amd64' : 'amd64/Win10',
+    'qxldod/w10/amd64' : 'amd64/Win10',
+    'vioinput/w10/amd64' : 'amd64/Win10',
+    'viorng/w10/amd64' : 'amd64/Win10',
+    'vioscsi/w10/amd64' : 'amd64/Win10',
+    'vioserial/w10/amd64' : 'amd64/Win10',
+    'viostor/w10/amd64' : 'amd64/Win10',
+}
+
 ###################
 # Utility helpers #
 ###################
@@ -223,6 +317,31 @@ def build_vfd(fname, dmap, driverdir, rootdir, finaldir):
     run(cmd)
     shutil.rmtree(floppydir)
 
+def build_osinfo(arch, dmap, driverdir, finaldir):
+    """construct the osinfo dir from the checkout"""
+    print('building the osinfo dir for ' + arch)
+
+    osinfodir = os.path.join(finaldir, "osinfo")
+
+    for osinfo_map_src, osinfo_map_dest in list(dmap.items()):
+        src = os.path.join(driverdir, osinfo_map_src)
+        dest = os.path.join(osinfodir, osinfo_map_dest)
+
+        try:
+            os.makedirs(dest)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+
+        for src_file in os.listdir(src):
+            # .pdb and .doc files are not needed for preinstalling the drivers;
+            # .exe files cannot be preinstalled;
+            if (src_file.endswith('.pdb') or
+                src_file.endswith('.doc') or
+                src_file.endswith('.exe')):
+                continue
+
+            shutil.copy2(os.path.join(src, src_file), dest)
 
 def hardlink_identical_files(outdir):
     print("Hardlinking identical files...")
@@ -302,6 +421,9 @@ def main():
         options.driverdir, rootdir, finaldir)
     build_vfd(options.nvr + '_servers_amd64.vfd', vfd_dirs_servers_64,
         options.driverdir, rootdir, finaldir)
+
+    build_osinfo("i386", osinfo_dirs_32, options.driverdir, finaldir)
+    build_osinfo("amd64", osinfo_dirs_64, options.driverdir, finaldir)
 
     run(["cp", "-rpL", "%s/." % options.driverdir, finaldir])
     hardlink_identical_files(finaldir)

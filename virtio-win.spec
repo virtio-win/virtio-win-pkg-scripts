@@ -77,6 +77,9 @@ popd
 %{__rm} */2k8/ vfddrivers/*/Win2008/ -rf
 %{__rm} */2k3/ vfddrivers/*/Win2003 -rf
 %{__rm} */xp/ vfddrivers/*/WinXP -rf
+%{__rm} */2k8/ osinfo/*/Win2008/ -rf
+%{__rm} */2k3/ osinfo/*/Win2003 -rf
+%{__rm} */xp/ osinfo/*/WinXP -rf
 %{__rm} smbus -rf
 %endif
 
@@ -114,6 +117,7 @@ popd
 %{__install} -p -m0644 guest-agent/qemu-ga-x86_64.msi  %{buildroot}%{_datadir}/%{name}/guest-agent/qemu-ga-x86_64.msi
 
 %{__cp} -a vfddrivers %{buildroot}/%{_datadir}/%{name}/drivers
+%{__cp} -a osinfo %{buildroot}/%{_datadir}/%{name}/osinfo
 
 
 %files
@@ -125,4 +129,5 @@ popd
 %{_datadir}/%{name}/*.vfd
 %endif
 %{_datadir}/%{name}/drivers
+%{_datadir}/%{name}/osinfo
 %{_datadir}/%{name}/guest-agent/*.msi
