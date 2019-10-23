@@ -95,6 +95,15 @@ class LocalRepo():
         for path in paths:
             shellcomm("cp %s %s" % (path, qemugadir))
 
+    def add_virtiogt(self, paths):
+        """
+        Move virtiogt msis into the local virtio-win direct tree
+        """
+        virtiodir = os.path.join(
+                self.LOCAL_DIRECT_DIR, self.virtio_basedir)
+        for path in paths:
+            shellcomm("cp %s %s" % (path, virtiodir))
+
     def add_virtiowin_media(self, paths):
         """
         Move iso/vfd media to the local tree. Set up symlinks and
@@ -195,7 +204,7 @@ def _populate_local_tree(buildversions, rpm_output, rpm_buildroot):
             virtio_release_str, qemuga_release_str)
 
     # Move qemu-ga .msis into our local mirror
-    qemugapaths = _glob(os.path.join(sharedir, "guest-agent", "/*"))
+    qemugapaths = _glob(os.path.join(sharedir, "guest-agent", "*"))
     localrepo.add_qemuga(qemugapaths)
 
     # Move virtio .iso and .vfds
@@ -209,6 +218,10 @@ def _populate_local_tree(buildversions, rpm_output, rpm_buildroot):
         versionfile = os.path.realpath(symlink)
         virtiopaths.append((versionfile, symlink))
     localrepo.add_virtiowin_media(virtiopaths)
+
+    # Add virtio-win-gt .msis into the virtio iso/vfd dir
+    virtiogtpaths = _glob(os.path.join(sharedir, "installer", "*"))
+    localrepo.add_virtiogt(virtiogtpaths)
 
     # Link htaccess latest-X/stable-X to latest media
     localrepo.add_htaccess_stable_links()

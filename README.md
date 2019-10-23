@@ -46,6 +46,13 @@ make-virtio-win-rpm-archive.py expects, and what is largely shipped on the
 .iso file. The input directory is set up by `make-fedora-rpm.py`
 
 
+### make-installer.py
+
+This uses a [virtio-win-guest-tools-installer.git](https://github.com/virtio-win/virtio-win-guest-tools-installer]) git submodule to build .msi installers
+for all the drivers. Invoking this successfully requires quite a few
+pieces installed on the host, more details in the future.
+
+
 ### make-virtio-win-rpm-archive.py
 
 Run the script like:

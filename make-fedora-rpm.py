@@ -312,13 +312,20 @@ def main():
     shellcomm("./make-driver-dir.py %s --output-dir %s" %
         (driver_input_dir, driver_output_dir))
 
+    spec = Spec(buildversions)
+
+    # Build the driver installer
+    installer_output_dir = _tempdir("make-installer-output")
+    shellcomm("./make-installer.py %s %s --output-dir %s" %
+            (spec.newversion, driver_output_dir, installer_output_dir))
+    shellcomm("cp %s/* %s" % (installer_output_dir, rpm_src_dir))
+
     # Generate RPM input archive + vfd + iso
     shellcomm("./make-virtio-win-rpm-archive.py %s %s" %
         (buildversions.virtio_rpm_str, driver_output_dir))
     shellcomm("mv *.tar.gz %s" % rpm_src_dir)
 
     # Alter and save spec + changelog
-    spec = Spec(buildversions)
     _prompt_for_rpm_changelog(buildversions, spec)
     spec.write_changes(rpm_src_dir)
 

@@ -19,7 +19,7 @@
 Summary: VirtIO para-virtualized drivers for Windows(R)
 Name: virtio-win
 Version: 0.1.173
-Release: 1
+Release: 2
 Group: Applications/System
 URL: http://www.redhat.com/
 BuildArch: noarch
@@ -46,8 +46,12 @@ Source2: %{qemu_ga_win_build}.noarch.rpm
 Source3: %{virtio_win_prewhql_build}-sources.zip
 Source4: mingw-%{qemu_ga_win_build}.src.rpm
 Source5: %{qxl_build}-sources.zip
+
 %if 0%{?fedora}
-Source6: %{qxlwddm_build}-sources.zip
+Source20: %{qxlwddm_build}-sources.zip
+Source21: virtio-win-gt-x86.msi
+Source22: virtio-win-gt-x64.msi
+Source23: virtio-win-guest-tools-installer-%{version}.tar.gz
 %endif
 
 
@@ -71,6 +75,13 @@ popd
 
 %{__mv} %{qemu_ga_win_build}/usr/i686-w64-mingw32/sys-root/mingw/bin/qemu-ga-i386.msi guest-agent/
 %{__mv} %{qemu_ga_win_build}/usr/x86_64-w64-mingw32/sys-root/mingw/bin/qemu-ga-x86_64.msi guest-agent/
+
+
+# Move virtio-win MSIs into place
+%if 0%{?fedora}
+%{__cp} %{SOURCE21} .
+%{__cp} %{SOURCE22} .
+%endif
 
 
 %if 0%{?rhel} > 7
@@ -129,6 +140,14 @@ popd
 %{__install} -p -m0644 guest-agent/qemu-ga-x86_64.msi  %{buildroot}%{_datadir}/%{name}/guest-agent/qemu-ga-x86_64.msi
 
 
+# Copy virtio-win install .msi into final RPM location
+%if 0%{?fedora}
+%{__mkdir} -p %{buildroot}%{_datadir}/%{name}/installer/
+%{__install} -p -m0644 virtio-win-gt-x86.msi %{buildroot}%{_datadir}/%{name}/installer/
+%{__install} -p -m0644 virtio-win-gt-x64.msi  %{buildroot}%{_datadir}/%{name}/installer/
+%endif
+
+
 
 %files
 %doc virtio-win_license.txt
@@ -140,3 +159,6 @@ popd
 %endif
 %{_datadir}/%{name}/drivers
 %{_datadir}/%{name}/guest-agent/*.msi
+%if 0%{?fedora}
+%{_datadir}/%{name}/installer/*.msi
+%endif
