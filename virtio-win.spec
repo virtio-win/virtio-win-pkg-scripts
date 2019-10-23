@@ -59,9 +59,11 @@ VirtIO para-virtualized Windows(R) drivers for 32-bit and 64-bit
 Windows(R) guests.
 
 
+
 %prep
 %setup -q -T -b 1 -n %{name}-%{version}
 
+# Extract qemu-ga RPM
 mkdir -p guest-agent
 mkdir -p %{qemu_ga_win_build}
 pushd %{qemu_ga_win_build}/ && rpm2cpio %{SOURCE2} | cpio -idmv
@@ -69,6 +71,7 @@ popd
 
 %{__mv} %{qemu_ga_win_build}/usr/i686-w64-mingw32/sys-root/mingw/bin/qemu-ga-i386.msi guest-agent/
 %{__mv} %{qemu_ga_win_build}/usr/x86_64-w64-mingw32/sys-root/mingw/bin/qemu-ga-x86_64.msi guest-agent/
+
 
 %if 0%{?rhel} > 7
 # Dropping unsupported Windows versions.
@@ -80,11 +83,20 @@ popd
 %{__rm} smbus -rf
 %endif
 
-%build
 
+
+%build
 # Generate .iso
-/usr/bin/mkisofs -m 'virtio-win*.vfd' -m vfddrivers -m %{qemu_ga_win_build} -o %{name}-%{version}.iso -r -J \
-  -input-charset iso8859-1 -V "%{name}-%{version}" .
+/usr/bin/mkisofs \
+    -m 'virtio-win*.vfd' \
+    -m vfddrivers \
+    -m %{qemu_ga_win_build} \
+    -o %{name}-%{version}.iso \
+    -r -J \
+    -input-charset iso8859-1 \
+    -V "%{name}-%{version}" .
+
+
 
 %install
 %{__install} -d -m0755 %{buildroot}%{_datadir}/%{name}
@@ -108,12 +120,14 @@ popd
 %{__ln_s} %{name}-%{version}_servers_amd64.vfd %{buildroot}%{_datadir}/%{name}/%{name}_servers_amd64.vfd
 %endif
 
+%{__cp} -a vfddrivers %{buildroot}/%{_datadir}/%{name}/drivers
 
+
+# Copy the guest agent .msi into final RPM location
 %{__mkdir} -p %{buildroot}%{_datadir}/%{name}/guest-agent/
 %{__install} -p -m0644 guest-agent/qemu-ga-i386.msi %{buildroot}%{_datadir}/%{name}/guest-agent/qemu-ga-i386.msi
 %{__install} -p -m0644 guest-agent/qemu-ga-x86_64.msi  %{buildroot}%{_datadir}/%{name}/guest-agent/qemu-ga-x86_64.msi
 
-%{__cp} -a vfddrivers %{buildroot}/%{_datadir}/%{name}/drivers
 
 
 %files
