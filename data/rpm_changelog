@@ -1,4 +1,7 @@
 %changelog
+* Wed Oct 23 2019 Cole Robinson <crobinso@redhat.com> - 0.1.173-1
+- Update to virtio-win-prewhql-0.1-173
+
 * Wed Sep 04 2019 Cole Robinson <crobinso@redhat.com> - 0.1.172-1
 - Update to virtio-win-prewhql-0.1-172
 - netkvm: Increase timeout of control command completion
