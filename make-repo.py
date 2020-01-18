@@ -164,11 +164,10 @@ class LocalRepo():
         pkg_input_dir = os.path.join(pkg_input_topdir, self.virtio_release_str)
         if os.path.exists(pkg_input_dir):
             print("%s exists, not changing content." % pkg_input_dir)
-            return
-
-        os.mkdir(pkg_input_dir)
-        for filename in glob.glob(buildversions.NEW_BUILDS_DIR + "/*"):
-            shellcomm("cp %s %s" % (filename, pkg_input_dir))
+        else:
+            os.mkdir(pkg_input_dir)
+            for filename in glob.glob(buildversions.NEW_BUILDS_DIR + "/*"):
+                shellcomm("cp %s %s" % (filename, pkg_input_dir))
 
         shellcomm("ln -sf %s %s/latest-build " % (
             os.path.basename(pkg_input_dir), pkg_input_topdir))
@@ -230,7 +229,7 @@ def _populate_local_tree(buildversions, rpm_output, rpm_buildroot):
     localrepo.add_pkg_build_input(buildversions)
 
     # Copy RPMs to the tree
-    rpms = _glob(rpm_output + "/*.rpm", recursive=True)
+    rpms = _glob(rpm_output + "/**/*.rpm", recursive=True)
     localrepo.add_rpms(rpms)
 
 
@@ -279,9 +278,15 @@ def _generate_repos():
 
 
 def _run_rsync(reverse, dry):
-    rsync = "rsync --archive --verbose --compress --progress "
-    if dry:
-        rsync += "--dry-run "
+    def _cmd(opts, src, dst):
+        rsync = "rsync --archive --verbose --compress --progress "
+        if dry:
+            rsync += "--dry-run "
+        rsync += "%s %s/ %s" % (opts, src, dst)
+        if dry:
+            # Filter out uninteresting repoadata updates
+            rsync += " | grep -Ev 'repodata/.+'"
+        return rsync
 
     remote = ("%s@fedorapeople.org:~/virtgroup/virtio-win" %
             LocalRepo.HOSTED_USERNAME)
@@ -295,10 +300,10 @@ def _run_rsync(reverse, dry):
         dst = remote
 
     # Put the RPMs in place
-    shellcomm("%s --exclude repodata %s/ %s""" % (rsync, src, dst))
+    shellcomm(_cmd("--exclude repodata", src, dst))
 
     # Overwrite the repodata and remove stale files
-    shellcomm("%s --delete %s/ %s" % (rsync, src, dst))
+    shellcomm(_cmd("--delete", src, dst))
 
 
 def _push_repos(reverse):
