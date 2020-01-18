@@ -56,7 +56,7 @@ def _update_copymap_for_driver(input_dir, ostuple, drivername, copymap):
     return missing_patterns
 
 
-def copy_virtio_drivers(input_dir, output_dir, flavor):
+def copy_virtio_drivers(input_dir, output_dir):
     # Create a flat list of every leaf directory in the virtio-win directory
     alldirs = []
     for dirpath, dirnames, files in os.walk(input_dir):
@@ -71,15 +71,12 @@ def copy_virtio_drivers(input_dir, output_dir, flavor):
     drivers = list(filemap.DRIVER_OS_MAP.keys())[:]
     copymap = {}
     missing_patterns = []
-    qemupciserial_ostuple = "./rhel" if flavor == "rhel" else "./"
     for drivername in drivers:
         for ostuple in sorted(filemap.DRIVER_OS_MAP[drivername]):
             # ./rhel is only used on RHEL builds for the qemupciserial
             # driver, so if it's not present on public builds, ignore it
-            # Similarly, if we're asked to create a RHEL build, don't
-            # look for the Fedora qemupciserial in ./
             if (drivername == "qemupciserial" and
-                ostuple != qemupciserial_ostuple):
+                ostuple == "./rhel"):
                 continue
             if os.path.normpath(ostuple) not in alldirs and ostuple != "./":
                 fail("driver=%s ostuple=%s not found in input=%s" %
@@ -114,7 +111,7 @@ def copy_virtio_drivers(input_dir, output_dir, flavor):
     return list(copymap.keys())
 
 
-def check_remaining_files(input_dir, seenfiles, flavor):
+def check_remaining_files(input_dir, seenfiles):
     # Expected files that we want to skip. The reason we are so strict here
     # is to make sure that we don't forget to ship important files that appear
     # in new virtio-win builds. If a new file appears, we probably need to ask
@@ -159,19 +156,12 @@ def check_remaining_files(input_dir, seenfiles, flavor):
         # If you add to this list, be sure it's not a newly introduced
         # driver that you are ignoring! Everything listed here needs
         # be covered by a mapping in DRIVER_OS_MAP
-    ]
 
-    if flavor == "rhel":
-        whitelist.extend([
-            "/qemupciserial.cat",
-            "/qemupciserial.inf",
-        ])
-    else:
-        whitelist.extend([
-            # Added in virtio-win build 137, for rhel only
-            "/rhel/qemupciserial.cat",
-            "/rhel/qemupciserial.inf",
-        ])
+        # Added in virtio-win build 137, for rhel only, and this
+        # script is only used for non-rhel (Fedora) builds
+        "/rhel/qemupciserial.cat",
+        "/rhel/qemupciserial.inf",
+    ]
 
     remaining = []
     for dirpath, dirnames, files in os.walk(input_dir):
@@ -233,34 +223,27 @@ def parse_args():
         help="Directory to output the organized drivers. "
         "Default=%s" % default_output_dir, default=default_output_dir)
 
-    parser.add_argument("--flavor", help="Flavor of drivers to use if more "
-        "than one is available. Default is fedora.", default="fedora")
-
     return parser.parse_args()
 
 
 def main():
     options = parse_args()
     output_dir = options.output_dir
-    flavor = options.flavor
 
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
     if os.listdir(output_dir):
         fail("%s is not empty." % output_dir)
 
-    if flavor != "fedora" and flavor != "rhel":
-        fail("%s is not a known flavor." % flavor)
-
     options.input_dir = os.path.abspath(os.path.expanduser(options.input_dir))
 
     # Actually move the files
     seenfiles = []
-    seenfiles += copy_virtio_drivers(options.input_dir, output_dir, flavor)
+    seenfiles += copy_virtio_drivers(options.input_dir, output_dir)
     seenfiles += copy_license(options.input_dir, output_dir)
 
     # Verify that there is nothing left over that we missed
-    check_remaining_files(options.input_dir, seenfiles, flavor)
+    check_remaining_files(options.input_dir, seenfiles)
 
     print("Generated %s" % output_dir)
     return 0
