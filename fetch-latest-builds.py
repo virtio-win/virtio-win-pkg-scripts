@@ -7,6 +7,7 @@ import argparse
 import configparser
 import difflib
 import distutils.version
+import glob
 import json
 import os
 import re
@@ -224,13 +225,28 @@ def set_internal_url():
     INTERNAL_URL = script_cfg.get("config", "internal_url")
 
 
-def download_latest_buildversions():
+def download_published_buildversions_json():
     """
     Grab buildversions.json for the latest virtio-win build from the
     fedorapeople site.
     """
     url = "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/virtio-win-pkg-scripts-input/latest-build/buildversions.json"  # pylint: disable=line-too-long
     return geturl(url)
+
+
+def download_published_input():
+    """
+    Use wget to grab all the latest-build/ builds and stuff them in
+    NEW_BUILDS_DIR
+    """
+    url = "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/virtio-win-pkg-scripts-input/latest-build/"  # pylint: disable=line-too-long
+    cmd = ["wget", "-r", "--no-parent", "--no-directories"]
+    cmd += ["--directory-prefix=%s" % BuildVersions.NEW_BUILDS_DIR]
+    cmd += ["--no-verbose"]
+    cmd += [url]
+    subprocess.check_call(cmd)
+    subprocess.check_call(
+        ["rm"] + glob.glob("%s/*html*" % BuildVersions.NEW_BUILDS_DIR))
 
 
 def check_new_builds_is_same(buildversions_data):
@@ -246,7 +262,7 @@ def check_new_builds_is_same(buildversions_data):
             os.path.basename(BuildVersions.NEW_BUILDS_DIR), diff))
         return False
     print("%s already has the latest content. Exiting." %
-          BuildVersions.NEW_BUILDS_DIR)
+          BuildVersions.NEW_BUILDS_JSON)
     return True
 
 
@@ -256,7 +272,10 @@ def parse_args():
         "output to NEW_BUILDS_DIR. See README.md for more details.")
 
     parser.add_argument("--redownload", action="store_true",
-        help="Redownload the latest packages")
+        help="Force a redownload of the latest detected builds.")
+    parser.add_argument("--rebuild", action="store_true",
+        help="Redownload the input used to build the most recent "
+             "published RPM.")
 
     return parser.parse_args()
 
@@ -266,20 +285,23 @@ def main():
 
     set_internal_url()
 
-    if not options.redownload:
+    if not options.rebuild:
         buildversions_data = find_latest_buildversions()
 
         # If we already have the latest builds downloaded, just exit
-        if check_new_builds_is_same(buildversions_data):
+        if (not options.redownload and
+            check_new_builds_is_same(buildversions_data)):
             return 0
-
-    public_buildversions_str = download_latest_buildversions()
-    if options.redownload:
-        buildversions_data = json.loads(public_buildversions_str)
 
     if os.path.exists(BuildVersions.NEW_BUILDS_DIR):
         shutil.rmtree(BuildVersions.NEW_BUILDS_DIR)
     os.mkdir(BuildVersions.NEW_BUILDS_DIR)
+
+    if options.rebuild:
+        download_published_input()
+        return
+
+    public_buildversions_str = download_published_buildversions_json()
 
     print()
     print("New builds found. Downloading them...")
