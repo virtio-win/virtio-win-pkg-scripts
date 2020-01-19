@@ -224,6 +224,18 @@ def build_vfd(fname, dmap, driverdir, rootdir, finaldir):
     shutil.rmtree(floppydir)
 
 
+def build_floppies(nvr, driverdir, rootdir, finaldir):
+    build_vfd(nvr + '_x86.vfd', vfd_dirs_32,
+        driverdir, rootdir, finaldir)
+    build_vfd(nvr + '_amd64.vfd', vfd_dirs_64,
+        driverdir, rootdir, finaldir)
+
+    build_vfd(nvr + '_servers_x86.vfd', vfd_dirs_servers_32,
+        driverdir, rootdir, finaldir)
+    build_vfd(nvr + '_servers_amd64.vfd', vfd_dirs_servers_64,
+        driverdir, rootdir, finaldir)
+
+
 def hardlink_identical_files(outdir):
     print("Hardlinking identical files...")
 
@@ -298,15 +310,7 @@ def main():
     run(["cp", "-rpL", "%s/." % options.driverdir, isodir])
 
     # Build floppy images
-    build_vfd(options.nvr + '_x86.vfd', vfd_dirs_32,
-        options.driverdir, rootdir, finaldir)
-    build_vfd(options.nvr + '_amd64.vfd', vfd_dirs_64,
-        options.driverdir, rootdir, finaldir)
-
-    build_vfd(options.nvr + '_servers_x86.vfd', vfd_dirs_servers_32,
-        options.driverdir, rootdir, finaldir)
-    build_vfd(options.nvr + '_servers_amd64.vfd', vfd_dirs_servers_64,
-        options.driverdir, rootdir, finaldir)
+    build_floppies(options.nvr, options.driverdir, rootdir, finaldir)
 
     hardlink_identical_files(finaldir)
     archive(options.nvr, finaldir)
