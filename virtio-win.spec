@@ -68,19 +68,19 @@ Windows(R) guests.
 %setup -q -T -b 1 -n %{name}-%{version}
 
 # Extract qemu-ga RPM
-mkdir -p guest-agent
+mkdir -p iso-content/guest-agent
 mkdir -p %{qemu_ga_win_build}
 pushd %{qemu_ga_win_build}/ && rpm2cpio %{SOURCE2} | cpio -idmv
 popd
 
-%{__mv} %{qemu_ga_win_build}/usr/i686-w64-mingw32/sys-root/mingw/bin/qemu-ga-i386.msi guest-agent/
-%{__mv} %{qemu_ga_win_build}/usr/x86_64-w64-mingw32/sys-root/mingw/bin/qemu-ga-x86_64.msi guest-agent/
+%{__mv} %{qemu_ga_win_build}/usr/i686-w64-mingw32/sys-root/mingw/bin/qemu-ga-i386.msi iso-content/guest-agent/
+%{__mv} %{qemu_ga_win_build}/usr/x86_64-w64-mingw32/sys-root/mingw/bin/qemu-ga-x86_64.msi iso-content/guest-agent/
 
 
 # Move virtio-win MSIs into place
 %if 0%{?fedora}
-%{__cp} %{SOURCE21} .
-%{__cp} %{SOURCE22} .
+%{__cp} %{SOURCE21} iso-content/
+%{__cp} %{SOURCE22} iso-content/
 %endif
 
 
@@ -88,24 +88,23 @@ popd
 # Dropping unsupported Windows versions.
 # It's done here to fix two issues at the same time: do not
 # release them in iso AND as binary drivers.
-%{__rm} */2k8/ vfddrivers/*/Win2008/ -rf
-%{__rm} */2k3/ vfddrivers/*/Win2003 -rf
-%{__rm} */xp/ vfddrivers/*/WinXP -rf
-%{__rm} smbus -rf
+%{__rm} iso-content/*/2k8/ vfddrivers/*/Win2008/ -rf
+%{__rm} iso-content/*/2k3/ vfddrivers/*/Win2003 -rf
+%{__rm} iso-content/*/xp/ vfddrivers/*/WinXP -rf
+%{__rm} iso-content/smbus -rf
 %endif
 
 
 
 %build
 # Generate .iso
+pushd iso-content
 /usr/bin/mkisofs \
-    -m 'virtio-win*.vfd' \
-    -m vfddrivers \
-    -m %{qemu_ga_win_build} \
-    -o %{name}-%{version}.iso \
+    -o ../%{name}-%{version}.iso \
     -r -J \
     -input-charset iso8859-1 \
     -V "%{name}-%{version}" .
+popd
 
 
 
@@ -136,21 +135,21 @@ popd
 
 # Copy the guest agent .msi into final RPM location
 %{__mkdir} -p %{buildroot}%{_datadir}/%{name}/guest-agent/
-%{__install} -p -m0644 guest-agent/qemu-ga-i386.msi %{buildroot}%{_datadir}/%{name}/guest-agent/qemu-ga-i386.msi
-%{__install} -p -m0644 guest-agent/qemu-ga-x86_64.msi  %{buildroot}%{_datadir}/%{name}/guest-agent/qemu-ga-x86_64.msi
+%{__install} -p -m0644 iso-content/guest-agent/qemu-ga-i386.msi %{buildroot}%{_datadir}/%{name}/guest-agent/qemu-ga-i386.msi
+%{__install} -p -m0644 iso-content/guest-agent/qemu-ga-x86_64.msi  %{buildroot}%{_datadir}/%{name}/guest-agent/qemu-ga-x86_64.msi
 
 
 # Copy virtio-win install .msi into final RPM location
 %if 0%{?fedora}
 %{__mkdir} -p %{buildroot}%{_datadir}/%{name}/installer/
-%{__install} -p -m0644 virtio-win-gt-x86.msi %{buildroot}%{_datadir}/%{name}/installer/
-%{__install} -p -m0644 virtio-win-gt-x64.msi  %{buildroot}%{_datadir}/%{name}/installer/
+%{__install} -p -m0644 iso-content/virtio-win-gt-x86.msi %{buildroot}%{_datadir}/%{name}/installer/
+%{__install} -p -m0644 iso-content/virtio-win-gt-x64.msi  %{buildroot}%{_datadir}/%{name}/installer/
 %endif
 
 
 
 %files
-%doc virtio-win_license.txt
+%doc iso-content/virtio-win_license.txt
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/%{name}-%{version}.iso
 %{_datadir}/%{name}/%{name}.iso

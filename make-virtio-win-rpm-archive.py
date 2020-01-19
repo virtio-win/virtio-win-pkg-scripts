@@ -291,8 +291,13 @@ def main():
     rootdir = tempfile.mkdtemp(prefix='virtio-win-archive-')
     atexit.register(lambda: shutil.rmtree(rootdir))
     finaldir = os.path.join(rootdir, options.nvr)
-    os.mkdir(finaldir)
+    isodir = os.path.join(finaldir, "iso-content")
+    os.makedirs(isodir)
 
+    # Copy driverdir content into the dest isodir
+    run(["cp", "-rpL", "%s/." % options.driverdir, isodir])
+
+    # Build floppy images
     build_vfd(options.nvr + '_x86.vfd', vfd_dirs_32,
         options.driverdir, rootdir, finaldir)
     build_vfd(options.nvr + '_amd64.vfd', vfd_dirs_64,
@@ -303,7 +308,6 @@ def main():
     build_vfd(options.nvr + '_servers_amd64.vfd', vfd_dirs_servers_64,
         options.driverdir, rootdir, finaldir)
 
-    run(["cp", "-rpL", "%s/." % options.driverdir, finaldir])
     hardlink_identical_files(finaldir)
     archive(options.nvr, finaldir)
 
