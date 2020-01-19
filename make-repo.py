@@ -40,6 +40,19 @@ def _make_redirect(root, old, new):
     return "redirect permanent %s/%s %s/%s\n" % (root, old, root, new)
 
 
+def _add_link(topdir, src, link):
+    fullsrc = os.path.join(topdir, src)
+    linkpath = os.path.join(topdir, link)
+
+    if not os.path.exists(fullsrc):
+        fail("Nonexistent link src=%s for target=%s" %
+                (fullsrc, linkpath))
+    if os.path.exists(linkpath):
+        os.unlink(linkpath)
+
+    shellcomm("ln -s %s %s" % (src, linkpath))
+
+
 class LocalRepo():
     """
     Class representing the virtio-win tree locally on the system.
@@ -133,16 +146,8 @@ class LocalRepo():
     def add_htaccess_stable_links(self):
         # Make latest-qemu-ga, latest-virtio, and stable-virtio links
         def add_link(src, link):
-            fullsrc = os.path.join(self.LOCAL_DIRECT_DIR, src)
-            linkpath = os.path.join(self.LOCAL_DIRECT_DIR, link)
-
-            if not os.path.exists(fullsrc):
-                fail("Nonexistent link src=%s for target=%s" %
-                        (fullsrc, linkpath))
-            if os.path.exists(linkpath):
-                os.unlink(linkpath)
-
-            shellcomm("ln -s %s %s" % (src, linkpath))
+            topdir = self.LOCAL_DIRECT_DIR
+            _add_link(topdir, src, link)
             return _make_redirect(self.HTTP_DIRECT_DIR, link, src)
 
         htaccess = ""
@@ -169,8 +174,8 @@ class LocalRepo():
             for filename in glob.glob(buildversions.NEW_BUILDS_DIR + "/*"):
                 shellcomm("cp %s %s" % (filename, pkg_input_dir))
 
-        shellcomm("ln -sf %s %s/latest-build " % (
-            os.path.basename(pkg_input_dir), pkg_input_topdir))
+        _add_link(pkg_input_topdir,
+            os.path.basename(pkg_input_dir), "latest-build")
 
 
 def _populate_local_tree(buildversions, rpm_output, rpm_buildroot):
