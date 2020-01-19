@@ -23,6 +23,7 @@ import subprocess
 import sys
 import tempfile
 
+from util import filemap
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -236,6 +237,29 @@ def build_floppies(nvr, driverdir, rootdir, finaldir):
         driverdir, rootdir, finaldir)
 
 
+def create_auto_symlinks(isodir):
+    """
+    Create the autodetectable dir hierarchy. For example, taking
+    all content under $ISO/viostor/w10/amd64/* and linking it
+    into $ISO/amd64/w10
+    """
+    for srcarch, dstarch in filemap.AUTO_ARCHES.items():
+        for drivername in filemap.AUTO_DRIVERS:
+            for osname in os.listdir(os.path.join(isodir, drivername)):
+                if osname in filemap.AUTO_OS_BLACKLIST:
+                    continue
+
+                srcdir = os.path.join(isodir, drivername, osname, srcarch)
+                if not os.path.exists(srcdir):
+                    continue
+
+                dstdir = os.path.join(isodir, dstarch, osname)
+                os.makedirs(dstdir, exist_ok=True)
+                for base in os.listdir(srcdir):
+                    os.link(os.path.join(srcdir, base),
+                            os.path.join(dstdir, base))
+
+
 def hardlink_identical_files(outdir):
     print("Hardlinking identical files...")
 
@@ -308,6 +332,9 @@ def main():
 
     # Copy driverdir content into the dest isodir
     run(["cp", "-rpL", "%s/." % options.driverdir, isodir])
+
+    # Create the auto directory naming symlink tree
+    create_auto_symlinks(isodir)
 
     # Build floppy images
     build_floppies(options.nvr, options.driverdir, rootdir, finaldir)

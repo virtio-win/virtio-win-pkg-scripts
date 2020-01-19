@@ -11,6 +11,18 @@ SUPPORTED_OSES = ['xp', '2k3', '2k8', '2k8R2', 'w7', 'w8', 'w8.1', '2k12',
 SUPPORTED_ARCHES = ['x86', 'amd64']
 
 
+# List of drivers and windows versions we want to add to the
+# autodetectable $arch/$os/$driver symlink tree on the iso
+AUTO_DRIVERS = ["viostor", "vioscsi"]
+AUTO_OS_BLACKLIST = ['xp', '2k3', '2k8']
+AUTO_ARCHES = {
+    # pairs of: (iso arch naming, auto arch naming)
+    "x86": "i386",
+    "amd64": "amd64",
+}
+
+
+
 # These are strings that can be grepped from the .cat files,
 # to determine what windows OS they are intended for. This is used for
 # the internal RHEL process.
@@ -294,20 +306,18 @@ DRIVER_OS_MAP = {
 
 
     'vioscsi': {
-        'Wlh/x86': ['2k8/x86', '../i386/2k8'],
-        'Wlh/amd64': ['2k8/amd64', '../amd64/2k8'],
+        'Wlh/x86': ['2k8/x86'],
+        'Wlh/amd64': ['2k8/amd64'],
 
-        'Win7/x86': ['w7/x86', '../i386/w7'],
-        'Win7/amd64': ['w7/amd64', '2k8R2/amd64', '../amd64/w7'],
+        'Win7/x86': ['w7/x86'],
+        'Win7/amd64': ['w7/amd64', '2k8R2/amd64'],
 
-        'Win8/x86': ['w8/x86', 'w8.1/x86', '../i386/w8'],
-        'Win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64',
-                       '../amd64/w8'],
+        'Win8/x86': ['w8/x86', 'w8.1/x86'],
+        'Win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
 
-        'Win10/x86': ['w10/x86', '../i386/w10'],
-        'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64',
-                        '../amd64/w10'],
-        'Win10/ARM64': ['w10/ARM64', '../ARM64/w10'],
+        'Win10/x86': ['w10/x86'],
+        'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64'],
+        'Win10/ARM64': ['w10/ARM64'],
     },
 
 
@@ -338,20 +348,18 @@ DRIVER_OS_MAP = {
         'Wnet/x86': ['2k3/x86'],
         'Wnet/amd64': ['2k3/amd64', 'xp/amd64'],
 
-        'Wlh/x86': ['2k8/x86', '../i386/2k8'],
-        'Wlh/amd64': ['2k8/amd64', '../amd64/2k8'],
+        'Wlh/x86': ['2k8/x86'],
+        'Wlh/amd64': ['2k8/amd64'],
 
-        'Win7/x86': ['w7/x86', '../i386/w7'],
-        'Win7/amd64': ['w7/amd64', '2k8R2/amd64', '../amd64/w7'],
+        'Win7/x86': ['w7/x86'],
+        'Win7/amd64': ['w7/amd64', '2k8R2/amd64'],
 
-        'Win8/x86': ['w8/x86', 'w8.1/x86', '../i386/w8'],
-        'Win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64',
-                       '../amd64/w8'],
+        'Win8/x86': ['w8/x86', 'w8.1/x86'],
+        'Win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
 
-        'Win10/x86': ['w10/x86', '../i386/w10'],
-        'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64',
-                        '../amd64/w10'],
-        'Win10/ARM64': ['w10/ARM64', '../ARM64/w10'],
+        'Win10/x86': ['w10/x86'],
+        'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64'],
+        'Win10/ARM64': ['w10/ARM64'],
     },
 
     'qemupciserial': {
