@@ -14,9 +14,11 @@
 
 import argparse
 import atexit
+import configparser
 import errno
 import glob
 import hashlib
+import json
 import os
 import shutil
 import subprocess
@@ -144,6 +146,75 @@ def run(cmd, shell=False):
         print('Output:\n%s' % output)
         sys.exit(ret)
     return ret, output
+
+
+#############################
+# version manifest building #
+#############################
+
+def _parse_inf_data(path):
+    config = configparser.ConfigParser(delimiters=('=',), strict=False)
+    try:
+        config.read(path)
+    except configparser.ParsingError:
+        pass
+
+    # Get section names ignoring the case
+    s_version = [s for s in config.sections() if s.lower() == 'version'][0]
+    s_strings = [s for s in config.sections() if s.lower() == 'strings'][0]
+    # Get values
+    version = config.get(s_version, 'DriverVer')
+    name = None
+    for k, v in config.items(s_strings):
+        if k.endswith('.devicedesc'):
+            name = v.strip(' "')
+    return (name, version)
+
+
+def _identify_inf(isodir, path):
+    fullpath = os.path.join(isodir, path)
+    name, version = _parse_inf_data(fullpath)
+    if name is None:
+        # This warns on QXL (non-dod) driver, not sure where the name is
+        print('Skipping file for info.json: '
+                '{}: failed to read INF'.format(path))
+        return None
+
+    path_components = path.split("/")
+    win = path_components[1]
+    arch = path_components[2]
+    return {
+        'arch': arch,
+        'driver_version': version,
+        'inf_path': path,
+        'name': name,
+        'windows_version': win,
+    }
+
+
+def generate_version_manifest(isodir, datadir):
+    drivers = []
+    for root, dummy, files in os.walk(isodir):
+        for f in files:
+            if not f.endswith(".inf"):
+                continue
+
+            path = os.path.join(root, f)[len(isodir) + 1:]
+            if len(path.split("/")) != 4:
+                # Isn't the expected drivername/os/arch/ combo
+                continue
+            if "qemupciserial" in path:
+                # Doesn't have a driver version
+                continue
+
+            info = _identify_inf(isodir, path)
+            if info is not None:
+                drivers.append(info)
+
+    jsoninfo = {"drivers": drivers}
+    content = json.dumps(jsoninfo, sort_keys=True, indent=2)
+    outfile = os.path.join(datadir, "info.json")
+    open(outfile, "w").write(content)
 
 
 ######################
@@ -328,10 +399,14 @@ def main():
     atexit.register(lambda: shutil.rmtree(rootdir))
     finaldir = os.path.join(rootdir, options.nvr)
     isodir = os.path.join(finaldir, "iso-content")
-    os.makedirs(isodir)
+    datadir = os.path.join(isodir, "data")
+    os.makedirs(datadir)
 
     # Copy driverdir content into the dest isodir
     run(["cp", "-rpL", "%s/." % options.driverdir, isodir])
+
+    # Create version manifest file
+    generate_version_manifest(isodir, datadir)
 
     # Create the auto directory naming symlink tree
     create_auto_symlinks(isodir)
