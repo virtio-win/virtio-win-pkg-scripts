@@ -1,4 +1,7 @@
 %changelog
+* Sun Jan 19 2020 Cole Robinson <crobinso@redhat.com> - 0.1.173-3
+- Add data/info.json to the ISO
+
 * Wed Oct 23 2019 Cole Robinson <crobinso@redhat.com> - 0.1.173-2
 - Add virtio-win-guest-tools-installer msis
 
