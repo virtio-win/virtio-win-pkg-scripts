@@ -100,7 +100,7 @@ popd
 # Generate .iso
 pushd iso-content
 /usr/bin/mkisofs \
-    -o ../%{name}-%{version}.iso \
+    -o ../media/%{name}-%{version}.iso \
     -r -J \
     -input-charset iso8859-1 \
     -V "%{name}-%{version}" .
@@ -114,7 +114,7 @@ popd
 
 add_link() {
     # Adds name-version$1 to datadir, with a non-versioned symlink
-    %{__install} -p -m0644 %{name}-%{version}$1 %{buildroot}%{_datadir}/%{name}
+    %{__install} -p -m0644 media/%{name}-%{version}$1 %{buildroot}%{_datadir}/%{name}
     %{__ln_s} %{name}-%{version}$1 %{buildroot}%{_datadir}/%{name}/%{name}$1
 }
 

@@ -220,7 +220,7 @@ def generate_version_manifest(isodir, datadir):
 # Functional helpers #
 ######################
 
-def build_vfd(fname, dmap, driverdir, rootdir, finaldir):
+def build_vfd(fname, dmap, driverdir, rootdir, finaldir, mediadir):
     """construct the VFD from the checkout"""
     print('building a VFD: ' + fname)
 
@@ -235,7 +235,7 @@ def build_vfd(fname, dmap, driverdir, rootdir, finaldir):
 
     # The actual .vfd file. Put it in the final archive directory. We
     # will populate this using libguestfs.
-    full_fname = os.path.join(finaldir, fname)
+    full_fname = os.path.join(mediadir, fname)
     run(('mkdosfs', '-C', full_fname, '2880'))
 
     for vfd_map_src, vfd_map_dest in list(dmap.items()):
@@ -288,15 +288,19 @@ def build_vfd(fname, dmap, driverdir, rootdir, finaldir):
 
 
 def build_floppies(nvr, driverdir, rootdir, finaldir):
+    # The archive directory where the .vfd files will be stored
+    mediadir = os.path.join(finaldir, "media")
+    os.makedirs(mediadir)
+
     build_vfd(nvr + '_x86.vfd', vfd_dirs_32,
-        driverdir, rootdir, finaldir)
+        driverdir, rootdir, finaldir, mediadir)
     build_vfd(nvr + '_amd64.vfd', vfd_dirs_64,
-        driverdir, rootdir, finaldir)
+        driverdir, rootdir, finaldir, mediadir)
 
     build_vfd(nvr + '_servers_x86.vfd', vfd_dirs_servers_32,
-        driverdir, rootdir, finaldir)
+        driverdir, rootdir, finaldir, mediadir)
     build_vfd(nvr + '_servers_amd64.vfd', vfd_dirs_servers_64,
-        driverdir, rootdir, finaldir)
+        driverdir, rootdir, finaldir, mediadir)
 
 
 def create_auto_symlinks(isodir):
