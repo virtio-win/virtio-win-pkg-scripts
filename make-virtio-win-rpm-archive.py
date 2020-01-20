@@ -220,18 +220,12 @@ def generate_version_manifest(isodir, datadir):
 # Functional helpers #
 ######################
 
-def build_vfd(fname, dmap, driverdir, rootdir, finaldir, mediadir):
+def build_vfd(fname, dmap, driverdir, rootdir, rpmdriversdir, mediadir):
     """construct the VFD from the checkout"""
     print('building a VFD: ' + fname)
 
     # The temp directory where we stage the files that will go on the vfd
     floppydir = os.path.join(rootdir, "drivers")
-
-    # The directory that will end up in the archive, and in /usr/share
-    # via the RPM. We call this 'vfddrivers' to make it explicit where
-    # they are coming from, but the RPM installs it as 'drivers' for
-    # historical reasons.
-    archive_vfd_dir = os.path.join(finaldir, "vfddrivers")
 
     # The actual .vfd file. Put it in the final archive directory. We
     # will populate this using libguestfs.
@@ -241,7 +235,10 @@ def build_vfd(fname, dmap, driverdir, rootdir, finaldir, mediadir):
     for vfd_map_src, vfd_map_dest in list(dmap.items()):
         src = os.path.join(driverdir, vfd_map_src)
         dest_vfd = os.path.join(floppydir, vfd_map_dest)
-        dest_archive = os.path.join(archive_vfd_dir, vfd_map_dest)
+
+        # This content will end up in /usr/share/virtio-win/drivers/
+        # For historical reasons this was a copy of the floppy content
+        dest_archive = os.path.join(rpmdriversdir, vfd_map_dest)
 
         os.makedirs(dest_vfd, exist_ok=True)
         os.makedirs(dest_archive, exist_ok=True)
@@ -287,20 +284,20 @@ def build_vfd(fname, dmap, driverdir, rootdir, finaldir, mediadir):
     shutil.rmtree(floppydir)
 
 
-def build_floppies(nvr, driverdir, rootdir, finaldir):
+def build_floppies(nvr, driverdir, rootdir, finaldir, rpmdriversdir):
     # The archive directory where the .vfd files will be stored
     mediadir = os.path.join(finaldir, "media")
     os.makedirs(mediadir)
 
     build_vfd(nvr + '_x86.vfd', vfd_dirs_32,
-        driverdir, rootdir, finaldir, mediadir)
+        driverdir, rootdir, rpmdriversdir, mediadir)
     build_vfd(nvr + '_amd64.vfd', vfd_dirs_64,
-        driverdir, rootdir, finaldir, mediadir)
+        driverdir, rootdir, rpmdriversdir, mediadir)
 
     build_vfd(nvr + '_servers_x86.vfd', vfd_dirs_servers_32,
-        driverdir, rootdir, finaldir, mediadir)
+        driverdir, rootdir, rpmdriversdir, mediadir)
     build_vfd(nvr + '_servers_amd64.vfd', vfd_dirs_servers_64,
-        driverdir, rootdir, finaldir, mediadir)
+        driverdir, rootdir, rpmdriversdir, mediadir)
 
 
 def create_auto_symlinks(isodir):
@@ -395,7 +392,9 @@ def main():
     finaldir = os.path.join(rootdir, options.nvr)
     isodir = os.path.join(finaldir, "iso-content")
     datadir = os.path.join(isodir, "data")
+    rpmdriversdir = os.path.join(finaldir, "rpm-drivers")
     os.makedirs(datadir)
+    os.makedirs(rpmdriversdir)
 
     # Copy driverdir content into the dest isodir
     run(["cp", "-rpL", "%s/." % options.driverdir, isodir])
@@ -407,7 +406,8 @@ def main():
     create_auto_symlinks(isodir)
 
     # Build floppy images
-    build_floppies(options.nvr, options.driverdir, rootdir, finaldir)
+    build_floppies(options.nvr, options.driverdir,
+            rootdir, finaldir, rpmdriversdir)
 
     hardlink_identical_files(finaldir)
     archive(options.nvr, finaldir)

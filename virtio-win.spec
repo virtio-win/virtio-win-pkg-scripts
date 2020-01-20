@@ -88,9 +88,9 @@ popd
 # Dropping unsupported Windows versions.
 # It's done here to fix two issues at the same time: do not
 # release them in iso AND as binary drivers.
-%{__rm} iso-content/*/2k8/ vfddrivers/*/Win2008/ -rf
-%{__rm} iso-content/*/2k3/ vfddrivers/*/Win2003 -rf
-%{__rm} iso-content/*/xp/ vfddrivers/*/WinXP -rf
+%{__rm} iso-content/*/2k8/ rpm-drivers/*/Win2008/ -rf
+%{__rm} iso-content/*/2k3/ rpm-drivers/*/Win2003 -rf
+%{__rm} iso-content/*/xp/ rpm-drivers/*/WinXP -rf
 %{__rm} iso-content/smbus -rf
 %endif
 
@@ -128,7 +128,7 @@ add_link _servers_x86.vfd
 add_link _servers_amd64.vfd
 %endif
 
-%{__cp} -a vfddrivers %{buildroot}/%{_datadir}/%{name}/drivers
+%{__cp} -a rpm-drivers %{buildroot}/%{_datadir}/%{name}/drivers
 
 
 # Copy the guest agent .msi into final RPM location
