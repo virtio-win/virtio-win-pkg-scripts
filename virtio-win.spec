@@ -164,11 +164,40 @@ add_link _servers_amd64.vfd
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/%{name}-%{version}.iso
 %{_datadir}/%{name}/%{name}.iso
+%{_datadir}/%{name}/guest-agent/*.msi
+
+%{_datadir}/%{name}/drivers/i386
+%{_datadir}/%{name}/drivers/amd64
+
+# Add some by-os and by-driver whitelisting, so unintended things don't
+# sneak into the hierarchy
+%{_datadir}/%{name}/drivers/by-driver/Balloon
+%{_datadir}/%{name}/drivers/by-driver/NetKVM
+%{_datadir}/%{name}/drivers/by-driver/pvpanic
+%{_datadir}/%{name}/drivers/by-driver/qemufwcfg
+%{_datadir}/%{name}/drivers/by-driver/qemupciserial
+%{_datadir}/%{name}/drivers/by-driver/qxl
+%{_datadir}/%{name}/drivers/by-driver/vioinput
+%{_datadir}/%{name}/drivers/by-driver/viorng
+%{_datadir}/%{name}/drivers/by-driver/vioscsi
+%{_datadir}/%{name}/drivers/by-driver/vioserial
+%{_datadir}/%{name}/drivers/by-driver/viostor
+%exclude %{_datadir}/%{name}/drivers/by-driver/virtio-win_license.txt
+%if 0%{?fedora}
+%{_datadir}/%{name}/drivers/by-driver/qxldod
+%{_datadir}/%{name}/drivers/by-driver/smbus
+%endif
+
+%{_datadir}/%{name}/drivers/by-os/i386
+%{_datadir}/%{name}/drivers/by-os/amd64
+%if 0%{?fedora}
+%{_datadir}/%{name}/drivers/by-os/ARM64
+%endif
+
 %if 0%{?rhel} <= 7
 %{_datadir}/%{name}/*.vfd
 %endif
-%{_datadir}/%{name}/drivers
-%{_datadir}/%{name}/guest-agent/*.msi
+
 %if 0%{?fedora}
 %{_datadir}/%{name}/installer/*.msi
 %endif

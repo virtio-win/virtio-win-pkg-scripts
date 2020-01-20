@@ -388,6 +388,36 @@ Example: %(prog)s virtio-win-1.2.3 /path/to/built/drivers
     return options
 
 
+def make_rpm_driver_dirs(driverdir, rpmdriversdir):
+    """
+    Build the driver dirs that are installed on the host by the RPM.
+
+    * virtio-win/by-driver: Has layout matching the .iso, for example
+        by-driver/viorng/w10/x86/
+    * virtio-win/by-os: Has layout matching windows autodetect arch:
+        by-os/i386/w10/
+    """
+    by_driver = os.path.join(rpmdriversdir, "by-driver")
+    by_os = os.path.join(rpmdriversdir, "by-os")
+
+    # Copy driverdir content into the dest by-driver dir
+    os.makedirs(by_driver)
+    run(["cp", "-rpL", "%s/." % driverdir, by_driver])
+
+    # Build the by-os tree from the by-driver tree
+    for (driver, osname, arch, path) in _find_driver_os_arch_dirs(by_driver):
+        if path.endswith(".pdb"):
+            # This files take up a ton of space. Skip them
+            continue
+        dummy = driver
+        arch = filemap.AUTO_ARCHES.get(arch, arch)
+        destdir = os.path.join(by_os, arch, osname)
+        os.makedirs(destdir, exist_ok=True)
+        destpath = os.path.join(destdir, os.path.basename(path))
+        if not os.path.exists(destpath):
+            os.link(path, os.path.join(destdir, os.path.basename(path)))
+
+
 def main():
     options = get_options()
 
@@ -412,6 +442,9 @@ def main():
     # Build floppy images
     build_floppies(options.nvr, options.driverdir,
             rootdir, finaldir, rpmdriversdir)
+
+    # Build by-os and by-driver dirs for the RPM
+    make_rpm_driver_dirs(options.driverdir, rpmdriversdir)
 
     hardlink_identical_files(finaldir)
     archive(options.nvr, finaldir)
