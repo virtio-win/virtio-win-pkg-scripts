@@ -123,7 +123,9 @@ def main():
         print()
         print()
         print("file diff:")
-        shellcomm(r"diff -rup --exclude \*.vfd --exclude \*.iso %s %s" %
+        shellcomm(r"diff -rup "
+            "--exclude \\*.vfd --exclude \\*.iso --exclude \\*.msi "
+            "%s %s" %
             (origdir, newdir))
 
     return 0
