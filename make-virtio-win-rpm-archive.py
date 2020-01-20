@@ -170,45 +170,49 @@ def _parse_inf_data(path):
     return (name, version)
 
 
-def _identify_inf(isodir, path):
-    fullpath = os.path.join(isodir, path)
-    name, version = _parse_inf_data(fullpath)
-    if name is None:
-        # This warns on QXL (non-dod) driver, not sure where the name is
-        print('Skipping file for info.json: '
-                '{}: failed to read INF'.format(path))
-        return None
-
-    path_components = path.split("/")
-    win = path_components[1]
-    arch = path_components[2]
-    return {
-        'arch': arch,
-        'driver_version': version,
-        'inf_path': path,
-        'name': name,
-        'windows_version': win,
-    }
+def _find_driver_os_arch_dirs(topdir):
+    """
+    Walk the passed dir which has ISO driver layout, and return a list
+    of tuples of (driver, osname, arch, fullpath). Example:
+        (viorng, w10, x86, viorng/w10/x86/viorng.cat)
+    """
+    ret = []
+    for root, dummy, files in os.walk(topdir):
+        for f in files:
+            fullpath = os.path.join(root, f)
+            relpath = fullpath[len(topdir) + 1:]
+            if relpath.count("/") != 3:
+                break
+            driver, osname, arch, dummy = relpath.split("/")
+            ret.append((driver, osname, arch, fullpath))
+    return ret
 
 
 def generate_version_manifest(isodir, datadir):
     drivers = []
-    for root, dummy, files in os.walk(isodir):
-        for f in files:
-            if not f.endswith(".inf"):
-                continue
+    for (driver, osname, arch, path) in _find_driver_os_arch_dirs(isodir):
+        if not path.endswith(".inf"):
+            continue
+        if driver == "qemupciserial":
+            # Doesn't have a driver version
+            continue
 
-            path = os.path.join(root, f)[len(isodir) + 1:]
-            if len(path.split("/")) != 4:
-                # Isn't the expected drivername/os/arch/ combo
-                continue
-            if "qemupciserial" in path:
-                # Doesn't have a driver version
-                continue
+        relpath = path[len(isodir) + 1:]
+        name, version = _parse_inf_data(path)
+        if name is None:
+            # This warns on QXL (non-dod) driver, not sure where the name is
+            print('Skipping file for info.json: '
+                    '{}: failed to read INF'.format(relpath))
+            continue
 
-            info = _identify_inf(isodir, path)
-            if info is not None:
-                drivers.append(info)
+        data = {
+            'arch': arch,
+            'driver_version': version,
+            'inf_path': relpath,
+            'name': name,
+            'windows_version': osname,
+        }
+        drivers.append(data)
 
     jsoninfo = {"drivers": drivers}
     content = json.dumps(jsoninfo, sort_keys=True, indent=2)
@@ -306,21 +310,18 @@ def create_auto_symlinks(isodir):
     all content under $ISO/viostor/w10/amd64/* and linking it
     into $ISO/amd64/w10
     """
-    for srcarch, dstarch in filemap.AUTO_ARCHES.items():
-        for drivername in filemap.AUTO_DRIVERS:
-            for osname in os.listdir(os.path.join(isodir, drivername)):
-                if osname in filemap.AUTO_OS_BLACKLIST:
-                    continue
+    for (driver, osname, arch, path) in _find_driver_os_arch_dirs(isodir):
+        if osname in filemap.AUTO_OS_BLACKLIST:
+            continue
+        if driver not in filemap.AUTO_DRIVERS:
+            continue
+        if arch not in filemap.AUTO_ARCHES:
+            continue
 
-                srcdir = os.path.join(isodir, drivername, osname, srcarch)
-                if not os.path.exists(srcdir):
-                    continue
-
-                dstdir = os.path.join(isodir, dstarch, osname)
-                os.makedirs(dstdir, exist_ok=True)
-                for base in os.listdir(srcdir):
-                    os.link(os.path.join(srcdir, base),
-                            os.path.join(dstdir, base))
+        newpath = os.path.join(isodir, filemap.AUTO_ARCHES[arch], osname,
+                os.path.basename(path))
+        os.makedirs(os.path.dirname(newpath), exist_ok=True)
+        os.link(path, newpath)
 
 
 def hardlink_identical_files(outdir):
