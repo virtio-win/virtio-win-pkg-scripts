@@ -199,7 +199,10 @@ def generate_version_manifest(isodir, datadir):
 
         relpath = path[len(isodir) + 1:]
         name, version = _parse_inf_data(path)
-        if name is None:
+        if name is None and driver == "qxl":
+            # qxl .inf doesn't have easily parseable name
+            name = "Red Hat QXL GPU"
+        elif name is None:
             # This warns on QXL (non-dod) driver, not sure where the name is
             print('Skipping file for info.json: '
                     '{}: failed to read INF'.format(relpath))
