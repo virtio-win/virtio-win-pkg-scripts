@@ -56,6 +56,7 @@ Source23: virtio-guest-tools-installer-%{version}.tar.gz
 
 
 BuildRequires: /usr/bin/mkisofs
+BuildRequires: findutils
 
 
 %description
@@ -88,10 +89,22 @@ popd
 # Dropping unsupported Windows versions.
 # It's done here to fix two issues at the same time: do not
 # release them in iso AND as binary drivers.
-%{__rm} iso-content/*/2k8/ rpm-drivers/*/Win2008/ -rf
-%{__rm} iso-content/*/2k3/ rpm-drivers/*/Win2003 -rf
-%{__rm} iso-content/*/xp/ rpm-drivers/*/WinXP -rf
-%{__rm} iso-content/smbus -rf
+for srcdir in iso-content rpm-drivers; do
+    rm_driver_dir() {
+        find $srcdir -type d -name $1 -print0 | xargs -0 rm -rf
+    }
+
+    # ISO naming
+    rm_driver_dir xp
+    rm_driver_dir 2k3
+    rm_driver_dir 2k8
+    rm_driver_dir smbus
+
+    # Old floppy naming
+    rm_driver_dir WinXP
+    rm_driver_dir Win2003
+    rm_driver_dir Win2008
+done
 %endif
 
 
