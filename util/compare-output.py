@@ -69,7 +69,8 @@ def extract_files(filename):
     for mediafile in mediafiles:
         if os.path.islink(mediafile):
             continue
-        media_out_dir = os.path.join(output_dir, os.path.basename(mediafile))
+        media_out_dir = os.path.join(output_dir,
+                os.path.basename(mediafile) + "-extracted")
         os.mkdir(media_out_dir)
 
         shellcomm(
