@@ -111,23 +111,21 @@ popd
 %install
 %{__install} -d -m0755 %{buildroot}%{_datadir}/%{name}
 
-# Install .iso, create non-versioned symlink
-%{__install} -p -m0644 %{name}-%{version}.iso %{buildroot}%{_datadir}/%{name}
-%{__ln_s} %{name}-%{version}.iso %{buildroot}%{_datadir}/%{name}/%{name}.iso
 
+add_link() {
+    # Adds name-version$1 to datadir, with a non-versioned symlink
+    %{__install} -p -m0644 %{name}-%{version}$1 %{buildroot}%{_datadir}/%{name}
+    %{__ln_s} %{name}-%{version}$1 %{buildroot}%{_datadir}/%{name}/%{name}$1
+}
+
+add_link .iso
 
 # RHEL-8 does not support vfd images
 %if 0%{?rhel} <= 7
-# Install .vfd files, create non-versioned symlinks
-%{__install} -p -m0644 %{name}-%{version}_x86.vfd  %{buildroot}%{_datadir}/%{name}
-%{__ln_s} %{name}-%{version}_x86.vfd %{buildroot}%{_datadir}/%{name}/%{name}_x86.vfd
-%{__install} -p -m0644 %{name}-%{version}_amd64.vfd  %{buildroot}%{_datadir}/%{name}
-%{__ln_s} %{name}-%{version}_amd64.vfd %{buildroot}%{_datadir}/%{name}/%{name}_amd64.vfd
-
-%{__install} -p -m0644 %{name}-%{version}_servers_x86.vfd  %{buildroot}%{_datadir}/%{name}
-%{__ln_s} %{name}-%{version}_servers_x86.vfd %{buildroot}%{_datadir}/%{name}/%{name}_servers_x86.vfd
-%{__install} -p -m0644 %{name}-%{version}_servers_amd64.vfd  %{buildroot}%{_datadir}/%{name}
-%{__ln_s} %{name}-%{version}_servers_amd64.vfd %{buildroot}%{_datadir}/%{name}/%{name}_servers_amd64.vfd
+add_link _x86.vfd
+add_link _amd64.vfd
+add_link _servers_x86.vfd
+add_link _servers_amd64.vfd
 %endif
 
 %{__cp} -a vfddrivers %{buildroot}/%{_datadir}/%{name}/drivers
