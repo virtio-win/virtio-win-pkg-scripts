@@ -1,4 +1,7 @@
 %changelog
+* Mon Jan 20 2020 Cole Robinson <crobinso@redhat.com> - 0.1.173-4
+* Add drivers/by-os and drivers/by-driver to the RPM
+
 * Sun Jan 19 2020 Cole Robinson <crobinso@redhat.com> - 0.1.173-3
 - Add data/info.json to the ISO
 
