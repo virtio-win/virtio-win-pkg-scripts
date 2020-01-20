@@ -15,7 +15,6 @@
 import argparse
 import atexit
 import configparser
-import errno
 import glob
 import hashlib
 import json
@@ -244,16 +243,8 @@ def build_vfd(fname, dmap, driverdir, rootdir, finaldir):
         dest_vfd = os.path.join(floppydir, vfd_map_dest)
         dest_archive = os.path.join(archive_vfd_dir, vfd_map_dest)
 
-        try:
-            os.makedirs(dest_vfd)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                raise
-        try:
-            os.makedirs(dest_archive)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                raise
+        os.makedirs(dest_vfd, exist_ok=True)
+        os.makedirs(dest_archive, exist_ok=True)
 
         for src_file in os.listdir(src):
             # See the .vfd description at the top of this file.
