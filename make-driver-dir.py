@@ -140,6 +140,9 @@ def check_remaining_files(input_dir, seenfiles):
         ".*/spice-qxl-wddm-dod/w10/Changelog",
         ".*/spice-qxl-wddm-dod-8.1-compatible/Changelog",
 
+        # An rng test that doesn't need to be shipped
+        ".*viorngtest.*",
+
         # virtio-win build system unconditionally builds every driver
         # for every windows platform that supports it. However, depending
         # on the driver, functionally identical binaries might be
