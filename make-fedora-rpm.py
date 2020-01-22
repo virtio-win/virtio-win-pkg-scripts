@@ -183,8 +183,7 @@ def _prep_driver_dir_input(driver_input_dir):
 
 
     # Copy static data/old-drivers/ content into place
-    shellcomm("cp -r data/old-drivers/xp-viostor/* %s" % driver_input_dir)
-    shellcomm("cp -r data/old-drivers/xp-qxl/* %s/qxl" % driver_input_dir)
+    shellcomm("cp -r data/old-drivers/* %s" % driver_input_dir)
 
 
 ##################
