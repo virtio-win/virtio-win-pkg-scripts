@@ -19,7 +19,7 @@
 Summary: VirtIO para-virtualized drivers for Windows(R)
 Name: virtio-win
 Version: 0.1.173
-Release: 4
+Release: 5
 Group: Applications/System
 URL: http://www.redhat.com/
 BuildArch: noarch
@@ -51,7 +51,7 @@ Source5: %{qxl_build}-sources.zip
 Source20: %{qxlwddm_build}-sources.zip
 Source21: virtio-win-gt-x86.msi
 Source22: virtio-win-gt-x64.msi
-Source23: virtio-guest-tools-installer-%{version}.tar.gz
+Source23: virtio-win-guest-tools-installer-%{version}.tar.gz
 %endif
 
 
