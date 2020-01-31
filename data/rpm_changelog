@@ -1,4 +1,7 @@
 %changelog
+* Sat Feb 01 2020 Cole Robinson <crobinso@redhat.com> - 0.1.173-6
+* Update virtio-win-guest-tools-installer to 4bc3ac5
+
 * Thu Jan 23 2020 Cole Robinson <crobinso@redhat.com> - 0.1.173-5
 - Update virtio-win-guest-tools-installer to 187de02
 
