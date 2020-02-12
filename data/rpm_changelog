@@ -1,12 +1,15 @@
 %changelog
+* Wed Feb 12 2020 Cole Robinson <crobinso@redhat.com> - 0.1.173-7
+- Force xz RPM compression for RHEL7 compat
+
 * Sat Feb 01 2020 Cole Robinson <crobinso@redhat.com> - 0.1.173-6
-* Update virtio-win-guest-tools-installer to 4bc3ac5
+- Update virtio-win-guest-tools-installer to 4bc3ac5
 
 * Thu Jan 23 2020 Cole Robinson <crobinso@redhat.com> - 0.1.173-5
 - Update virtio-win-guest-tools-installer to 187de02
 
 * Mon Jan 20 2020 Cole Robinson <crobinso@redhat.com> - 0.1.173-4
-* Add drivers/by-os and drivers/by-driver to the RPM
+- Add drivers/by-os and drivers/by-driver to the RPM
 
 * Sun Jan 19 2020 Cole Robinson <crobinso@redhat.com> - 0.1.173-3
 - Add data/info.json to the ISO

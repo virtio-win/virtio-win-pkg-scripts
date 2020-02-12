@@ -272,7 +272,10 @@ def _rpmbuild(spec, rpm_src_dir, rpm_build_dir, rpm_output_dir):
         "--define '_builddir {builddir}' "
         "--define '_buildrootdir {builddir}' "
         "--define '_rpmdir {outputdir}' "
-        "--define '_srcrpmdir {outputdir}' {spec}".format(
+        "--define '_srcrpmdir {outputdir}' "
+        "--define '_source_payload w6.xzdio' "
+        "--define '_binary_payload w6.xzdio' "
+        "{spec}".format(
             topdir=rpm_src_dir, builddir=rpm_build_dir,
             outputdir=rpm_output_dir,
             spec=spec.basename))
