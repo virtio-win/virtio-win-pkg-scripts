@@ -48,6 +48,8 @@ def main():
     driverdir = os.path.abspath(options.driverdir)
     os.chdir("virtio-win-guest-tools-installer")
 
+    shellcomm("git clean -xdf")
+
     shellcomm("./automation/build-artifacts.sh %s %s" %
             (driverdir, options.nvr))
 
