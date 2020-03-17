@@ -114,7 +114,7 @@ done
 pushd iso-content
 /usr/bin/mkisofs \
     -o ../media/%{name}-%{version}.iso \
-    -r -J \
+    -r -iso-level 4 \
     -input-charset iso8859-1 \
     -V "%{name}-%{version}" .
 popd
