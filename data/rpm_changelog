@@ -1,4 +1,7 @@
 %changelog
+* Mon Mar 23 2020 Cole Robinson <crobinso@redhat.com> - 0.1.173-9
+- Adjust iso settings to fix label length restrictions
+
 * Tue Mar 10 2020 Cole Robinson <crobinso@redhat.com> - 0.1.173-8
 - Update to virtio-win-guest-tools-installer 822f817
 
