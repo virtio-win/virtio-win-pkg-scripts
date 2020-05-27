@@ -62,6 +62,7 @@ class Spec(object):
 
         self.newvirtio = buildversions.virtio_prewhql_str
         self.newqxl = buildversions.qxl_str
+
         self.newqemuga = buildversions.qemu_ga_str
         self.newqxlwddm = buildversions.qxlwddm_str
         self.newspicevda = buildversions.spice_vda_str
@@ -211,9 +212,19 @@ def _prep_qxldod_msi(driver_input_dir, msi_dst_dir):
     """
     msi_dir = os.path.join(driver_input_dir, "spice-qxl-wddm-dod/w10/")
     for msifile in glob.glob(os.path.join(msi_dir, "*.msi")):
-        print (msifile)
         if (re.search("QxlWddmDod_", msifile)):
             shellcomm("cp -r %s %s" % (msifile, msi_dst_dir))
+
+
+def _find_msi(msi_dir, msi_name, msi_arch):
+    """
+    Find msi file by its name and arch
+    """
+    params = [msi_name, msi_arch]
+    for msifile in glob.glob(os.path.join(msi_dir, "*.msi")):
+        if all(x in msifile for x in params):
+            return msifile
+    return ''
 
 ##################
 # main() helpers #
@@ -351,8 +362,22 @@ def main():
     _prep_spice_vdagent_msi(spice_dir)
     _prep_qxldod_msi(driver_input_dir, spice_dir)
 
-    shellcomm("./make-installer.py %s %s --output-dir %s" %
-            (spec.newversion, driver_output_dir, installer_output_dir))
+    spice_vdagent_x64_msi = _find_msi(spice_dir, 'spice-vdagent-', 'x64')
+    spice_vdagent_x86_msi = _find_msi(spice_dir, 'spice-vdagent-', 'x86')
+
+    spice_driver_x64_msi = _find_msi(spice_dir, 'QxlWddmDod_', 'x64')
+    spice_driver_x86_msi = _find_msi(spice_dir, 'QxlWddmDod_', 'x86')
+
+    qemu_ga_agent_dir = os.path.join(TOP_TEMP_DIR, "mingw-qemu-ga-rpm-extracted")
+    qemu_ga_agent_x64_msi = _find_msi(qemu_ga_agent_dir, 'qemu-ga-', 'x64')
+    qemu_ga_agent_x86_msi = _find_msi(qemu_ga_agent_dir, 'qemu-ga-', 'x86')
+
+    shellcomm("./make-installer.py %s %s %s %s %s %s %s %s --output-dir %s" %
+            (spec.newversion, driver_output_dir,
+             spice_vdagent_x64_msi, spice_vdagent_x86_msi,
+             spice_driver_x64_msi, spice_driver_x86_msi,
+             qemu_ga_agent_x64_msi, qemu_ga_agent_x86_msi,
+             installer_output_dir))
     shellcomm("cp %s/* %s" % (installer_output_dir, rpm_src_dir))
 
     # Generate RPM input archive + vfd + iso
