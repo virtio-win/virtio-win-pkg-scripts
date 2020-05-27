@@ -53,6 +53,7 @@ Source20: %{qxlwddm_build}-sources.zip
 Source21: virtio-win-gt-x86.msi
 Source22: virtio-win-gt-x64.msi
 Source23: virtio-win-guest-tools-installer-%{version}.tar.gz
+Source24: virtio-win-guest-tools.exe
 Source25: %{spice_vdagent}-sources.zip
 %endif
 
@@ -80,10 +81,11 @@ popd
 %{__mv} %{qemu_ga_win_build}/usr/x86_64-w64-mingw32/sys-root/mingw/bin/qemu-ga-x86_64.msi iso-content/guest-agent/
 
 
-# Move virtio-win MSIs into place
+# Move virtio-win MSIs and EXE into place
 %if 0%{?fedora}
 %{__cp} %{SOURCE21} iso-content/
 %{__cp} %{SOURCE22} iso-content/
+%{__cp} %{SOURCE24} iso-content/
 %endif
 
 
@@ -152,11 +154,12 @@ add_link _servers_amd64.vfd
 %{__install} -p -m0644 iso-content/guest-agent/qemu-ga-x86_64.msi  %{buildroot}%{_datadir}/%{name}/guest-agent/qemu-ga-x86_64.msi
 
 
-# Copy virtio-win install .msi into final RPM location
+# Copy virtio-win install .msi and .exe into final RPM location
 %if 0%{?fedora}
 %{__mkdir} -p %{buildroot}%{_datadir}/%{name}/installer/
 %{__install} -p -m0644 iso-content/virtio-win-gt-x86.msi %{buildroot}%{_datadir}/%{name}/installer/
 %{__install} -p -m0644 iso-content/virtio-win-gt-x64.msi  %{buildroot}%{_datadir}/%{name}/installer/
+%{__install} -p -m0644 iso-content/virtio-win-guest-tools.exe  %{buildroot}%{_datadir}/%{name}/installer/
 %endif
 
 
@@ -202,4 +205,5 @@ add_link _servers_amd64.vfd
 
 %if 0%{?fedora}
 %{_datadir}/%{name}/installer/*.msi
+%{_datadir}/%{name}/installer/*.exe
 %endif
