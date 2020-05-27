@@ -121,6 +121,7 @@ def check_remaining_files(input_dir, seenfiles):
         # (private mail May 2015)
         r".*DVL\.XML",
         ".*vioser-test.*",
+        ".*viorngtest.*",
         # Added in 171 build in May 2019, similar to above XML so I
         # presume it shouldn't be shipped
         r".*DVL-compat\.XML",
