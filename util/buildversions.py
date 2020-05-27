@@ -36,6 +36,8 @@ class BuildVersions:
         self.mingw_qemu_ga_str = self._verstr_from_filename(
                 "mingw-qemu-ga-win", "mingw-qemu-ga-win.*src.rpm")
         self.qemu_ga_str = self.mingw_qemu_ga_str[len("mingw-"):]
+        self.spice_vda_str = self._verstr_from_filename(
+                "spice-vdagent-win", "spice-vdagent-win.*sources.zip")
 
         # Change virtio-win-prewhql-0.1-100 to virtio-win-0.1.100, since it's
         # what we want for making RPM version happy
