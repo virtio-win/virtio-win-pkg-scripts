@@ -13,7 +13,7 @@
 %global qxl_build qxl-win-unsigned-0.1-24
 # qxlwddm is fedora only for now
 %if 0%{?fedora}
-%global qxlwddm_build spice-qxl-wddm-dod-0.19-0
+%global qxlwddm_build spice-qxl-wddm-dod-0.20-0
 %endif
 
 Summary: VirtIO para-virtualized drivers for Windows(R)
