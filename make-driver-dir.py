@@ -141,6 +141,10 @@ def check_remaining_files(input_dir, seenfiles):
         ".*/spice-qxl-wddm-dod/w10/Changelog",
         ".*/spice-qxl-wddm-dod-8.1-compatible/Changelog",
 
+        ".*/spice-qxl-wddm-dod/w10/QxlWddmDod_0.20.0.0_x64.msi",
+        ".*/spice-qxl-wddm-dod/w10/QxlWddmDod_0.20.0.0_x86.msi",
+
+
         # virtio-win build system unconditionally builds every driver
         # for every windows platform that supports it. However, depending
         # on the driver, functionally identical binaries might be
