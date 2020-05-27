@@ -14,6 +14,7 @@
 # qxlwddm is fedora only for now
 %if 0%{?fedora}
 %global qxlwddm_build spice-qxl-wddm-dod-0.20-0
+%global spice_vdagent spice-vdagent-win-0.10.0-2
 %endif
 
 Summary: VirtIO para-virtualized drivers for Windows(R)
@@ -52,6 +53,7 @@ Source20: %{qxlwddm_build}-sources.zip
 Source21: virtio-win-gt-x86.msi
 Source22: virtio-win-gt-x64.msi
 Source23: virtio-win-guest-tools-installer-%{version}.tar.gz
+Source25: %{spice_vdagent}-sources.zip
 %endif
 
 
