@@ -186,6 +186,10 @@ def _prep_driver_dir_input(driver_input_dir):
     shellcomm("cp -r data/old-drivers/xp-viostor/* %s" % driver_input_dir)
     shellcomm("cp -r data/old-drivers/xp-qxl/* %s/qxl" % driver_input_dir)
 
+    shellcomm("cp -r data/old-drivers/Win7 %s" % driver_input_dir)
+    shellcomm("cp -r data/old-drivers/Wlh %s" % driver_input_dir)
+    shellcomm("cp -r data/old-drivers/Wnet %s" % driver_input_dir)
+    shellcomm("cp -r data/old-drivers/Wxp %s" % driver_input_dir)
 
 ##################
 # main() helpers #
