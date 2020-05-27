@@ -206,6 +206,14 @@ def _prep_spice_vdagent_msi(msi_dst_dir):
         if (re.search("spice-vdagent-", msifile)):
             shellcomm("cp -r %s %s" % (msifile, msi_dst_dir))
 
+def _prep_qxldod_msi(driver_input_dir, msi_dst_dir):
+    """
+    """
+    msi_dir = os.path.join(driver_input_dir, "spice-qxl-wddm-dod/w10/")
+    for msifile in glob.glob(os.path.join(msi_dir, "*.msi")):
+        print (msifile)
+        if (re.search("QxlWddmDod_", msifile)):
+            shellcomm("cp -r %s %s" % (msifile, msi_dst_dir))
 
 ##################
 # main() helpers #
@@ -341,6 +349,7 @@ def main():
     installer_output_dir = _tempdir("make-installer-output")
     spice_dir = _tempdir("spice-extracted")
     _prep_spice_vdagent_msi(spice_dir)
+    _prep_qxldod_msi(driver_input_dir, spice_dir)
 
     shellcomm("./make-installer.py %s %s --output-dir %s" %
             (spec.newversion, driver_output_dir, installer_output_dir))
