@@ -64,6 +64,7 @@ class Spec(object):
         self.newqxl = buildversions.qxl_str
         self.newqemuga = buildversions.qemu_ga_str
         self.newqxlwddm = buildversions.qxlwddm_str
+        self.newspicevda = buildversions.spice_vda_str
 
         self.origvirtio = self._replace_global("virtio_win_prewhql_build",
             self.newvirtio)
@@ -72,6 +73,8 @@ class Spec(object):
             self.newqxlwddm)
         self.origqemuga = self._replace_global("qemu_ga_win_build",
             self.newqemuga)
+        self.origspicevda = self._replace_global("spice_vdagent",
+            self.newspicevda)
 
         self.newrelease, self.newversion = self._set_new_version()
         self._set_new_clog()
@@ -124,6 +127,8 @@ class Spec(object):
             clog += "- Update to %s\n" % self.newqxlwddm
         if self.origqemuga != self.newqemuga:
             clog += "- Update to %s\n" % self.newqemuga
+        if self.origspicevda != self.newspicevda:
+            clog += "- Update to %s\n" % self.newspicevda
 
         self.newclog = re.sub("%changelog", "%%changelog\n%s" % clog,
             self.newclog).strip() + "\n"
@@ -190,6 +195,17 @@ def _prep_driver_dir_input(driver_input_dir):
     shellcomm("cp -r data/old-drivers/Wlh %s" % driver_input_dir)
     shellcomm("cp -r data/old-drivers/Wnet %s" % driver_input_dir)
     shellcomm("cp -r data/old-drivers/Wxp %s" % driver_input_dir)
+
+
+def _prep_spice_vdagent_msi(msi_dst_dir):
+    """
+    Find and copy spice-vdagent-x64(x86).msi to a new directory
+    to be used later on by make-installer.py
+    """
+    for msifile in glob.glob(os.path.join(NEW_BUILDS_DIR, "*.msi")):
+        if (re.search("spice-vdagent-", msifile)):
+            shellcomm("cp -r %s %s" % (msifile, msi_dst_dir))
+
 
 ##################
 # main() helpers #
@@ -323,6 +339,9 @@ def main():
 
     # Build the driver installer
     installer_output_dir = _tempdir("make-installer-output")
+    spice_dir = _tempdir("spice-extracted")
+    _prep_spice_vdagent_msi(spice_dir)
+
     shellcomm("./make-installer.py %s %s --output-dir %s" %
             (spec.newversion, driver_output_dir, installer_output_dir))
     shellcomm("cp %s/* %s" % (installer_output_dir, rpm_src_dir))

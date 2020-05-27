@@ -88,6 +88,12 @@ def _check_qxlwddm():
     url = pkgurl + "qxl-wddm-dod-" + version + "/"
     return url, version
 
+def _check_spice_vdagent():
+    pkgurl = "{internalurl}/spice_vdagent/"
+    regex = r'href="spice-vdagent-x64-([\d\.-]+)/"'
+    version = _find_latest_version_dir(pkgurl, regex)
+    url = pkgurl + "spice-vdagent-" + version + "/"
+    return url, version
 
 ###########################
 # download the .zip files #
@@ -167,6 +173,15 @@ def _get_qemuga_urls(baseurl, version):
 
     return ret
 
+def _get_vdagent_urls(baseurl, version):
+    want = [
+        "spice-vdagent-win-%s-sources.zip" %version,
+        "spice-vdagent-x64-%s.msi" % version,
+        "spice-vdagent-x86-%s.msi" % version]
+    skip = [
+    ]
+    return _distill_links(baseurl + "win/", "zip", want, skip)
+
 
 def find_latest_buildversions():
     """
@@ -195,6 +210,10 @@ def find_latest_buildversions():
         if packagename == "virtio-win-prewhql":
             baseurl, version = _check_virtio_win_prewhql()
             urls = _get_virtio_urls(baseurl, version)
+        if packagename == "spice-vdagent-win":
+            baseurl, version = _check_spice_vdagent_win()
+            urls = _get_vdagent_urls(baseurl, version)
+            print (url)
 
         buildversions_data[packagename] = {}
         buildversions_data[packagename]["version"] = version
@@ -204,6 +223,7 @@ def find_latest_buildversions():
     _check("qxl")
     _check("qxlwddm")
     _check("virtio-win-prewhql")
+    _check("spice-vdagent-win")
 
     return buildversions_data
 
