@@ -1,4 +1,11 @@
 %changelog
+* Wed Jun 03 2020 Vadim Rozenfeld <vrozenfe@redhat.com> - 0.1.185-1
+- Update virtio-win to build 185
+- Update to spice-qxl-wddm-dod 0.20-0
+- Update to virtio-win-guest-tools-installer to fe746e3
+- Update to qemu-ga-win-101.1.0-1.el7ev
+- Ship spice vdagent
+
 * Mon Mar 23 2020 Cole Robinson <crobinso@redhat.com> - 0.1.173-9
 - Adjust iso settings to fix label length restrictions
 
