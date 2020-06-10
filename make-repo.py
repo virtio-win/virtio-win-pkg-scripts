@@ -32,6 +32,29 @@ def _glob(pattern, recursive=False):
     return ret
 
 
+def _get_fas_username():
+    """
+    Get fedora username. Uses FAS_USERNAME environment variable which is
+    used by some other fedora tools
+    """
+    ret = os.environ.get("FAS_USERNAME")
+    if not ret:
+        fail("You must set FAS_USERNAME environment variable to your "
+             "fedorapeople account name")
+    return ret
+
+
+def _get_local_dir():
+    """
+    Directory on the local machine we are using as the virtio-win mirror.
+    We will update this locally and then rsync it to fedorapeople
+    """
+    ret = os.path.expanduser("~/src/fedora/virt-group-repos/virtio-win")
+    if not os.path.exists(ret):
+        fail("Expected local virtio-win mirror does not exist: %s" % ret)
+    return ret
+
+
 ##############################
 # Local repo tree populating #
 ##############################
@@ -58,12 +81,11 @@ class LocalRepo():
     Class representing the virtio-win tree locally on the system.
     Helps contain the various repo tweaking logic
     """
-    LOCAL_ROOT_DIR = os.path.expanduser(
-            "~/src/fedora/virt-group-repos/virtio-win")
+    HOSTED_USERNAME = _get_fas_username()
+    LOCAL_ROOT_DIR = _get_local_dir()
     LOCAL_REPO_DIR = os.path.join(LOCAL_ROOT_DIR, "repo")
     LOCAL_DIRECT_DIR = os.path.join(LOCAL_ROOT_DIR, "direct-downloads")
     HTTP_DIRECT_DIR = "/groups/virt/virtio-win/direct-downloads"
-    HOSTED_USERNAME = "crobinso"
 
     def __init__(self, virtio_version_str, virtio_release_str,
             qemuga_release_str):
@@ -293,7 +315,7 @@ def _run_rsync(reverse, dry):
             rsync += " | grep -Ev 'repodata/.+'"
         return rsync
 
-    remote = ("%s@fedorapeople.org:~/virtgroup/virtio-win" %
+    remote = ("%s@fedorapeople.org:/srv/groups/virt/virtio-win" %
             LocalRepo.HOSTED_USERNAME)
     local = LocalRepo.LOCAL_ROOT_DIR
 
