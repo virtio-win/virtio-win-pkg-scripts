@@ -2,20 +2,26 @@ Scripts for packaging virtio-win drivers into VFDs, ISO, and an RPM. The goal
 here is to generate a virtio-win RPM that matches the same file layout as
 the RHEL virtio-win RPM.
 
-The build process is fed by input from 4 sources:
+The build process is fed by input from 5 sources:
 
   * `virtio-win` builds from the internal redhat build system
   * `qemu-guest-agent` builds from the internal redhat build system
+  * `spice-vdagent` windows builds from the internal redhat build system
   * `qxl` builds from https://www.spice-space.org/download/windows/qxl/
   * `qxlwddm` builds from https://www.spice-space.org/download/windows/qxl-wddm-dod/
 
 Build input is mirrored at: https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/virtio-win-pkg-scripts-input/
 
-To reproduce the build process, download a build directory contents from
-the above location and put it into ./new-builds/ in this repo. Then run
-`make-fedora-rpm.py`.
-
 For more details about the RPM, repos, public direct-downloads layout, etc, see: https://docs.fedoraproject.org/en-US/quick-docs/creating-windows-virtual-machines-using-virtio-drivers/
+
+
+## Contributing
+
+To reproduce the build process there's 3 steps:
+
+* Install host build dependencies. See the section below about [make-installer.py](#make-installerpy)
+* `fetch-latest-builds.py --rebuild`: this will grab the input used for the most recent published build
+* Run `make-fedora-rpm.py`
 
 
 ## Scripts
@@ -49,8 +55,11 @@ make-virtio-win-rpm-archive.py expects, and what is largely shipped on the
 ### make-installer.py
 
 This uses a [virtio-win-guest-tools-installer.git](https://github.com/virtio-win/virtio-win-guest-tools-installer]) git submodule to build .msi installers
-for all the drivers. Invoking this successfully requires quite a few
-pieces installed on the host, more details in the future.
+for all the drivers. Invoking this successfully requires quite a few RPMs installed on the host
+
+* `wix-toolset-binaries`, example: https://resources.ovirt.org/pub/ovirt-master-snapshot/rpm/fc32/noarch/wix-toolset-binaries-3.11.1-2.fc32.noarch.rpm
+* `ovirt-guest-agent-windows`, example: https://resources.ovirt.org/pub/ovirt-4.3-snapshot/rpm/fc30/noarch/ovirt-guest-agent-windows-1.0.16-1.20191009081759.git1048b68.fc30.noarch.rpm
+* `wine` from distro repos
 
 
 ### make-virtio-win-rpm-archive.py
