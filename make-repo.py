@@ -4,6 +4,7 @@ import argparse
 import glob
 import os
 import re
+import shutil
 import sys
 
 from util.buildversions import BuildVersions
@@ -63,17 +64,27 @@ def _make_redirect(root, old, new):
     return "redirect permanent %s/%s %s/%s\n" % (root, old, root, new)
 
 
-def _add_link(topdir, src, link):
-    fullsrc = os.path.join(topdir, src)
-    linkpath = os.path.join(topdir, link)
+def _add_relative_link(topdir, srcname, linkname):
+    """
+    Create symlink for passed paths, but using relative path resolution
+    """
+    srcpath = os.path.join(topdir, srcname)
+    linkpath = os.path.join(topdir, linkname)
 
-    if not os.path.exists(fullsrc):
+    if not os.path.exists(srcpath):
         fail("Nonexistent link src=%s for target=%s" %
-                (fullsrc, linkpath))
+                (srcpath, linkpath))
+
+    srcrelpath = os.path.relpath(srcname, os.path.dirname(linkname))
     if os.path.exists(linkpath):
+        if (os.path.islink(linkpath) and
+                os.readlink(linkpath) == srcrelpath):
+            print("link path=%s already points to src=%s, nothing to do" %
+                    (linkpath, srcrelpath))
+            return
         os.unlink(linkpath)
 
-    shellcomm("ln -s %s %s" % (src, linkpath))
+    shellcomm("ln -s %s %s" % (srcrelpath, linkpath))
 
 
 class LocalRepo():
@@ -169,7 +180,7 @@ class LocalRepo():
         # Make latest-qemu-ga, latest-virtio, and stable-virtio links
         def add_link(src, link):
             topdir = self.LOCAL_DIRECT_DIR
-            _add_link(topdir, src, link)
+            _add_relative_link(topdir, src, link)
             return _make_redirect(self.HTTP_DIRECT_DIR, link, src)
 
         htaccess = ""
@@ -196,8 +207,8 @@ class LocalRepo():
             for filename in glob.glob(buildversions.NEW_BUILDS_DIR + "/*"):
                 shellcomm("cp %s %s" % (filename, pkg_input_dir))
 
-        _add_link(pkg_input_topdir,
-            os.path.basename(pkg_input_dir), "latest-build")
+        _add_relative_link(pkg_input_topdir,
+                os.path.basename(pkg_input_dir), "latest-build")
 
 
 def _populate_local_tree(buildversions, rpm_output, rpm_buildroot):
@@ -271,37 +282,40 @@ def _generate_repos():
     LOCAL_REPO_DIR = LocalRepo.LOCAL_REPO_DIR
 
     # Generate stable symlinks
-    shellcomm("rm -rf %s/*" % os.path.join(LOCAL_REPO_DIR, "stable"))
     for stablever in STABLE_RPMS:
         filename = "virtio-win-%s.noarch.rpm" % stablever
-        fullpath = os.path.join(LOCAL_REPO_DIR, "rpms", filename)
-        if not os.path.exists(fullpath):
-            fail("Didn't find stable RPM path %s" % fullpath)
-
-        shellcomm("ln -s ../rpms/%s %s" % (filename,
-            os.path.join(LOCAL_REPO_DIR, "stable",
-                         os.path.basename(fullpath))))
+        _add_relative_link(LOCAL_REPO_DIR,
+                "rpms/%s" % filename,
+                "stable/%s" % filename)
 
     # Generate latest symlinks
-    shellcomm("rm -rf %s/*" % os.path.join(LOCAL_REPO_DIR, "latest"))
     for fullpath in glob.glob(os.path.join(LOCAL_REPO_DIR, "rpms", "*.rpm")):
         filename = os.path.basename(fullpath)
-        shellcomm("ln -s ../rpms/%s %s" % (filename,
-            os.path.join(LOCAL_REPO_DIR, "latest", os.path.basename(fullpath))))
+        _add_relative_link(LOCAL_REPO_DIR,
+                "rpms/%s" % filename,
+                "latest/%s" % filename)
 
     # Generate repodata
     for rpmdir in ["latest", "stable", "srpms"]:
-        shellcomm("rm -rf %s" %
-            os.path.join(LOCAL_REPO_DIR, rpmdir, "repodata"))
-        shellcomm("createrepo_c %s > /dev/null" %
+        #shellcomm("rm -rf %s" %
+        #    os.path.join(LOCAL_REPO_DIR, rpmdir, "repodata"))
+        shellcomm("createrepo_c %s --update > /dev/null" %
             os.path.join(LOCAL_REPO_DIR, rpmdir))
 
+    def cp(srcpath, dstpath):
+        # Copy, but not if content is unchanged
+        if (os.path.exists(dstpath) and
+                open(srcpath).read() == open(dstpath).read()):
+            print("%s is up to date, skipping." % dstpath)
+            return
+        shutil.copy(srcpath, dstpath)
+
     # Put the repo file in place
-    shellcomm("cp -f data/virtio-win.repo %s" %
-            LocalRepo.LOCAL_ROOT_DIR)
+    cp("data/virtio-win.repo",
+            os.path.join(LocalRepo.LOCAL_ROOT_DIR, "virtio-win.repo"))
     # Use the RPM changelog as a changelog file for the whole tree
-    shellcomm("cp -f data/rpm_changelog %s/CHANGELOG" %
-            LocalRepo.LOCAL_ROOT_DIR)
+    cp("data/rpm_changelog",
+            os.path.join(LocalRepo.LOCAL_ROOT_DIR, "CHANGELOG"))
 
 
 def _run_rsync(reverse, dry):
