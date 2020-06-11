@@ -351,7 +351,12 @@ def _run_rsync(reverse, dry):
     shellcomm(_cmd("--exclude repodata", src, dst))
 
     # Overwrite the repodata and remove stale files
-    shellcomm(_cmd("--delete", src, dst))
+    args = ""
+    # This says we only want to sync repodata/* and below, so we
+    # avoid possibly deleting anything else
+    args += '--include "*/" --include "repodata/*" --exclude "*" '
+    args += "--delete"
+    shellcomm(_cmd(args, src, dst))
 
 
 def _push_repos(reverse):
