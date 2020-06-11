@@ -306,7 +306,13 @@ def _generate_repos():
 
 def _run_rsync(reverse, dry):
     def _cmd(opts, src, dst):
-        rsync = "rsync --archive --verbose --compress --progress "
+        rsync = "rsync "
+        rsync += "--archive --verbose --compress --progress "
+        if not reverse:
+            # There is no virtmaint-sig user, so we use our user
+            rsync += "--chown=%s:virtmaint-sig " % LocalRepo.HOSTED_USERNAME
+            # Set dirs to 775 and files to 664
+            rsync += "--chmod=D775,F664 "
         if dry:
             rsync += "--dry-run "
         rsync += "%s %s/ %s" % (opts, src, dst)
@@ -326,7 +332,8 @@ def _run_rsync(reverse, dry):
         src = local
         dst = remote
 
-    # Put the RPMs in place
+    # Put the RPMs in place. Skip yum repodata until RPMs
+    # are inplace, to prevent users seeing an inconsistent repo
     shellcomm(_cmd("--exclude repodata", src, dst))
 
     # Overwrite the repodata and remove stale files
