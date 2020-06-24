@@ -232,8 +232,8 @@ add_link _servers_amd64.vfd
 
 # osinfo-db drop-in files
 %if 0%{?rhel}
-%{_datadir}/osinfo-db/microsoft.com/win-7.d/virtio-win-pre-installable-drivers-win-7.xml
-%{_datadir}/osinfo-db/microsoft.com/win-8.d/virtio-win-pre-installable-drivers-win-8.xml
-%{_datadir}/osinfo-db/microsoft.com/win-8.1.d/virtio-win-pre-installable-drivers-win-8.1.xml
-%{_datadir}/osinfo-db/microsoft.com/win-10.d/virtio-win-pre-installable-drivers-win-10.xml
+%{_datadir}/osinfo-db/os/microsoft.com/win-7.d/virtio-win-pre-installable-drivers-win-7.xml
+%{_datadir}/osinfo-db/os/microsoft.com/win-8.d/virtio-win-pre-installable-drivers-win-8.xml
+%{_datadir}/osinfo-db/os/microsoft.com/win-8.1.d/virtio-win-pre-installable-drivers-win-8.1.xml
+%{_datadir}/osinfo-db/os/microsoft.com/win-10.d/virtio-win-pre-installable-drivers-win-10.xml
 %endif
