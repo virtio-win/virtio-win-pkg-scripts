@@ -153,17 +153,17 @@ add_link _servers_amd64.vfd
 
 
 %if 0%{?rhel}
-%{__mkdir} -p %{buildroot}/%{_datadir}/osinfo-db/os/microsoft.com/win-7.d/
-%{__cp} %{SOURCE70} %{buildroot}/%{_datadir}/osinfo-db/os/microsoft.com/win-7.d/
+%{__mkdir} -p %{buildroot}/%{_datadir}/osinfo/os/microsoft.com/win-7.d/
+%{__cp} %{SOURCE70} %{buildroot}/%{_datadir}/osinfo/os/microsoft.com/win-7.d/
 
-%{__mkdir} -p %{buildroot}/%{_datadir}/osinfo-db/os/microsoft.com/win-8.d/
-%{__cp} %{SOURCE71} %{buildroot}/%{_datadir}/osinfo-db/os/microsoft.com/win-8.d/
+%{__mkdir} -p %{buildroot}/%{_datadir}/osinfo/os/microsoft.com/win-8.d/
+%{__cp} %{SOURCE71} %{buildroot}/%{_datadir}/osinfo/os/microsoft.com/win-8.d/
 
-%{__mkdir} -p %{buildroot}/%{_datadir}/osinfo-db/os/microsoft.com/win-8.1.d/
-%{__cp} %{SOURCE72} %{buildroot}/%{_datadir}/osinfo-db/os/microsoft.com/win-8.1.d/
+%{__mkdir} -p %{buildroot}/%{_datadir}/osinfo/os/microsoft.com/win-8.1.d/
+%{__cp} %{SOURCE72} %{buildroot}/%{_datadir}/osinfo/os/microsoft.com/win-8.1.d/
 
-%{__mkdir} -p %{buildroot}/%{_datadir}/osinfo-db/os/microsoft.com/win-10.d/
-%{__cp} %{SOURCE73} %{buildroot}/%{_datadir}/osinfo-db/os/microsoft.com/win-10.d/
+%{__mkdir} -p %{buildroot}/%{_datadir}/osinfo/os/microsoft.com/win-10.d/
+%{__cp} %{SOURCE73} %{buildroot}/%{_datadir}/osinfo/os/microsoft.com/win-10.d/
 %endif
 
 
@@ -233,8 +233,8 @@ add_link _servers_amd64.vfd
 
 # osinfo-db drop-in files
 %if 0%{?rhel}
-%{_datadir}/osinfo-db/os/microsoft.com/win-7.d/virtio-win-pre-installable-drivers-win-7.xml
-%{_datadir}/osinfo-db/os/microsoft.com/win-8.d/virtio-win-pre-installable-drivers-win-8.xml
-%{_datadir}/osinfo-db/os/microsoft.com/win-8.1.d/virtio-win-pre-installable-drivers-win-8.1.xml
-%{_datadir}/osinfo-db/os/microsoft.com/win-10.d/virtio-win-pre-installable-drivers-win-10.xml
+%{_datadir}/osinfo/os/microsoft.com/win-7.d/virtio-win-pre-installable-drivers-win-7.xml
+%{_datadir}/osinfo/os/microsoft.com/win-8.d/virtio-win-pre-installable-drivers-win-8.xml
+%{_datadir}/osinfo/os/microsoft.com/win-8.1.d/virtio-win-pre-installable-drivers-win-8.1.xml
+%{_datadir}/osinfo/os/microsoft.com/win-10.d/virtio-win-pre-installable-drivers-win-10.xml
 %endif
