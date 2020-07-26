@@ -210,6 +210,18 @@ _smbusfiles = [
 ]
 FILELISTS['smbus'] = _smbusfiles
 
+_viofsfiles = [
+    'viofs.cat',
+    'viofs.inf',
+    'viofs.pdb',
+    'viofs.sys',
+    'virtiofs.exe',
+    'virtiofs.pdb',
+]
+FILELISTS['viofs'] = _viofsfiles
+FILELISTS['viofs:w8'] = _viofsfiles + ['WdfCoInstaller01011.dll']
+FILELISTS['viofs:w10'] = _viofsfiles
+
 # Describes what windows arch the virtio-win build output maps to.
 #
 # Example: Balloon: {"Wxp/x86": ["2k3/x86"]}
@@ -405,4 +417,13 @@ DRIVER_OS_MAP = {
         'spice-qxl-wddm-dod/w10/amd64': [
             'w10/amd64', '2k16/amd64', '2k19/amd64'],
     },
+
+    'viofs': {
+        'Win8/x86': ['w8/x86', 'w8.1/x86'],
+        'Win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+
+        'Win10/x86': ['w10/x86'],
+        'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64'],
+    },
+    
 }
