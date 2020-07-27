@@ -1,4 +1,8 @@
 %changelog
+* Mon Jul 27 2020 vrozenfe@redhat.com - 0.1.187-1
+- Update to virtio-win-guest-tools-installer to 2951dba
+- Add virtiofs
+
 * Wed Jun 03 2020 Vadim Rozenfeld <vrozenfe@redhat.com> - 0.1.185-1
 - Update virtio-win to build 185
 - Update to spice-qxl-wddm-dod 0.20-0

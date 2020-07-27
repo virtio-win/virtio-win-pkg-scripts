@@ -8,7 +8,7 @@
 # If you make any changes to this file that affect the RPM content (but not
 # version numbers or changelogs, etc), submit a patch to the upstream spec.
 
-%global virtio_win_prewhql_build virtio-win-prewhql-0.1-185
+%global virtio_win_prewhql_build virtio-win-prewhql-0.1-187
 %global qemu_ga_win_build qemu-ga-win-101.1.0-1.el7ev
 %global qxl_build qxl-win-unsigned-0.1-24
 # qxlwddm is fedora only for now
@@ -19,7 +19,7 @@
 
 Summary: VirtIO para-virtualized drivers for Windows(R)
 Name: virtio-win
-Version: 0.1.185
+Version: 0.1.187
 Release: 1
 Group: Applications/System
 URL: http://www.redhat.com/
@@ -209,6 +209,7 @@ add_link _servers_amd64.vfd
 %{_datadir}/%{name}/drivers/by-driver/vioscsi
 %{_datadir}/%{name}/drivers/by-driver/vioserial
 %{_datadir}/%{name}/drivers/by-driver/viostor
+%{_datadir}/%{name}/drivers/by-driver/viofs
 %exclude %{_datadir}/%{name}/drivers/by-driver/virtio-win_license.txt
 %if 0%{?fedora}
 %{_datadir}/%{name}/drivers/by-driver/qxldod
