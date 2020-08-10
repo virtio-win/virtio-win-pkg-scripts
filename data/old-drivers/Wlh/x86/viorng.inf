@@ -21,7 +21,7 @@ ClassGuid       = {4d36e97d-e325-11ce-bfc1-08002be10318}
 Provider        = %VENDOR%
 CatalogFile     = viorng.cat
 PnpLockdown     = 1
-DriverVer = 01/08/2020,60.81.104.17600
+DriverVer = 12/12/2019,60.81.104.17400
 
 [DestinationDirs]
 DefaultDestDir = 12

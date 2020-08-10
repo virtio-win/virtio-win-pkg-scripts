@@ -18,7 +18,7 @@ Signature       = "$WINDOWS NT$"
 Class           = System
 ClassGuid       = {4d36e97d-e325-11ce-bfc1-08002be10318}
 Provider        = %VENDOR%
-DriverVer = 01/08/2020,60.81.104.17600
+DriverVer = 12/12/2019,60.81.104.17400
 CatalogFile     = pvpanic.cat
 PnpLockdown     = 1
 
