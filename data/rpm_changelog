@@ -1,4 +1,7 @@
 %changelog
+* Mon Aug 10 2020 vrozenfe@redhat.com - 0.1.189-1
+- Update to virtio-win-prewhql-0.1-189
+
 * Mon Jul 27 2020 vrozenfe@redhat.com - 0.1.187-1
 - Update to virtio-win-guest-tools-installer to 2951dba
 - Add virtiofs
