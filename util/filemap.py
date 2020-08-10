@@ -222,6 +222,16 @@ FILELISTS['viofs'] = _viofsfiles
 FILELISTS['viofs:w8'] = _viofsfiles + ['WdfCoInstaller01011.dll']
 FILELISTS['viofs:w10'] = _viofsfiles
 
+_viosriov = [
+    'vioprot.inf',
+    'vioprot.cat',
+    'netkvmno.dll',
+    'netkvmno.pdb',
+    'netkvmp.exe',
+    'netkvmp.pdb',
+]
+FILELISTS['sriov'] = _viosriov
+
 # Describes what windows arch the virtio-win build output maps to.
 #
 # Example: Balloon: {"Wxp/x86": ["2k3/x86"]}
@@ -425,5 +435,16 @@ DRIVER_OS_MAP = {
         'Win10/x86': ['w10/x86'],
         'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64'],
     },
-    
+
+    'sriov': {
+        'Win8/x86': ['w8/x86'],
+        'Win8/amd64': ['w8/amd64', '2k12/amd64'],
+
+        'Win8.1/x86': ['w8.1/x86'],
+        'Win8.1/amd64': ['w8.1/amd64', '2k12R2/amd64'],
+
+        'Win10/x86': ['w10/x86'],
+        'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64'],
+     },
+
 }
