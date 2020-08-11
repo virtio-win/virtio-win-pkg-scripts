@@ -3,7 +3,7 @@
 # Note: This spec file is largely shared with the public virtio-win drivers
 # shipped on fedora sites. The canonical location is here:
 #
-# https://github.com/crobinso/virtio-win-pkg-scripts
+# https://github.com/virtio-win/virtio-win-pkg-scripts
 #
 # If you make any changes to this file that affect the RPM content (but not
 # version numbers or changelogs, etc), submit a patch to the upstream spec.
