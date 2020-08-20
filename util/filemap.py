@@ -220,7 +220,12 @@ _viofsfiles = [
 ]
 FILELISTS['viofs'] = _viofsfiles
 FILELISTS['viofs:w8'] = _viofsfiles + ['WdfCoInstaller01011.dll']
+FILELISTS['viofs:w8.1'] = FILELISTS['viofs:w8']
+FILELISTS['viofs:2k12'] = FILELISTS['viofs:w8']
+FILELISTS['viofs:2k12R2'] = FILELISTS['viofs:w8']
 FILELISTS['viofs:w10'] = _viofsfiles
+FILELISTS['viofs:2k16'] = FILELISTS['viofs:w10']
+FILELISTS['viofs:2k19'] = FILELISTS['viofs:w10']
 
 _viosriov = [
     'vioprot.inf',
