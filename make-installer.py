@@ -37,6 +37,8 @@ Example: %(prog)s /path/to/built/drivers
         help="QEMU guest agent x64 msi path.")
     parser.add_argument("ga_x86_msi",
         help="QEMU guest agent x86 msi path.")
+    parser.add_argument("win_fsp_msi",
+        help="WinFSP msi path.")
 
     default_output_dir = os.path.join(os.getcwd(), "installer_output")
     parser.add_argument("--output-dir", "--outdir",
@@ -65,14 +67,14 @@ def main():
     qxlwddm_x86_msi = os.path.abspath(options.qxlwddm_x86_msi)
     ga_x64_msi = os.path.abspath(options.ga_x64_msi)
     ga_x86_msi = os.path.abspath(options.ga_x86_msi)
-
+    win_fsp_msi = os.path.abspath(options.win_fsp_msi)
     os.chdir("virtio-win-guest-tools-installer")
 
     shellcomm("git clean -xdf")
 
-    shellcomm("./automation/build-artifacts.sh %s %s %s %s %s %s %s %s" %
+    shellcomm("./automation/build-artifacts.sh %s %s %s %s %s %s %s %s %s" %
             (driverdir, vdagent_x64_msi, vdagent_x86_msi, qxlwddm_x64_msi,
-             qxlwddm_x86_msi, ga_x64_msi, ga_x86_msi, options.nvr))
+             qxlwddm_x86_msi, ga_x64_msi, ga_x86_msi, win_fsp_msi, options.nvr))
 
     shellcomm("mv ./exported-artifacts/* %s" % output_dir)
 

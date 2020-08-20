@@ -226,6 +226,15 @@ def _find_msi(msi_dir, msi_name, msi_arch):
             return msifile
     return ''
 
+def _prep_win_fsp_msi(msi_dst_dir):
+    """
+    Find and copy winfsp.msi to a new directory
+    to be used later on by make-installer.py
+    """
+    for msifile in glob.glob(os.path.join(NEW_BUILDS_DIR, "*.msi")):
+        if (re.search("winfsp-", msifile)):
+            shellcomm("cp -r %s %s" % (msifile, msi_dst_dir))
+
 ##################
 # main() helpers #
 ##################
@@ -359,8 +368,10 @@ def main():
     # Build the driver installer
     installer_output_dir = _tempdir("make-installer-output")
     spice_dir = _tempdir("spice-extracted")
+    winfsp_dir = _tempdir("make-winfsp-output")
     _prep_spice_vdagent_msi(spice_dir)
     _prep_qxldod_msi(driver_input_dir, spice_dir)
+    _prep_win_fsp_msi(winfsp_dir)
 
     spice_vdagent_x64_msi = _find_msi(spice_dir, 'spice-vdagent-', 'x64')
     spice_vdagent_x86_msi = _find_msi(spice_dir, 'spice-vdagent-', 'x86')
@@ -372,12 +383,14 @@ def main():
     qemu_ga_agent_x64_msi = _find_msi(qemu_ga_agent_dir, 'qemu-ga-', 'x64')
     qemu_ga_agent_x86_msi = _find_msi(qemu_ga_agent_dir, 'qemu-ga-', 'x86')
 
-    shellcomm("./make-installer.py %s %s %s %s %s %s %s %s --output-dir %s" %
+    win_fsp_msi = _find_msi(winfsp_dir, 'winfsp-', '')
+
+    shellcomm("./make-installer.py %s %s %s %s %s %s %s %s %s --output-dir %s" %
             (spec.newversion, driver_output_dir,
              spice_vdagent_x64_msi, spice_vdagent_x86_msi,
              spice_driver_x64_msi, spice_driver_x86_msi,
              qemu_ga_agent_x64_msi, qemu_ga_agent_x86_msi,
-             installer_output_dir))
+             win_fsp_msi, installer_output_dir))
     shellcomm("cp %s/* %s" % (installer_output_dir, rpm_src_dir))
 
     # Generate RPM input archive + vfd + iso
