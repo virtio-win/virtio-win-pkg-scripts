@@ -52,11 +52,6 @@
       <file>qemupciserial.cat</file>
       <file>qemupciserial.inf</file>
 
-      <file>qxldod.cat</file>
-      <file>qxldod.inf</file>
-      <file>qxldod.sys</file>
-      <device id="http://pcisig.com/pci/1b36/0100"/> 
-
       <file>viohidkmdf.sys</file>
       <file>vioinput.cat</file>
       <file>vioinput.inf</file>
@@ -118,11 +113,6 @@
 
       <file>qemupciserial.cat</file>
       <file>qemupciserial.inf</file>
-
-      <file>qxldod.cat</file>
-      <file>qxldod.inf</file>
-      <file>qxldod.sys</file>
-      <device id="http://pcisig.com/pci/1b36/0100"/> 
 
       <file>viohidkmdf.sys</file>
       <file>vioinput.cat</file>
