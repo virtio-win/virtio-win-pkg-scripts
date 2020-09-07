@@ -85,8 +85,7 @@
       <file>viofs.cat</file>
       <file>viofs.inf</file>
       <file>viofs.sys</file>
-      <device id="http://pcisig.com/pci/1af4/1009"/>
-      <device id="http://pcisig.com/pci/1af4/1049"/>
+      <device id="http://pcisig.com/pci/1af4/105a"/>
     </driver>
 
     <driver signed="true" pre-installable="true" location="file:///usr/share/virtio-win/drivers/by-os/amd64/w10/" arch="x86_64">
@@ -148,8 +147,7 @@
       <file>viofs.cat</file>
       <file>viofs.inf</file>
       <file>viofs.sys</file>
-      <device id="http://pcisig.com/pci/1af4/1009"/>
-      <device id="http://pcisig.com/pci/1af4/1049"/>
+      <device id="http://pcisig.com/pci/1af4/105a"/>
     </driver>
   </os>
 </libosinfo>
