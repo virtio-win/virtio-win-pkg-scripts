@@ -91,7 +91,7 @@
       <device id="http://pcisig.com/pci/1af4/1042"/> 
     </driver>
 
-    <driver signed="true" pre-installable="true" location="file:///usr/share/virtio-win/driver/by-os/amd64/w7/" arch="x86_64">
+    <driver signed="true" pre-installable="true" location="file:///usr/share/virtio-win/drivers/by-os/amd64/w7/" arch="x86_64">
       <file>WdfCoInstaller01009.dll</file>
 
       <file>balloon.cat</file>
