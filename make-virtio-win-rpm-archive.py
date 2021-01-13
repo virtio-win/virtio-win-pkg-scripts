@@ -427,8 +427,15 @@ def main():
     isodir = os.path.join(finaldir, "iso-content")
     datadir = os.path.join(isodir, "data")
     rpmdriversdir = os.path.join(finaldir, "rpm-drivers")
+    osinfoxmldir = os.path.join(finaldir, "osinfo-xml")
     os.makedirs(datadir)
     os.makedirs(rpmdriversdir)
+    os.makedirs(osinfoxmldir)
+
+    # Copy osinfo files into osinfo-xml
+    for filename in glob.glob(
+            os.path.join(script_dir, "data", "virtio-win*.xml")):
+        run(["cp", "-rpL", filename, osinfoxmldir])
 
     # Copy driverdir content into the dest isodir
     run(["cp", "-rpL", "%s/." % options.driverdir, isodir])

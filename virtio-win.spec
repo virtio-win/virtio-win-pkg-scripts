@@ -57,12 +57,6 @@ Source24: virtio-win-guest-tools.exe
 Source25: %{spice_vdagent}-sources.zip
 %endif
 
-%if 0%{?rhel}
-Source70: virtio-win-pre-installable-drivers-win-7.xml
-Source71: virtio-win-pre-installable-drivers-win-8.xml
-Source72: virtio-win-pre-installable-drivers-win-8.1.xml
-Source73: virtio-win-pre-installable-drivers-win-10.xml
-%endif
 
 BuildRequires: /usr/bin/mkisofs
 BuildRequires: findutils
@@ -153,17 +147,17 @@ add_link _servers_amd64.vfd
 
 
 %if 0%{?rhel}
-%{__mkdir} -p %{buildroot}/%{_datadir}/osinfo/os/microsoft.com/win-7.d/
-%{__cp} %{SOURCE70} %{buildroot}/%{_datadir}/osinfo/os/microsoft.com/win-7.d/
+add_osinfo() {
+    OSINFOFILE="osinfo-xml/$1"
+    OSINFODIR="%{buildroot}/%{_datadir}/osinfo/os/microsoft.com/$2"
+    %{__mkdir} -p "${OSINFODIR}"
+    %{__cp} "${OSINFOFILE}" "${OSINFODIR}"
+}
 
-%{__mkdir} -p %{buildroot}/%{_datadir}/osinfo/os/microsoft.com/win-8.d/
-%{__cp} %{SOURCE71} %{buildroot}/%{_datadir}/osinfo/os/microsoft.com/win-8.d/
-
-%{__mkdir} -p %{buildroot}/%{_datadir}/osinfo/os/microsoft.com/win-8.1.d/
-%{__cp} %{SOURCE72} %{buildroot}/%{_datadir}/osinfo/os/microsoft.com/win-8.1.d/
-
-%{__mkdir} -p %{buildroot}/%{_datadir}/osinfo/os/microsoft.com/win-10.d/
-%{__cp} %{SOURCE73} %{buildroot}/%{_datadir}/osinfo/os/microsoft.com/win-10.d/
+add_osinfo virtio-win-pre-installable-drivers-win-7.xml win-7.d
+add_osinfo virtio-win-pre-installable-drivers-win-8.xml win-8.d
+add_osinfo virtio-win-pre-installable-drivers-win-8.1.xml win-8.1.d
+add_osinfo virtio-win-pre-installable-drivers-win-10.xml win-10.d
 %endif
 
 
