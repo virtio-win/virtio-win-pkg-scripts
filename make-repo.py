@@ -153,7 +153,7 @@ class LocalRepo():
 
     def add_virtiowin_media(self, paths):
         """
-        Move iso/vfd media to the local tree. Set up symlinks and
+        Move iso media to the local tree. Set up symlinks and
         htaccess magic for the non-versioned links
         """
         virtiodir = os.path.join(
@@ -215,7 +215,7 @@ class LocalRepo():
 def _populate_local_tree(buildversions, rpm_output, rpm_buildroot):
     """
     Copy all the built bits into our local repo tree to get it
-    ready for syncing: vfd, iso, unpacked qemu-ga msis, etc.
+    ready for syncing: iso, unpacked qemu-ga msis, etc.
 
     Also generate root dir .htaccess redirects
     """
@@ -245,11 +245,9 @@ def _populate_local_tree(buildversions, rpm_output, rpm_buildroot):
     qemugapaths = _glob(os.path.join(sharedir, "guest-agent", "*"))
     localrepo.add_qemuga(qemugapaths)
 
-    # Move virtio .iso and .vfds
+    # Move virtio .iso and
     virtiopaths = []
-    for basename in ["virtio-win_x86.vfd",
-                     "virtio-win_amd64.vfd",
-                     "virtio-win.iso"]:
+    for basename in ["virtio-win.iso"]:
         symlink = os.path.join(sharedir, basename)
         assert os.path.exists(symlink)
         assert os.path.islink(symlink)
@@ -257,7 +255,7 @@ def _populate_local_tree(buildversions, rpm_output, rpm_buildroot):
         virtiopaths.append((versionfile, symlink))
     localrepo.add_virtiowin_media(virtiopaths)
 
-    # Add virtio-win-gt .msis into the virtio iso/vfd dir
+    # Add virtio-win-gt .msis into the virtio iso dir
     virtiogtpaths = _glob(os.path.join(sharedir, "installer", "*"))
     localrepo.add_virtiogt(virtiogtpaths)
 
