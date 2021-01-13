@@ -276,9 +276,9 @@ def _populate_local_tree(buildversions, rpm_output, rpm_buildroot):
 # Repo generate + push #
 ########################
 
-def _generate_repos():
+def _add_misc_data():
     """
-    Create repo trees, run createrepo_c
+    Add tree stable links, and misc data
     """
     LOCAL_REPO_DIR = LocalRepo.LOCAL_REPO_DIR
 
@@ -296,13 +296,6 @@ def _generate_repos():
                 "rpms/%s" % filename,
                 "latest/%s" % filename)
 
-    # Generate repodata
-    for rpmdir in ["latest", "stable", "srpms"]:
-        #shellcomm("rm -rf %s" %
-        #    os.path.join(LOCAL_REPO_DIR, rpmdir, "repodata"))
-        shellcomm("createrepo_c %s --update > /dev/null" %
-            os.path.join(LOCAL_REPO_DIR, rpmdir))
-
     def cp(srcpath, dstpath):
         # Copy, but not if content is unchanged
         if (os.path.exists(dstpath) and
@@ -317,6 +310,17 @@ def _generate_repos():
     # Use the RPM changelog as a changelog file for the whole tree
     cp("data/rpm_changelog",
             os.path.join(LocalRepo.LOCAL_ROOT_DIR, "CHANGELOG"))
+
+
+def _run_createrepo():
+    """
+    Run yum createrepo
+    """
+    for rpmdir in ["latest", "stable", "srpms"]:
+        #shellcomm("rm -rf %s" %
+        #    os.path.join(LOCAL_REPO_DIR, rpmdir, "repodata"))
+        shellcomm("createrepo_c %s --update > /dev/null" %
+            os.path.join(LocalRepo.LOCAL_REPO_DIR, rpmdir))
 
 
 def _run_rsync(reverse, dry):
@@ -412,7 +416,8 @@ def main():
                 options.rpm_output, options.rpm_buildroot)
 
     if not options.resync:
-        _generate_repos()
+        _add_misc_data()
+        _run_createrepo()
     _push_repos(reverse=options.resync)
 
     return 0
