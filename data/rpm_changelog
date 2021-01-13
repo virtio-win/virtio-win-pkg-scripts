@@ -1,4 +1,7 @@
 %changelog
+* Tue Nov 24 2020 vrozenfe@redhat.com - 0.1.190-1
+- Update to virtio-win-prewhql-0.1-190
+
 * Mon Aug 10 2020 vrozenfe@redhat.com - 0.1.189-1
 - Update to virtio-win-prewhql-0.1-189
 

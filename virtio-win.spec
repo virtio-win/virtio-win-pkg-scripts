@@ -8,18 +8,18 @@
 # If you make any changes to this file that affect the RPM content (but not
 # version numbers or changelogs, etc), submit a patch to the upstream spec.
 
-%global virtio_win_prewhql_build virtio-win-prewhql-0.1-189
-%global qemu_ga_win_build qemu-ga-win-101.1.0-1.el7ev
+%global virtio_win_prewhql_build virtio-win-prewhql-0.1-190
+%global qemu_ga_win_build qemu-ga-win-101.2.0-1.el7ev
 %global qxl_build qxl-win-unsigned-0.1-24
 # qxlwddm is fedora only for now
 %if 0%{?fedora}
 %global qxlwddm_build spice-qxl-wddm-dod-0.20-0
-%global spice_vdagent spice-vdagent-win-0.10.0-2
+%global spice_vdagent spice-vdagent-win-0.10.0-5
 %endif
 
 Summary: VirtIO para-virtualized drivers for Windows(R)
 Name: virtio-win
-Version: 0.1.189
+Version: 0.1.190
 Release: 1
 Group: Applications/System
 URL: http://www.redhat.com/
