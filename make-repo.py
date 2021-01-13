@@ -117,15 +117,19 @@ class LocalRepo():
         self.virtio_basedir = os.path.join(
                 "archive-virtio", self.virtio_release_str)
 
-    def add_rpms(self, paths):
+    def add_rpms(self, src_rpmpath, src_srpmpath):
         """
         Add the build RPM to the local tree
         """
-        for path in paths:
-            dest = "rpms"
-            if path.endswith(".src.rpm"):
-                dest = "srpms"
-            shellcomm("cp %s %s/%s" % (path, self.LOCAL_REPO_DIR, dest))
+        def addpath(srcpath, repodir):
+            dstpath = os.path.join(self.LOCAL_REPO_DIR, repodir,
+                    os.path.basename(srcpath))
+            shellcomm("cp %s %s" % (srcpath, dstpath))
+            return dstpath
+
+        dst_rpmpath = addpath(src_rpmpath, "rpms")
+        dst_srpmpath = addpath(src_srpmpath, "srpms")
+        return dst_rpmpath, dst_srpmpath
 
     def add_qemuga(self, paths):
         """
@@ -151,7 +155,7 @@ class LocalRepo():
         for path in paths:
             shellcomm("cp %s %s" % (path, virtiodir))
 
-    def add_virtiowin_media(self, paths):
+    def add_virtiowin_media(self, isopath, rpmpath, srpmpath):
         """
         Move iso media to the local tree. Set up symlinks and
         htaccess magic for the non-versioned links
@@ -165,12 +169,25 @@ class LocalRepo():
         os.mkdir(virtiodir)
         htaccess = ""
 
-        for versionfile, symlink in paths:
-            shellcomm("cp %s %s" % (versionfile, virtiodir))
-            shellcomm("cp %s %s" % (symlink, virtiodir))
+        def add_stable_path(path, stablename):
+            versionname = os.path.basename(path)
+            _add_relative_link(virtiodir, versionname, stablename)
+            nonlocal htaccess
             htaccess += _make_redirect(
                 os.path.join(self.HTTP_DIRECT_DIR, self.virtio_basedir),
-                os.path.basename(symlink), os.path.basename(versionfile))
+                stablename, versionname)
+
+        def add_rpm(path, stablename):
+            # RPMs are already in the repo tree, so symlink the full path
+            _add_relative_link(virtiodir,
+                os.path.relpath(path, virtiodir),
+                os.path.basename(path))
+            add_stable_path(path, stablename)
+
+        add_rpm(rpmpath, "virtio-win.noarch.rpm")
+        add_rpm(srpmpath, "virtio-win.src.rpm")
+        shellcomm("cp %s %s" % (isopath, virtiodir))
+        add_stable_path(isopath, "virtio-win.iso")
 
         # Write .htaccess, redirecting symlinks to versioned files, so
         # nobody ends up with unversioned files locally, since that
@@ -245,15 +262,16 @@ def _populate_local_tree(buildversions, rpm_output, rpm_buildroot):
     qemugapaths = _glob(os.path.join(sharedir, "guest-agent", "*"))
     localrepo.add_qemuga(qemugapaths)
 
-    # Move virtio .iso and
-    virtiopaths = []
-    for basename in ["virtio-win.iso"]:
-        symlink = os.path.join(sharedir, basename)
-        assert os.path.exists(symlink)
-        assert os.path.islink(symlink)
-        versionfile = os.path.realpath(symlink)
-        virtiopaths.append((versionfile, symlink))
-    localrepo.add_virtiowin_media(virtiopaths)
+    # Copy RPMs to the repo/ tree
+    rpms = _glob(rpm_output + "/**/*.rpm", recursive=True)
+    assert len(rpms) == 2
+    src_rpmpath = [rpm for rpm in rpms if rpm.endswith(".noarch.rpm")][0]
+    src_srpmpath = [rpm for rpm in rpms if rpm.endswith(".src.rpm")][0]
+    dst_rpmpath, dst_srpmpath = localrepo.add_rpms(src_rpmpath, src_srpmpath)
+
+    # Move virtio .iso and RPMs to stable locations
+    virtiowinpath = os.path.realpath(os.path.join(sharedir, "virtio-win.iso"))
+    localrepo.add_virtiowin_media(virtiowinpath, dst_rpmpath, dst_srpmpath)
 
     # Add virtio-win-gt .msis into the virtio iso dir
     virtiogtpaths = _glob(os.path.join(sharedir, "installer", "*"))
@@ -264,10 +282,6 @@ def _populate_local_tree(buildversions, rpm_output, rpm_buildroot):
 
     # Copy build input content to the tree
     localrepo.add_pkg_build_input(buildversions)
-
-    # Copy RPMs to the tree
-    rpms = _glob(rpm_output + "/**/*.rpm", recursive=True)
-    localrepo.add_rpms(rpms)
 
 
 ########################
