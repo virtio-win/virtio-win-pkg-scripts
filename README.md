@@ -14,9 +14,9 @@ These links will redirect to versioned filenames when downloaded.
 The `stable` builds of virtio-win roughly correlate to what was shipped with the most recent Red Hat Enterprise Linux release. The `latest` builds of virtio-win are the latest available builds, which may be pre-release quality.
 
 * [Stable virtio-win ISO](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso)
-* [Stable virtio-win RPM](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.rpm)
+* [Stable virtio-win RPM](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.noarch.rpm)
 * [Latest virtio-win ISO](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win.iso)
-* [Latest virtio-win ISO](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win.rpm)
+* [Latest virtio-win RPM](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win.noarch.rpm)
 * [virtio-win direct-downloads full archive](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/) with links to other bits like `qemu-ga`, a changelog, etc.
 
 
@@ -26,7 +26,7 @@ All the Windows binaries are from builds done on Red Hat’s internal build syst
 
 The drivers are cryptographically signed with Red Hat’s vendor signature. However they are not signed with Microsoft’s WHQL signature.
 
-Warning: Due to the [signing requirements of the Windows Driver Signing Policy](https://docs.microsoft.com/en-us/windows-hardware/drivers/install/kernel-mode-code-signing-policy\--windows-vista-and-later-#signing-requirements-by-version), drivers which are not signed by Microsoft will not be loaded by some versions of Windows when [Secure Boot](https://docs.microsoft.com/en-us/windows-hardware/design/device-experiences/oem-secure-boot) is enabled in the virtual machine. See [bug #1844726)(https://bugzilla.redhat.com/1844726).
+Warning: Due to the [signing requirements of the Windows Driver Signing Policy](https://docs.microsoft.com/en-us/windows-hardware/drivers/install/kernel-mode-code-signing-policy\--windows-vista-and-later-#signing-requirements-by-version), drivers which are not signed by Microsoft will not be loaded by some versions of Windows when [Secure Boot](https://docs.microsoft.com/en-us/windows-hardware/design/device-experiences/oem-secure-boot) is enabled in the virtual machine. See [bug #1844726](https://bugzilla.redhat.com/1844726).
 
 
 ## `yum`/`dnf` repo
