@@ -17,6 +17,7 @@ The `stable` builds of virtio-win roughly correlate to what was shipped with the
 * [Stable virtio-win RPM](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.noarch.rpm)
 * [Latest virtio-win ISO](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win.iso)
 * [Latest virtio-win RPM](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win.noarch.rpm)
+* [Latest virtio-win-guest-tools.exe](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win-guest-tools.exe)
 * [virtio-win direct-downloads full archive](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/) with links to other bits like `qemu-ga`, a changelog, etc.
 
 
