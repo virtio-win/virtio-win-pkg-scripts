@@ -91,6 +91,11 @@
       <file>qxldod.inf</file>
       <file>qxldod.sys</file>
       <device id="http://pcisig.com/pci/1b36/0100"/>
+
+      <file>viogpudo.cat</file>
+      <file>viogpudo.inf</file>
+      <file>viogpudo.sys</file>
+      <device id="http://pcisig.com/pci/1af4/1050"/>
     </driver>
 
     <driver signed="true" pre-installable="true" location="file:///usr/share/virtio-win/drivers/by-os/amd64/w10/" arch="x86_64">
@@ -158,6 +163,11 @@
       <file>qxldod.inf</file>
       <file>qxldod.sys</file>
       <device id="http://pcisig.com/pci/1b36/0100"/>
+
+      <file>viogpudo.cat</file>
+      <file>viogpudo.inf</file>
+      <file>viogpudo.sys</file>
+      <device id="http://pcisig.com/pci/1af4/1050"/>
     </driver>
   </os>
 </libosinfo>
