@@ -237,6 +237,14 @@ _viosriov = [
 ]
 FILELISTS['sriov'] = _viosriov
 
+_viogpudofiles = [
+    'viogpudo.cat',
+    'viogpudo.inf',
+    'viogpudo.pdb',
+    'viogpudo.sys',
+]
+FILELISTS['viogpudo'] = _viogpudofiles
+
 # Describes what windows arch the virtio-win build output maps to.
 #
 # Example: Balloon: {"Wxp/x86": ["2k3/x86"]}
@@ -452,4 +460,12 @@ DRIVER_OS_MAP = {
         'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64'],
      },
 
+    'viogpudo': {
+        'Win8/x86': ['w8/x86', 'w8.1/x86'],
+        'Win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+
+        'Win10/x86': ['w10/x86'],
+        'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64'],
+        'Win10/ARM64': ['w10/ARM64'],
+    },
 }
