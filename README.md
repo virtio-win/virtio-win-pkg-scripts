@@ -23,9 +23,7 @@ The `stable` builds of virtio-win roughly correlate to what was shipped with the
 
 ## virtio-win driver signatures
 
-All the Windows binaries are from builds done on Red Hat’s internal build system, which are generated using publicly available code. The drivers are cryptographically signed with Red Hat’s vendor signature. However they are not signed with Microsoft’s [WHQL signature](https://docs.microsoft.com/en-us/windows-hardware/drivers/install/whql-release-signature). WHQL signed builds are only available with a paid RHEL subscription.
-
-The drivers are cryptographically signed with Red Hat’s vendor signature. However they are not signed with Microsoft’s WHQL signature.
+All the Windows binaries are from builds done on Red Hat’s internal build system that is generated using publicly available code. The drivers are cryptographically signed with Red Hat’s vendor signature. However, they are not signed with Microsoft’s [WHQL signature](https://docs.microsoft.com/en-us/windows-hardware/drivers/install/whql-release-signature). WHQL signed builds are only available with a paid RHEL subscription.
 
 Warning: Due to the [signing requirements of the Windows Driver Signing Policy](https://docs.microsoft.com/en-us/windows-hardware/drivers/install/kernel-mode-code-signing-policy\--windows-vista-and-later-#signing-requirements-by-version), drivers which are not signed by Microsoft will not be loaded by some versions of Windows when [Secure Boot](https://docs.microsoft.com/en-us/windows-hardware/design/device-experiences/oem-secure-boot) is enabled in the virtual machine. See [bug #1844726](https://bugzilla.redhat.com/1844726).
 
