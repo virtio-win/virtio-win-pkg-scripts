@@ -173,7 +173,7 @@ def _prep_driver_dir_input(driver_input_dir):
         zipbasename = os.path.basename(zipfile)
         is_qxl_old = bool(re.match(r"^qxl_.*$", zipbasename))
         is_qxl_dod = bool(re.match(
-            r"^spice-qxl-wddm-dod-\d+\.\d+.zip$", zipbasename))
+            r"^spice-qxl-wddm-dod.zip$", zipbasename))
 
         # Unpack qxl_* to $dir/qxl/
         # Unpack latest qxlwddm to $dir/spice-qxl-wddm-dod/
