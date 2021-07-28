@@ -141,8 +141,8 @@ def check_remaining_files(input_dir, seenfiles):
         ".*/spice-qxl-wddm-dod/w10/Changelog",
         ".*/spice-qxl-wddm-dod-8.1-compatible/Changelog",
 
-        ".*/spice-qxl-wddm-dod/w10/QxlWddmDod_0.20.0.0_x64.msi",
-        ".*/spice-qxl-wddm-dod/w10/QxlWddmDod_0.20.0.0_x86.msi",
+        ".*/spice-qxl-wddm-dod/w10/QxlWddmDod_0.21.2.0_x64.msi",
+        ".*/spice-qxl-wddm-dod/w10/QxlWddmDod_0.21.2.0_x86.msi",
 
 
         # virtio-win build system unconditionally builds every driver
@@ -166,6 +166,10 @@ def check_remaining_files(input_dir, seenfiles):
         # script is only used for non-rhel (Fedora) builds
         "/rhel/qemupciserial.cat",
         "/rhel/qemupciserial.inf",
+
+        # Added in virtio-win build 204, experemental driver for
+        # rhel only
+        ".*fwcfgdmp.*",
     ]
 
     remaining = []
