@@ -242,6 +242,10 @@ _viogpudofiles = [
     'viogpudo.inf',
     'viogpudo.pdb',
     'viogpudo.sys',
+    'vgpusrv.exe',
+    'vgpusrv.pdb',
+    'viogpuap.exe',
+    'viogpuap.pdb',
 ]
 FILELISTS['viogpudo'] = _viogpudofiles
 
