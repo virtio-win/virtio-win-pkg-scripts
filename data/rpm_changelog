@@ -1,4 +1,7 @@
 %changelog
+* Mon Sep 13 2021 vrozenfe@redhat.com - 0.1.208-1
+- Update virtio-win to build 208
+
 * Mon Jul 26 2021 vrozenfe@redhat.com - 0.1.204-1
 - Update to spice-qxl-wddm-dod-0.21-2
 
