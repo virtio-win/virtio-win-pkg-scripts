@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<libosinfo version="0.0.1">
+
+  <os id="http://microsoft.com/win/11">
+    <short-id>win11</short-id>
+    <name>Microsoft Windows 11</name>
+    <name xml:lang="ca">Microsoft Windows 11</name>
+    <name xml:lang="es">Microsoft Windows 11</name>
+    <name xml:lang="fr">Microsoft Windows 11</name>
+    <name xml:lang="id">Microsoft Windows 11</name>
+    <name xml:lang="it">Microsoft Windows 11</name>
+    <name xml:lang="pl">Microsoft Windows 11</name>
+    <name xml:lang="tr">Microsoft Windows 11</name>
+    <name xml:lang="uk">Microsoft Windows 11</name>
+    <vendor>Microsoft Corporation</vendor>
+    <vendor xml:lang="ca">Microsoft Corporation</vendor>
+    <vendor xml:lang="de">Microsoft Corporation</vendor>
+    <vendor xml:lang="es">Microsoft Corporation</vendor>
+    <vendor xml:lang="fr">Microsoft Corporation</vendor>
+    <vendor xml:lang="id">Microsoft Corporation</vendor>
+    <vendor xml:lang="it">Microsoft Corporation</vendor>
+    <vendor xml:lang="ja">Microsoft Corporation</vendor>
+    <vendor xml:lang="pl">Microsoft Corporation</vendor>
+    <vendor xml:lang="pt_BR">Microsoft Corporation</vendor>
+    <vendor xml:lang="tr">Microsoft Corporation</vendor>
+    <vendor xml:lang="uk">Корпорація Microsoft</vendor>
+
+    
+    <driver signed="true" pre-installable="true" location="file:///usr/share/virtio-win/drivers/by-os/amd64/w11/" arch="x86_64">
+      <file>balloon.cat</file>
+      <file>balloon.inf</file>
+      <file>balloon.sys</file>
+      <device id="http://pcisig.com/pci/1af4/1002"/> 
+      <device id="http://pcisig.com/pci/1af4/1045"/> 
+
+      <file>netkvm.cat</file>
+      <file>netkvm.inf</file>
+      <file>netkvm.sys</file>
+      <file>netkvmco.dll</file>
+      <device id="http://pcisig.com/pci/1af4/1000"/> 
+      <device id="http://pcisig.com/pci/1af4/1041"/> 
+
+      <file>pvpanic.cat</file>
+      <file>pvpanic.inf</file>
+      <file>pvpanic.sys</file>
+
+      <file>qemufwcfg.cat</file>
+      <file>qemufwcfg.inf</file>
+
+      <file>qemupciserial.cat</file>
+      <file>qemupciserial.inf</file>
+
+      <file>viohidkmdf.sys</file>
+      <file>vioinput.cat</file>
+      <file>vioinput.inf</file>
+      <file>vioinput.sys</file>
+      <device id="http://pcisig.com/pci/1af4/1052"/> 
+
+      <file>viorng.cat</file>
+      <file>viorng.inf</file>
+      <file>viorng.sys</file>
+      <file>viorngci.dll</file>
+      <file>viorngum.dll</file>
+      <device id="http://pcisig.com/pci/1af4/1005"/> 
+      <device id="http://pcisig.com/pci/1af4/1044"/> 
+
+      <file>vioscsi.cat</file>
+      <file>vioscsi.inf</file>
+      <file>vioscsi.sys</file>
+      <device id="http://pcisig.com/pci/1af4/1004"/> 
+      <device id="http://pcisig.com/pci/1af4/1048"/> 
+
+      <file>vioser.cat</file>
+      <file>vioser.inf</file>
+      <file>vioser.sys</file>
+      <device id="http://pcisig.com/pci/1af4/1003"/> 
+      <device id="http://pcisig.com/pci/1af4/1043"/> 
+
+      <file>viostor.cat</file>
+      <file>viostor.inf</file>
+      <file>viostor.sys</file>
+      <device id="http://pcisig.com/pci/1af4/1001"/> 
+      <device id="http://pcisig.com/pci/1af4/1042"/> 
+
+      <file>viofs.cat</file>
+      <file>viofs.inf</file>
+      <file>viofs.sys</file>
+      <device id="http://pcisig.com/pci/1af4/105a"/>
+
+      <file>viogpudo.cat</file>
+      <file>viogpudo.inf</file>
+      <file>viogpudo.sys</file>
+      <device id="http://pcisig.com/pci/1af4/1050"/>
+    </driver>
+  </os>
+</libosinfo>

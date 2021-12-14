@@ -182,6 +182,7 @@ add_osinfo virtio-win-pre-installable-drivers-win-7.xml win-7.d
 add_osinfo virtio-win-pre-installable-drivers-win-8.xml win-8.d
 add_osinfo virtio-win-pre-installable-drivers-win-8.1.xml win-8.1.d
 add_osinfo virtio-win-pre-installable-drivers-win-10.xml win-10.d
+add_osinfo virtio-win-pre-installable-drivers-win-11.xml win-11.d
 %endif
 
 
@@ -257,4 +258,5 @@ add_osinfo virtio-win-pre-installable-drivers-win-10.xml win-10.d
 %{_datadir}/osinfo/os/microsoft.com/win-8.d/virtio-win-pre-installable-drivers-win-8.xml
 %{_datadir}/osinfo/os/microsoft.com/win-8.1.d/virtio-win-pre-installable-drivers-win-8.1.xml
 %{_datadir}/osinfo/os/microsoft.com/win-10.d/virtio-win-pre-installable-drivers-win-10.xml
+%{_datadir}/osinfo/os/microsoft.com/win-11.d/virtio-win-pre-installable-drivers-win-11.xml
 %endif
