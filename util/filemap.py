@@ -220,6 +220,13 @@ _smbusfiles = [
 ]
 FILELISTS['smbus'] = _smbusfiles
 
+FILELISTS['fwcfg'] = [
+    'fwcfg.cat',
+    'fwcfg.inf',
+    'fwcfg.pdb',
+    'fwcfg.sys',
+]
+
 _viofsfiles = [
     'viofs.cat',
     'viofs.inf',
@@ -433,9 +440,14 @@ DRIVER_OS_MAP = {
     },
 
     'smbus': {
-        './': ['2k8/x86', '2k8/amd64'],
+        './': ['2k8/x86', '2k8/amd64', 'w11/amd64', '2k22/amd64'],
     },
 
+    'fwcfg': {
+        'Win8/amd64': ['w8/amd64', '2k12/amd64'],
+        'Win8.1/amd64': ['w8.1/amd64', '2k12R2/amd64'],
+        'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64', 'w11/amd64', '2k22/amd64'],
+    },
 
 
     # qxl and qxldod mappings are only used by fedora scripts. if the
@@ -468,8 +480,8 @@ DRIVER_OS_MAP = {
     },
 
     'sriov': {
-        'Win8/x86': ['w8/x86'],
-        'Win8/amd64': ['w8/amd64', '2k12/amd64'],
+#        'Win8/x86': ['w8/x86'],
+#        'Win8/amd64': ['w8/amd64', '2k12/amd64'],
 
         'Win8.1/x86': ['w8.1/x86'],
         'Win8.1/amd64': ['w8.1/amd64', '2k12R2/amd64'],

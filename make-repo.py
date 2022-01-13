@@ -16,6 +16,7 @@ from util.utils import fail, shellcomm, yes_or_no
 # Note, if you update this, --repo-only doesn't currently handle
 # the .htacess updating. Do it by hand or fix this script :)
 STABLE_RPMS = [
+    "0.1.215-2",  # RHEL8.4.0.z and RHEL8.5.0.z
     "0.1.208-1",  # RHEL8.5.0
     "0.1.196-1",  # RHEL8.4.0
     "0.1.185-2",  # RHEL8.2.1 and RHEL7.9
@@ -340,7 +341,7 @@ def _run_createrepo():
 def _run_rsync(reverse, dry):
     def _cmd(opts, src, dst):
         rsync = "rsync "
-        rsync += "--archive --verbose --compress --progress "
+        rsync += "--archive --verbose --compress --progress --omit-link-times --omit-dir-times "
         if not reverse:
             # There is no virtmaint-sig user, so we use our user
             rsync += "--chown=%s:virtmaint-sig " % LocalRepo.HOSTED_USERNAME

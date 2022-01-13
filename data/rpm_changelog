@@ -1,4 +1,9 @@
 %changelog
+* Wed Jan 12 2022 vrozenfe@redhat.com - 0.1.215-2
+
+* Tue Jan 11 2022 vrozenfe@redhat.com - 0.1.215-1
+- Update virtio-win to build 215
+
 * Mon Sep 13 2021 vrozenfe@redhat.com - 0.1.208-1
 - Update virtio-win to build 208
 
