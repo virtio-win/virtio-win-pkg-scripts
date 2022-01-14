@@ -166,10 +166,6 @@ def check_remaining_files(input_dir, seenfiles):
         # script is only used for non-rhel (Fedora) builds
         "/rhel/qemupciserial.cat",
         "/rhel/qemupciserial.inf",
-
-        # Added in virtio-win build 204, experemental driver for
-        # rhel only
-        ".*fwcfgdmp.*",
     ]
 
     remaining = []
