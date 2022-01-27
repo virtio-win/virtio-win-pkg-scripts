@@ -125,6 +125,8 @@ def check_remaining_files(input_dir, seenfiles):
         # Added in 171 build in May 2019, similar to above XML so I
         # presume it shouldn't be shipped
         r".*DVL-compat\.XML",
+        # Added for support different XMLs for Windows 10 and Windows 11
+        r".*DVL-win10\.XML",
 
         # These are files that are needed for the vfd build process. They
         # were added to the prewhql sources in July 2015.
