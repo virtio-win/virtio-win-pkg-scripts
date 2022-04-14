@@ -1,24 +1,10 @@
-;/*++
-;
-;Copyright (c) 2008-2016 Red Hat Inc.
-;
-;Module Name:
-;    viostor.inf
-;
-;Abstract:
-;
-;Installation Notes:
-;    Using Devcon: Type "devcon install viostor.inf PCI\VEN_1AF4&DEV_1001&SUBSYS_00021AF4&REV_00" or
-;                       "devcon install viostor.inf PCI\VEN_1AF4&DEV_1042&SUBSYS_11001AF4&REV_01" to install
-;
-;--*/
-
+; Copyright (c) 2009, Red Hat Inc.
 [Version]
 Signature="$Windows NT$"
 Class=SCSIAdapter
 ClassGUID={4D36E97B-E325-11CE-BFC1-08002BE10318}
 Provider=%RHEL%
-DriverVer=01/15/2017,51.74.104.13000
+DriverVer=11/27/2012,51.64.104.4800 
 CatalogFile=viostor.cat
 DriverPackageType = PlugAndPlay
 DriverPackageDisplayName = %RHELScsi.DeviceDesc%
@@ -45,11 +31,12 @@ viostor_Files_Driver = 12
 ;
 
 [Manufacturer]
-%RHEL%   = RHEL,NTx86.5.1
+%RHEL%   = RHEL,NTx86
 
-[RHEL.NTx86.5.1]
-%RHELScsi.DeviceDesc% = rhelscsi_inst, PCI\VEN_1AF4&DEV_1001&SUBSYS_00021AF4&REV_00
-%RHELScsi.DeviceDesc% = rhelscsi_inst, PCI\VEN_1AF4&DEV_1042&SUBSYS_11001AF4&REV_01
+[RHEL.NTx86]
+%RHELScsi.DeviceDesc% = rhelscsi_inst, PCI\VEN_1AF4&DEV_1001&SUBSYS_00000000
+%RHELScsi.DeviceDesc% = rhelscsi_inst, PCI\VEN_1AF4&DEV_1001&SUBSYS_00020000
+%RHELScsi.DeviceDesc% = rhelscsi_inst, PCI\VEN_1AF4&DEV_1001&SUBSYS_00021AF4
 
 ;
 ; General installation section

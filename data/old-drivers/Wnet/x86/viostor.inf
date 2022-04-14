@@ -1,28 +1,13 @@
-;/*++
-;
-;Copyright (c) 2008-2019 Red Hat Inc.
-;
-;
-;Module Name:
-;    viostor.inf
-;
-;Abstract:
-;
-;Installation Notes:
-;    Using Devcon: Type "devcon install viostor.inf PCI\VEN_1AF4&DEV_1001&SUBSYS_00021AF4&REV_00" or
-;                       "devcon install viostor.inf PCI\VEN_1AF4&DEV_1042&SUBSYS_11001AF4&REV_01" to install
-;
-;--*/
-
+; Copyright (c) 2009, Red Hat Inc.
 [Version]
 Signature="$Windows NT$"
 Class=SCSIAdapter
 ClassGUID={4D36E97B-E325-11CE-BFC1-08002BE10318}
-Provider=%VENDOR%
-DriverVer = 12/12/2019,52.81.104.17400
+Provider=%RHEL%
+DriverVer=11/27/2012,52.64.104.4800 
 CatalogFile=viostor.cat
 DriverPackageType = PlugAndPlay
-DriverPackageDisplayName = %VioStorScsi.DeviceDesc%
+DriverPackageDisplayName = %RHELScsi.DeviceDesc%
 
 ;
 ; Source file information
@@ -46,11 +31,12 @@ viostor_Files_Driver = 12
 ;
 
 [Manufacturer]
-%VENDOR%   = VioStor,NTx86.5.2
+%RHEL%   = RHEL,NTx86
 
-[VioStor.NTx86.5.2]
-%VioStorScsi.DeviceDesc% = scsi_inst, PCI\VEN_1AF4&DEV_1001&SUBSYS_00021AF4&REV_00, PCI\VEN_1AF4&DEV_1001
-%VioStorScsi.DeviceDesc% = scsi_inst, PCI\VEN_1AF4&DEV_1042&SUBSYS_11001AF4&REV_01, PCI\VEN_1AF4&DEV_1042
+[RHEL.NTx86]
+%RHELScsi.DeviceDesc% = rhelscsi_inst, PCI\VEN_1AF4&DEV_1001&SUBSYS_00000000
+%RHELScsi.DeviceDesc% = rhelscsi_inst, PCI\VEN_1AF4&DEV_1001&SUBSYS_00020000
+%RHELScsi.DeviceDesc% = rhelscsi_inst, PCI\VEN_1AF4&DEV_1001&SUBSYS_00021AF4
 
 ;
 ; General installation section
@@ -59,17 +45,17 @@ viostor_Files_Driver = 12
 [viostor_Files_Driver]
 viostor.sys,,,2
 
-[scsi_inst]
+[rhelscsi_inst]
 CopyFiles=viostor_Files_Driver
 
 ;
 ; Service Installation
 ;
 
-[scsi_inst.Services]
-AddService = viostor, 0x00000002 , scsi_Service_Inst, scsi_EventLog_Inst
+[rhelscsi_inst.Services]
+AddService = viostor, 0x00000002 , rhelscsi_Service_Inst, rhelscsi_EventLog_Inst
 
-[scsi_Service_Inst]
+[rhelscsi_Service_Inst]
 ServiceType    = %SERVICE_KERNEL_DRIVER%
 StartType      = %SERVICE_BOOT_START%
 ErrorControl   = %SERVICE_ERROR_NORMAL%
@@ -77,10 +63,10 @@ ServiceBinary  = %12%\viostor.sys
 LoadOrderGroup = SCSI miniport
 AddReg         = pnpsafe_pci_addreg
 
-[scsi_EventLog_Inst]
-AddReg = scsi_EventLog_AddReg
+[rhelscsi_EventLog_Inst]
+AddReg = rhelscsi_EventLog_AddReg
 
-[scsi_EventLog_AddReg]
+[rhelscsi_EventLog_AddReg]
 HKR,,EventMessageFile,%REG_EXPAND_SZ%,"%%SystemRoot%%\System32\IoLogMsg.dll"
 HKR,,TypesSupported,%REG_DWORD%,7
 
@@ -92,9 +78,9 @@ HKR, "Parameters", "BusType", %REG_DWORD%, 0x00000001
 ;
 ; Localizable Strings
 ;
-VENDOR = "Red Hat, Inc."
 diskId1 = "Red Hat VirtIO SCSI controller Installation Disk"
-VioStorScsi.DeviceDesc = "Red Hat VirtIO SCSI controller"
+RHELScsi.DeviceDesc = "Red Hat VirtIO SCSI controller"
+RHEL = "Red Hat, Inc."
 
 ;
 ; Non-Localizable Strings

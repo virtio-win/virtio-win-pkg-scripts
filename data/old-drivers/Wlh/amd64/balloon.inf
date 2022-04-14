@@ -1,7 +1,6 @@
 ;/*++
 ;
-;Copyright (c) 2009-2019 Red Hat Inc.
-;
+;Copyright (c) 2009-2018 Red Hat Inc.
 ;
 ;Module Name:
 ;    BALLOON.INF
@@ -18,8 +17,8 @@
 Signature="$WINDOWS NT$"
 Class=System
 ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318}
-Provider=%VENDOR%
-DriverVer = 12/12/2019,60.81.104.17400
+Provider=%RHEL%
+DriverVer=06/11/2018,60.76.104.15400
 CatalogFile=Balloon.cat
 DriverPackageType = PlugAndPlay
 DriverPackageDisplayName = %BALLOON.DeviceDesc%
@@ -41,11 +40,11 @@ WdfCoInstaller01009.dll=1 ; make sure the number matches with SourceDisksNames
 ;*****************************************
 
 [Manufacturer]
-%VENDOR%=Standard,NTamd64.6.0
+%RHEL%=Standard,NTamd64.6.0
 
 [Standard.NTamd64.6.0]
-%BALLOON.DeviceDesc%=BALLOON_Device, PCI\VEN_1AF4&DEV_1002&SUBSYS_00051AF4&REV_00, PCI\VEN_1AF4&DEV_1002
-%BALLOON.DeviceDesc%=BALLOON_Device, PCI\VEN_1AF4&DEV_1045&SUBSYS_11001AF4&REV_01, PCI\VEN_1AF4&DEV_1045
+%BALLOON.DeviceDesc%=BALLOON_Device, PCI\VEN_1AF4&DEV_1002&SUBSYS_00051AF4&REV_00
+%BALLOON.DeviceDesc%=BALLOON_Device, PCI\VEN_1AF4&DEV_1045&SUBSYS_11001AF4&REV_01
 
 [BALLOON_Device.NT]
 CopyFiles=Drivers_Dir
@@ -95,8 +94,9 @@ KmdfLibraryVersion = 1.9
 
 [Strings]
 SPSVCINST_ASSOCSERVICE= 0x00000002
-VENDOR = "Red Hat, Inc."
+RHEL = "Red Hat, Inc."
 DiskId1 = "VirtIO Balloon Installation Disk #1"
 BALLOON.DeviceDesc = "VirtIO Balloon Driver"
 BALLOON.SVCDESC = "VirtIO Balloon Service"
 ClassName       = "VirtIO Balloon Device"
+

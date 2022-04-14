@@ -1,7 +1,6 @@
 ;/*++
 ;
-;Copyright (c) 2014-2019 Red Hat Inc.
-;
+;Copyright (c) 2014-2018 Red Hat Inc.
 ;
 ;Module Name:
 ;    viorng.inf
@@ -18,10 +17,10 @@
 Signature       = "$WINDOWS NT$"
 Class           = System
 ClassGuid       = {4d36e97d-e325-11ce-bfc1-08002be10318}
-Provider        = %VENDOR%
+Provider        = %RedHatMfg%
 CatalogFile     = viorng.cat
 PnpLockdown     = 1
-DriverVer = 12/12/2019,60.81.104.17400
+DriverVer=06/11/2018,60.76.104.15400
 
 [DestinationDirs]
 DefaultDestDir = 12
@@ -42,11 +41,11 @@ WdfCoInstaller01009.dll = 1 ; make sure the number matches with SourceDisksNames
 ; ---------------
 
 [Manufacturer]
-%VENDOR% = Standard,NTx86.6.0
+%RedHatMfg% = RedHat,NTx86.6.0
 
-[Standard.NTx86.6.0]
-%VirtRng.DeviceDesc% = VirtRng_Device, PCI\VEN_1AF4&DEV_1005&SUBSYS_00041AF4&REV_00, PCI\VEN_1AF4&DEV_1005
-%VirtRng.DeviceDesc% = VirtRng_Device, PCI\VEN_1AF4&DEV_1044&SUBSYS_11001AF4&REV_01, PCI\VEN_1AF4&DEV_1044
+[RedHat.NTx86.6.0]
+%VirtRng.DeviceDesc% = VirtRng_Device, PCI\VEN_1AF4&DEV_1005&SUBSYS_00041AF4&REV_00
+%VirtRng.DeviceDesc% = VirtRng_Device, PCI\VEN_1AF4&DEV_1044&SUBSYS_11001AF4&REV_01
 
 [VirtRng_Device.NT]
 CopyFiles = VirtRng_CopyFiles
@@ -109,7 +108,7 @@ KmdfService = VirtRng, VirtRng_wdfsect
 KmdfLibraryVersion = 1.9
 
 [Strings]
-VENDOR              = "Red Hat, Inc."
+RedHatMfg           = "Red Hat, Inc."
 DiskName            = "VirtIO RNG Installation Disk"
 VirtRng.DeviceDesc  = "VirtIO RNG Device"
 VirtRng.Service     = "VirtIO RNG Service"
