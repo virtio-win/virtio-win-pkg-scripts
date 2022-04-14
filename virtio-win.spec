@@ -33,8 +33,8 @@
 %endif
 
 
-%global virtio_win_prewhql_build virtio-win-prewhql-0.1-215
-%global qemu_ga_win_build qemu-ga-win-102.10.0-0.el8_5
+%global virtio_win_prewhql_build virtio-win-prewhql-0.1-217
+%global qemu_ga_win_build qemu-ga-win-103.0.0-1.el9_0
 %global qxl_build qxl-win-unsigned-0.1-24
 # qxlwddm is fedora only for now
 %if %{fedora_defaults}
@@ -44,8 +44,8 @@
 
 Summary: VirtIO para-virtualized drivers for Windows(R)
 Name: virtio-win
-Version: 0.1.215
-Release: 2
+Version: 0.1.217
+Release: 1
 Group: Applications/System
 URL: http://www.redhat.com/
 BuildArch: noarch
