@@ -45,7 +45,7 @@
 Summary: VirtIO para-virtualized drivers for Windows(R)
 Name: virtio-win
 Version: 0.1.217
-Release: 1
+Release: 2
 Group: Applications/System
 URL: http://www.redhat.com/
 BuildArch: noarch
