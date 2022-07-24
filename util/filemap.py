@@ -220,6 +220,12 @@ _smbusfiles = [
 ]
 FILELISTS['smbus'] = _smbusfiles
 
+_certfiles = [
+    'Virtio_Win_Red_Hat_CA.cer',
+]
+FILELISTS['cert'] = _certfiles
+
+
 FILELISTS['fwcfg'] = [
     'fwcfg.cat',
     'fwcfg.inf',
@@ -501,4 +507,9 @@ DRIVER_OS_MAP = {
         'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64', 'w11/amd64', '2k22/amd64'],
         'Win10/ARM64': ['w10/ARM64', 'w11/ARM64'],
     },
+
+    'cert': {
+        './': ['./'],
+    },
+
 }

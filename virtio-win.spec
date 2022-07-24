@@ -33,8 +33,8 @@
 %endif
 
 
-%global virtio_win_prewhql_build virtio-win-prewhql-0.1-217
-%global qemu_ga_win_build qemu-ga-win-103.0.0-1.el9_0
+%global virtio_win_prewhql_build virtio-win-prewhql-0.1-221
+%global qemu_ga_win_build qemu-ga-win-104.0.2-1.el9
 %global qxl_build qxl-win-unsigned-0.1-24
 # qxlwddm is fedora only for now
 %if %{fedora_defaults}
@@ -44,8 +44,8 @@
 
 Summary: VirtIO para-virtualized drivers for Windows(R)
 Name: virtio-win
-Version: 0.1.217
-Release: 2
+Version: 0.1.221
+Release: 1
 Group: Applications/System
 URL: http://www.redhat.com/
 BuildArch: noarch
@@ -53,9 +53,9 @@ BuildArch: noarch
 %if %{rhel_defaults}
 # RHEL RPM ships WHQL signed drivers, which are under a proprietary license
 # qemu-ga builds are GPLv2
-License: Red Hat Proprietary and GPLv2
+License: BSD-3-Clause and Apache-2.0 and GPLv2
 %else
-# virtio-win drivers are licensed under the BSD license, qxldod under Apache,
+# virtio-win drivers are licensed under the BSD license, qxldod under Apache-2.0,
 # everything else is GPLv2
 # virtio-win: https://github.com/virtio-win/kvm-guest-drivers-windows/blob/master/LICENSE
 # qxl: http://cgit.freedesktop.org/spice/win32/qxl/tree/xddm/COPYING
@@ -91,7 +91,6 @@ VirtIO para-virtualized Windows(R) drivers for 32-bit and 64-bit
 Windows(R) guests.
 
 
-
 %prep
 %setup -q -T -b 1 -n %{name}-%{version}
 
@@ -112,7 +111,6 @@ popd
 %{__cp} %{SOURCE24} iso-content/
 %endif
 
-
 %if %{rhel_defaults} && 0%{?rhel} > 7
 # Dropping unsupported Windows versions.
 # It's done here to fix two issues at the same time: do not
@@ -127,6 +125,7 @@ for srcdir in iso-content rpm-drivers; do
     rm_driver_dir 2k3
     rm_driver_dir 2k8
     rm_driver_dir smbus
+    rm_driver_dir cert
 
     # Old floppy naming
     rm_driver_dir WinXP
@@ -134,7 +133,6 @@ for srcdir in iso-content rpm-drivers; do
     rm_driver_dir Win2008
 done
 %endif
-
 
 
 %build
@@ -148,10 +146,8 @@ pushd iso-content
 popd
 
 
-
 %install
 %{__install} -d -m0755 %{buildroot}%{_datadir}/%{name}
-
 
 add_link() {
     # Adds name-version$1 to datadir, with a non-versioned symlink
@@ -159,6 +155,7 @@ add_link() {
     %{__ln_s} %{name}-%{version}$1 %{buildroot}%{_datadir}/%{name}/%{name}$1
 }
 
+# Install .iso, create non-versioned symlink
 add_link .iso
 
 # RHEL-8 does not support vfd images
@@ -185,9 +182,7 @@ add_osinfo virtio-win-pre-installable-drivers-win-10.xml win-10.d
 add_osinfo virtio-win-pre-installable-drivers-win-11.xml win-11.d
 %endif
 
-
 %{__cp} -a rpm-drivers %{buildroot}/%{_datadir}/%{name}/drivers
-
 
 # Copy the guest agent .msi into final RPM location
 %{__mkdir} -p %{buildroot}%{_datadir}/%{name}/guest-agent/
@@ -202,8 +197,6 @@ add_osinfo virtio-win-pre-installable-drivers-win-11.xml win-11.d
 %{__install} -p -m0644 iso-content/virtio-win-gt-x64.msi  %{buildroot}%{_datadir}/%{name}/installer/
 %{__install} -p -m0644 iso-content/virtio-win-guest-tools.exe  %{buildroot}%{_datadir}/%{name}/installer/
 %endif
-
-
 
 %files
 %doc iso-content/virtio-win_license.txt
@@ -230,12 +223,16 @@ add_osinfo virtio-win-pre-installable-drivers-win-11.xml win-11.d
 %{_datadir}/%{name}/drivers/by-driver/viostor
 %{_datadir}/%{name}/drivers/by-driver/viofs
 %{_datadir}/%{name}/drivers/by-driver/sriov
+%{_datadir}/%{name}/drivers/by-driver/qxldod
 %{_datadir}/%{name}/drivers/by-driver/viogpudo
 %exclude %{_datadir}/%{name}/drivers/by-driver/virtio-win_license.txt
 %if %{fedora_defaults}
-%{_datadir}/%{name}/drivers/by-driver/qxldod
 %{_datadir}/%{name}/drivers/by-driver/smbus
 %{_datadir}/%{name}/drivers/by-driver/fwcfg
+%endif
+
+%if %{fedora_defaults}
+%{_datadir}/%{name}/drivers/by-driver/cert
 %endif
 
 %{_datadir}/%{name}/drivers/by-os/i386
