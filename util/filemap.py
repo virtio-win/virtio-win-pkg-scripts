@@ -225,14 +225,6 @@ _certfiles = [
 ]
 FILELISTS['cert'] = _certfiles
 
-
-FILELISTS['fwcfg'] = [
-    'fwcfg.cat',
-    'fwcfg.inf',
-    'fwcfg.pdb',
-    'fwcfg.sys',
-]
-
 _viofsfiles = [
     'viofs.cat',
     'viofs.inf',
@@ -273,6 +265,21 @@ _viogpudofiles = [
     'viogpuap.pdb',
 ]
 FILELISTS['viogpudo'] = _viogpudofiles
+
+_fwcfgfiles = [
+    'fwcfg.cat',
+    'fwcfg.inf',
+    'fwcfg.pdb',
+    'fwcfg.sys',
+]
+FILELISTS['fwcfg'] = _fwcfgfiles
+FILELISTS['fwcfg:2k12'] = _fwcfgfiles + ['WdfCoInstaller01011.dll']
+FILELISTS['fwcfg:2k12R2'] = FILELISTS['fwcfg:2k12']
+FILELISTS['fwcfg:w10'] = _fwcfgfiles
+FILELISTS['fwcfg:2k16'] = FILELISTS['fwcfg:w10']
+FILELISTS['fwcfg:2k19'] = FILELISTS['fwcfg:w10']
+FILELISTS['fwcfg:w11'] = _fwcfgfiles
+FILELISTS['fwcfg:2k22'] = FILELISTS['fwcfg:w11']
 
 # Describes what windows arch the virtio-win build output maps to.
 #
@@ -449,15 +456,6 @@ DRIVER_OS_MAP = {
         './': ['2k8/x86', '2k8/amd64', 'w11/amd64', '2k22/amd64'],
     },
 
-    'fwcfg': {
-        'Win8/amd64': ['w8/amd64', '2k12/amd64'],
-        'Win8/x86': ['w8/x86'],
-        'Win8.1/amd64': ['w8.1/amd64', '2k12R2/amd64'],
-        'Win8.1/x86': ['w8.1/x86'],
-        'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64', 'w11/amd64', '2k22/amd64'],
-        'Win10/x86': ['w10/x86'],
-    },
-
 
     # qxl and qxldod mappings are only used by fedora scripts. if the
     # internal scripts every programmatically consume qxl/qxldod, this stuff
@@ -512,4 +510,10 @@ DRIVER_OS_MAP = {
         './': ['./'],
     },
 
+    'fwcfg': {
+        'Win8/amd64': ['2k12/amd64', '2k12R2/amd64'],
+
+        'Win10/x86': ['w10/x86'],
+        'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64', 'w11/amd64', '2k22/amd64'],
+    },
 }
