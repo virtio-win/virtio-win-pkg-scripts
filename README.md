@@ -23,7 +23,7 @@ The `stable` builds of virtio-win roughly correlate to what was shipped with the
 
 ## virtio-win driver signatures
 
-All the Windows binaries are from builds done on Red Hat’s internal build system, which are generated using publicly available code. Windows 8+ drivers are cryptographically signed with Red Hat’s trest signature. [Test Signing](https://docs.microsoft.com/en-us/windows-hardware/drivers/install/test-signing) Windows 10+ drivers are signed with Microsoft attestation signature.[Microsof Attestation Signing](https://docs.microsoft.com/en-us/windows-hardware/drivers/dashboard/code-signing-attestation). However they are not signed with Microsoft’s [WHQL signature](https://docs.microsoft.com/en-us/windows-hardware/drivers/install/whql-release-signature). WHQL signed builds are only available with a paid RHEL subscription.
+All the Windows binaries are from builds done on Red Hat’s internal build system, which are generated using publicly available code. Windows 8+ drivers are cryptographically signed with Red Hat’s trust signature. [Test Signing](https://docs.microsoft.com/en-us/windows-hardware/drivers/install/test-signing) Windows 10+ drivers are signed with Microsoft attestation signature.[Microsof Attestation Signing](https://docs.microsoft.com/en-us/windows-hardware/drivers/dashboard/code-signing-attestation). However they are not signed with Microsoft’s [WHQL signature](https://docs.microsoft.com/en-us/windows-hardware/drivers/install/whql-release-signature). WHQL signed builds are only available with a paid RHEL subscription.
 
 The drivers are cryptographically signed with Red Hat’s vendor signature. However they are not signed with Microsoft’s WHQL signature.
 
