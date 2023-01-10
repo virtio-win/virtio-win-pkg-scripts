@@ -45,8 +45,8 @@ SUPPORTED_PLATFORM_DIGITAL_SIG = {
     'w10/x86' : 'v.1.0.0._.V.b',
     '2k16/amd64': 'S.e.r.v.e.r._.v.1.0.0._.X.6.4._.R.S',
     '2k19/amd64': 'S.e.r.v.e.r._.v.1.0.0._.X.6.4._.R.S.5',
-    'w11/amd64' : 'v.1.0.0._.X.6.4._.2.1.H.2',
-    '2k22/amd64': 'S.e.r.v.e.r._.v.1.0.0._.X.6.4._.2.1.H.2',
+    'w11/amd64' : 'v.1.0.0._.X.6.4._.2.2.H.2',
+    '2k22/amd64': 'S.e.r.v.e.r._.v.1.0.0._.X.6.4._.2.2.H.2',
 }
 
 # This is used to map the driver name to the name of the
@@ -100,11 +100,15 @@ _pvpanicfiles = [
     "pvpanic.pdb",
     "pvpanic.sys",
 ]
-FILELISTS['pvpanic'] = _pvpanicfiles + ['WdfCoInstaller01011.dll']
+
 FILELISTS['pvpanic:w7'] = _pvpanicfiles + ['WdfCoInstaller01009.dll']
 FILELISTS['pvpanic:2k8'] = FILELISTS['pvpanic:w7']
 FILELISTS['pvpanic:2k8R2'] = FILELISTS['pvpanic:w7']
-FILELISTS['pvpanic:w10'] = _pvpanicfiles
+FILELISTS['pvpanic:w8'] = _pvpanicfiles + ['WdfCoInstaller01011.dll', 'pvpanic-pci.cat', 'pvpanic-pci.inf']
+FILELISTS['pvpanic:w8.1'] = FILELISTS["pvpanic:w8"]
+FILELISTS['pvpanic:2k12'] = FILELISTS["pvpanic:w8"]
+FILELISTS['pvpanic:2k12R2'] = FILELISTS["pvpanic:w8"]
+FILELISTS['pvpanic:w10'] = _pvpanicfiles + ['pvpanic-pci.cat', 'pvpanic-pci.inf']
 FILELISTS['pvpanic:2k16'] = FILELISTS['pvpanic:w10']
 FILELISTS['pvpanic:2k19'] = FILELISTS['pvpanic:w10']
 FILELISTS['pvpanic:w11'] = _pvpanicfiles
@@ -273,8 +277,10 @@ _fwcfgfiles = [
     'fwcfg.sys',
 ]
 FILELISTS['fwcfg'] = _fwcfgfiles
-FILELISTS['fwcfg:2k12'] = _fwcfgfiles + ['WdfCoInstaller01011.dll']
-FILELISTS['fwcfg:2k12R2'] = FILELISTS['fwcfg:2k12']
+FILELISTS['fwcfg:w8'] = _fwcfgfiles + ['WdfCoInstaller01011.dll']
+FILELISTS['fwcfg:2k12'] = FILELISTS['fwcfg:w8']
+FILELISTS['fwcfg:w8.1'] = _fwcfgfiles
+FILELISTS['fwcfg:2k12R2'] = FILELISTS['fwcfg:w8.1']
 FILELISTS['fwcfg:w10'] = _fwcfgfiles
 FILELISTS['fwcfg:2k16'] = FILELISTS['fwcfg:w10']
 FILELISTS['fwcfg:2k19'] = FILELISTS['fwcfg:w10']
@@ -511,7 +517,11 @@ DRIVER_OS_MAP = {
     },
 
     'fwcfg': {
-        'Win8/amd64': ['2k12/amd64', '2k12R2/amd64'],
+        'Win8/x86': ['w8/x86'],
+        'Win8/amd64': ['w8/amd64', '2k12/amd64'],
+
+        'Win8.1/x86': ['w8.1/x86'],
+        'Win8.1/amd64': ['w8.1/amd64', '2k12R2/amd64'],
 
         'Win10/x86': ['w10/x86'],
         'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64', 'w11/amd64', '2k22/amd64'],
