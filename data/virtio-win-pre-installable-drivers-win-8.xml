@@ -49,6 +49,10 @@
       <file>pvpanic.inf</file>
       <file>pvpanic.sys</file>
 
+      <file>fwcfg64.cat</file>
+      <file>fwcfg64.inf</file>
+      <file>fwcfg64.sys</file>
+
       <file>qemupciserial.cat</file>
       <file>qemupciserial.inf</file>
 
@@ -114,6 +118,10 @@
       <file>pvpanic.cat</file>
       <file>pvpanic.inf</file>
       <file>pvpanic.sys</file>
+
+      <file>fwcfg64.cat</file>
+      <file>fwcfg64.inf</file>
+      <file>fwcfg64.sys</file>
 
       <file>qemupciserial.cat</file>
       <file>qemupciserial.inf</file>
