@@ -91,7 +91,7 @@ FILELISTS['NetKVM:xp'] = [
 ]
 FILELISTS['NetKVM:2k3'] = FILELISTS['NetKVM:xp']
 FILELISTS['NetKVM'] = FILELISTS['NetKVM:xp'][:] + ["netkvmco.dll",
-    "netkvmco.pdb", "readme.doc"]
+    "netkvmco.pdb", "Readme.md"]
 
 
 _pvpanicfiles = [
