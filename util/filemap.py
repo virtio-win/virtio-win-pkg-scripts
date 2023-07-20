@@ -154,8 +154,6 @@ _viorngfiles = [
     'viorng.inf',
     'viorng.pdb',
     'viorng.sys',
-    'viorngci.dll',
-    'viorngci.pdb',
     'viorngum.dll',
     'viorngum.pdb',
 ]
