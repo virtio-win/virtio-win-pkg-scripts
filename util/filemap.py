@@ -76,6 +76,8 @@ FILELISTS['Balloon:2k3'] = FILELISTS['Balloon:xp']
 FILELISTS['Balloon:2k8'] = FILELISTS['Balloon:xp']
 FILELISTS['Balloon:2k8R2'] = FILELISTS['Balloon:xp']
 FILELISTS['Balloon:w7'] = FILELISTS['Balloon:xp']
+FILELISTS['Balloon:w8.1'] = _balloonfiles
+FILELISTS['Balloon:2k12R2'] = FILELISTS['Balloon:w8.1']
 FILELISTS['Balloon:w10'] = _balloonfiles
 FILELISTS['Balloon:2k16'] = FILELISTS['Balloon:w10']
 FILELISTS['Balloon:2k19'] = FILELISTS['Balloon:w10']
@@ -90,9 +92,14 @@ FILELISTS['NetKVM:xp'] = [
     'netkvm.sys',
 ]
 FILELISTS['NetKVM:2k3'] = FILELISTS['NetKVM:xp']
+FILELISTS['NetKVM:w7'] = FILELISTS['NetKVM:xp'][:] + ["netkvmco.dll",
+    "netkvmco.pdb", "readme.doc"]
+FILELISTS['NetKVM:2k8'] = FILELISTS['NetKVM:xp'][:] + ["netkvmco.dll",
+    "netkvmco.pdb", "readme.doc"]
+FILELISTS['NetKVM:2k8R2'] = FILELISTS['NetKVM:xp'][:] + ["netkvmco.dll",
+    "netkvmco.pdb", "readme.doc"]
 FILELISTS['NetKVM'] = FILELISTS['NetKVM:xp'][:] + ["netkvmco.dll",
     "netkvmco.pdb", "Readme.md"]
-
 
 _pvpanicfiles = [
     "pvpanic.cat",
@@ -105,9 +112,9 @@ FILELISTS['pvpanic:w7'] = _pvpanicfiles + ['WdfCoInstaller01009.dll']
 FILELISTS['pvpanic:2k8'] = FILELISTS['pvpanic:w7']
 FILELISTS['pvpanic:2k8R2'] = FILELISTS['pvpanic:w7']
 FILELISTS['pvpanic:w8'] = _pvpanicfiles + ['WdfCoInstaller01011.dll', 'pvpanic-pci.cat', 'pvpanic-pci.inf']
-FILELISTS['pvpanic:w8.1'] = FILELISTS["pvpanic:w8"]
+FILELISTS['pvpanic:w8.1'] = _pvpanicfiles + ['pvpanic-pci.cat', 'pvpanic-pci.inf']
 FILELISTS['pvpanic:2k12'] = FILELISTS["pvpanic:w8"]
-FILELISTS['pvpanic:2k12R2'] = FILELISTS["pvpanic:w8"]
+FILELISTS['pvpanic:2k12R2'] = FILELISTS["pvpanic:w8.1"]
 FILELISTS['pvpanic:w10'] = _pvpanicfiles + ['pvpanic-pci.cat', 'pvpanic-pci.inf']
 FILELISTS['pvpanic:2k16'] = FILELISTS['pvpanic:w10']
 FILELISTS['pvpanic:2k19'] = FILELISTS['pvpanic:w10']
@@ -142,9 +149,9 @@ _vioinputfiles = [
 FILELISTS['vioinput:w7'] = _vioinputfiles + ['WdfCoInstaller01009.dll']
 FILELISTS['vioinput:2k8R2'] = FILELISTS["vioinput:w7"]
 FILELISTS['vioinput:w8'] = _vioinputfiles + ['WdfCoInstaller01011.dll']
-FILELISTS['vioinput:w8.1'] = FILELISTS["vioinput:w8"]
+FILELISTS['vioinput:w8.1'] = _vioinputfiles
 FILELISTS['vioinput:2k12'] = FILELISTS["vioinput:w8"]
-FILELISTS['vioinput:2k12R2'] = FILELISTS["vioinput:w8"]
+FILELISTS['vioinput:2k12R2'] = FILELISTS["vioinput:w8.1"]
 # win10+ doesn't need .dll
 FILELISTS['vioinput'] = _vioinputfiles
 
@@ -158,11 +165,13 @@ _viorngfiles = [
     'viorngum.pdb',
 ]
 FILELISTS['viorng'] = _viorngfiles + ['WdfCoInstaller01011.dll']
-FILELISTS['viorng:xp'] = _viorngfiles + ['WdfCoInstaller01009.dll']
+FILELISTS['viorng:xp'] = _viorngfiles + ['WdfCoInstaller01009.dll'] + ['viorngci.dll'] + ['viorngci.pdb']
 FILELISTS['viorng:2k3'] = FILELISTS['viorng:xp']
 FILELISTS['viorng:2k8R2'] = FILELISTS['viorng:xp']
 FILELISTS['viorng:2k8'] = FILELISTS['viorng:xp']
 FILELISTS['viorng:w7'] = FILELISTS['viorng:xp']
+FILELISTS['viorng:w8.1'] = _viorngfiles
+FILELISTS['viorng:2k12R2'] = FILELISTS['viorng:w8.1']
 FILELISTS['viorng:w10'] = _viorngfiles
 FILELISTS['viorng:2k16'] = FILELISTS['viorng:w10']
 FILELISTS['viorng:2k19'] = FILELISTS['viorng:w10']
@@ -190,6 +199,8 @@ FILELISTS['vioserial:2k3'] = FILELISTS['vioserial:xp']
 FILELISTS['vioserial:2k8'] = FILELISTS['vioserial:xp']
 FILELISTS['vioserial:2k8R2'] = FILELISTS['vioserial:xp']
 FILELISTS['vioserial:w7'] = FILELISTS['vioserial:xp']
+FILELISTS['vioserial:w8.1'] = _vioserialfiles
+FILELISTS['vioserial:2k12R2'] = FILELISTS['vioserial:w8.1']
 FILELISTS['vioserial:w10'] = _vioserialfiles
 FILELISTS['vioserial:2k16'] = FILELISTS['vioserial:w10']
 FILELISTS['vioserial:2k19'] = FILELISTS['vioserial:w10']
@@ -237,9 +248,9 @@ _viofsfiles = [
 ]
 FILELISTS['viofs'] = _viofsfiles
 FILELISTS['viofs:w8'] = _viofsfiles + ['WdfCoInstaller01011.dll']
-FILELISTS['viofs:w8.1'] = FILELISTS['viofs:w8']
+FILELISTS['viofs:w8.1'] = _viofsfiles
 FILELISTS['viofs:2k12'] = FILELISTS['viofs:w8']
-FILELISTS['viofs:2k12R2'] = FILELISTS['viofs:w8']
+FILELISTS['viofs:2k12R2'] = FILELISTS['viofs:w8.1']
 FILELISTS['viofs:w10'] = _viofsfiles
 FILELISTS['viofs:2k16'] = FILELISTS['viofs:w10']
 FILELISTS['viofs:2k19'] = FILELISTS['viofs:w10']
@@ -303,8 +314,11 @@ DRIVER_OS_MAP = {
         'Win7/x86': ['w7/x86'],
         'Win7/amd64': ['w7/amd64', '2k8R2/amd64'],
 
-        'Win8/x86': ['w8/x86', 'w8.1/x86'],
-        'Win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+        'Win8/x86': ['w8/x86'],
+        'Win8/amd64': ['w8/amd64', '2k12/amd64'],
+
+        'Win8.1/x86': ['w8.1/x86'],
+        'Win8.1/amd64': ['w8.1/amd64', '2k12R2/amd64'],
 
         'Win10/x86': ['w10/x86'],
         'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64', 'w11/amd64', '2k22/amd64'],
@@ -343,8 +357,11 @@ DRIVER_OS_MAP = {
         'Win7/x86': ['w7/x86'],
         'Win7/amd64': ['w7/amd64', '2k8R2/amd64'],
 
-        'Win8/x86': ['w8/x86', 'w8.1/x86'],
-        'Win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+        'Win8/x86': ['w8/x86'],
+        'Win8/amd64': ['w8/amd64', '2k12/amd64'],
+
+        'Win8.1/x86': ['w8.1/x86'],
+        'Win8.1/amd64': ['w8.1/amd64', '2k12R2/amd64'],
 
         'Win10/x86': ['w10/x86'],
         'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64', 'w11/amd64', '2k22/amd64'],
@@ -356,8 +373,11 @@ DRIVER_OS_MAP = {
         'Win7/x86': ['w7/x86'],
         'Win7/amd64': ['w7/amd64', '2k8R2/amd64'],
 
-        'Win8/x86': ['w8/x86', 'w8.1/x86'],
-        'Win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+        'Win8/x86': ['w8/x86'],
+        'Win8/amd64': ['w8/amd64', '2k12/amd64'],
+
+        'Win8.1/x86': ['w8.1/x86'],
+        'Win8.1/amd64': ['w8.1/amd64', '2k12R2/amd64'],
 
         'Win10/x86': ['w10/x86'],
         'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64', 'w11/amd64', '2k22/amd64'],
@@ -372,11 +392,15 @@ DRIVER_OS_MAP = {
         'Win7/x86': ['w7/x86'],
         'Win7/amd64': ['w7/amd64', '2k8R2/amd64'],
 
-        'Win8/x86': ['w8/x86', 'w8.1/x86'],
-        'Win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+        'Win8/x86': ['w8/x86'],
+        'Win8/amd64': ['w8/amd64', '2k12/amd64'],
+
+        'Win8.1/x86': ['w8.1/x86'],
+        'Win8.1/amd64': ['w8.1/amd64', '2k12R2/amd64'],
 
         'Win10/x86': ['w10/x86'],
         'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64',  'w11/amd64', '2k22/amd64'],
+        'Win10/ARM64': ['w10/ARM64', 'w11/ARM64'],
     },
 
 
@@ -387,8 +411,11 @@ DRIVER_OS_MAP = {
         'Win7/x86': ['w7/x86'],
         'Win7/amd64': ['w7/amd64', '2k8R2/amd64'],
 
-        'Win8/x86': ['w8/x86', 'w8.1/x86'],
-        'Win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+        'Win8/x86': ['w8/x86'],
+        'Win8/amd64': ['w8/amd64', '2k12/amd64'],
+
+        'Win8.1/x86': ['w8.1/x86'],
+        'Win8.1/amd64': ['w8.1/amd64', '2k12R2/amd64'],
 
         'Win10/x86': ['w10/x86'],
         'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64', 'w11/amd64', '2k22/amd64'],
@@ -408,8 +435,11 @@ DRIVER_OS_MAP = {
         'Win7/x86': ['w7/x86'],
         'Win7/amd64': ['w7/amd64', '2k8R2/amd64'],
 
-        'Win8/x86': ['w8/x86', 'w8.1/x86'],
-        'Win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+        'Win8/x86': ['w8/x86'],
+        'Win8/amd64': ['w8/amd64', '2k12/amd64'],
+
+        'Win8.1/x86': ['w8.1/x86'],
+        'Win8.1/amd64': ['w8.1/amd64', '2k12R2/amd64'],
 
         'Win10/x86': ['w10/x86'],
         'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64', 'w11/amd64', '2k22/amd64'],
@@ -429,8 +459,11 @@ DRIVER_OS_MAP = {
         'Win7/x86': ['w7/x86'],
         'Win7/amd64': ['w7/amd64', '2k8R2/amd64'],
 
-        'Win8/x86': ['w8/x86', 'w8.1/x86'],
-        'Win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+        'Win8/x86': ['w8/x86'],
+        'Win8/amd64': ['w8/amd64', '2k12/amd64'],
+
+        'Win8.1/x86': ['w8.1/x86'],
+        'Win8.1/amd64': ['w8.1/amd64', '2k12R2/amd64'],
 
         'Win10/x86': ['w10/x86'],
         'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64', 'w11/amd64', '2k22/amd64'],
@@ -483,16 +516,19 @@ DRIVER_OS_MAP = {
     },
 
     'viofs': {
-        'Win8/x86': ['w8/x86', 'w8.1/x86'],
-        'Win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+        'Win8/x86': ['w8/x86'],
+        'Win8/amd64': ['w8/amd64', '2k12/amd64'],
+
+        'Win8.1/x86': ['w8.1/x86'],
+        'Win8.1/amd64': ['w8.1/amd64', '2k12R2/amd64'],
 
         'Win10/x86': ['w10/x86'],
         'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64', 'w11/amd64', '2k22/amd64'],
     },
 
     'sriov': {
-#        'Win8/x86': ['w8/x86'],
-#        'Win8/amd64': ['w8/amd64', '2k12/amd64'],
+        'Win8/x86': ['w8/x86'],
+        'Win8/amd64': ['w8/amd64', '2k12/amd64'],
 
         'Win8.1/x86': ['w8.1/x86'],
         'Win8.1/amd64': ['w8.1/amd64', '2k12R2/amd64'],
@@ -502,8 +538,11 @@ DRIVER_OS_MAP = {
      },
 
     'viogpudo': {
-        'Win8/x86': ['w8/x86', 'w8.1/x86'],
-        'Win8/amd64': ['w8/amd64', 'w8.1/amd64', '2k12/amd64', '2k12R2/amd64'],
+        'Win8/x86': ['w8/x86'],
+        'Win8/amd64': ['w8/amd64', '2k12/amd64'],
+
+        'Win8.1/x86': ['w8.1/x86'],
+        'Win8.1/amd64': ['w8.1/amd64', '2k12R2/amd64'],
 
         'Win10/x86': ['w10/x86'],
         'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64', 'w11/amd64', '2k22/amd64'],
