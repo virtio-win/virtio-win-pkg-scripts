@@ -16,6 +16,7 @@ from util.utils import fail, shellcomm, yes_or_no
 # Note, if you update this, --repo-only doesn't currently handle
 # the .htacess updating. Do it by hand or fix this script :)
 STABLE_RPMS = [
+    "0.1.240-1",  # RHEL9.3.0 and RHEL8.9
     "0.1.229-1",  # RHEL9.1.0.z and RHEL8.7
     "0.1.225-2",  # RHEL9.1.0
     "0.1.221-1",  # RHEL9.0.0.z
