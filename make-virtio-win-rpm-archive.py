@@ -267,11 +267,11 @@ def build_vfd(fname, dmap, driverdir, rootdir, rpmdriversdir, mediadir):
             #   used in any automatic fashion, so just putting them on the
             #   .iso is sufficient
             # * .doc doesn't serve any purpose on the .vfd
-            # * netkvmco.dll is an end user configuration tool for, as
+            # * netkvmco.exe is an end user configuration tool for, as
             #   such doesn't have much use at boot/install time
             if (src_file.endswith('.pdb') or
                 src_file.endswith('.doc') or
-                src_file == 'netkvmco.dll'):
+                src_file == 'netkvmco.exe'):
                 continue
 
             shutil.copy2(os.path.join(src, src_file), dest_vfd)
