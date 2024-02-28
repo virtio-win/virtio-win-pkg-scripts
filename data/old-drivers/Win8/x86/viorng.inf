@@ -1,0 +1,128 @@
+;/*++
+;
+;Copyright (c) 2014-2022 Red Hat Inc.
+;
+;
+;Module Name:
+;    viorng.inf
+;
+;Abstract:
+;
+;Installation Notes:
+;    Using Devcon: Type "devcon install viorng.inf PCI\VEN_1AF4&DEV_1005&SUBSYS_00041AF4&REV_00" or
+;                       "devcon install viorng.inf PCI\VEN_1AF4&DEV_1044&SUBSYS_11001AF4&REV_01" to install
+;
+;--*/
+
+[Version]
+Signature       = "$WINDOWS NT$"
+Class           = System
+ClassGuid       = {4d36e97d-e325-11ce-bfc1-08002be10318}
+Provider        = %VENDOR%
+CatalogFile     = viorng.cat
+PnpLockdown     = 1
+DriverVer = 07/21/2023,62.93.104.24000
+
+[DestinationDirs]
+DefaultDestDir = 12
+VirtRng_Provider_CopyFiles = 11
+VirtRng_Wdf_CoInstaller_CopyFiles = 11
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+viorng.sys = 1,,
+viorngum.dll = 1
+WdfCoInstaller01011.dll = 1 ; make sure the number matches with SourceDisksNames
+
+; ---------------
+; Install Section
+; ---------------
+
+[Manufacturer]
+%VENDOR% = Standard,NTx86.6.2
+
+[Standard.NTx86.6.2]
+%VirtRng.DeviceDesc% = VirtRng_Device, PCI\VEN_1AF4&DEV_1005&SUBSYS_00041AF4&REV_00, PCI\VEN_1AF4&DEV_1005
+%VirtRng.DeviceDesc% = VirtRng_Device, PCI\VEN_1AF4&DEV_1044&SUBSYS_11001AF4&REV_01, PCI\VEN_1AF4&DEV_1044
+
+[VirtRng_Device.NT]
+CopyFiles = VirtRng_CopyFiles
+CopyFiles = VirtRng_Provider_CopyFiles
+AddReg = VirtRng_Provider_AddReg
+
+[VirtRng_Device.NT.HW]
+AddReg = VirtRng_AddReg
+
+[VirtRng_CopyFiles]
+viorng.sys
+
+[VirtRng_AddReg]
+HKR,Interrupt Management,,0x00000010
+HKR,Interrupt Management\MessageSignaledInterruptProperties,,0x00000010
+HKR,Interrupt Management\MessageSignaledInterruptProperties,MSISupported,0x00010001,1
+HKR,Interrupt Management\MessageSignaledInterruptProperties,MessageNumberLimit,0x00010001,1
+
+; --------------------
+; Service Installation
+; --------------------
+
+[VirtRng_Device.NT.Services]
+AddService = VirtRng,0x00000002,VirtRng_Service_Install
+
+[VirtRng_Service_Install]
+DisplayName    = %VirtRng.Service%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\viorng.sys
+LoadOrderGroup = Extended Base
+AddReg         = DmaRemappingCompatible.Reg
+
+[DmaRemappingCompatible.Reg]
+HKR,Parameters,DmaRemappingCompatible,0x00010001,1
+
+; -------------------------
+; RNG Provider Installation
+; -------------------------
+
+[VirtRng_Provider_CopyFiles]
+viorngum.dll
+
+[VirtRng_Provider_AddReg]
+HKLM,SYSTEM\CurrentControlSet\Control\Cryptography\Providers\%PROVIDER_NAME%\UM,Image,,viorngum.dll
+HKLM,SYSTEM\CurrentControlSet\Control\Cryptography\Providers\%PROVIDER_NAME%\UM\00000006,Flags,%REG_DWORD%,0x00000001
+HKLM,SYSTEM\CurrentControlSet\Control\Cryptography\Providers\%PROVIDER_NAME%\UM\00000006,Functions,%REG_MULTI_SZ%,RNG
+HKLM,SYSTEM\CurrentControlSet\Control\Cryptography\Configuration\Local\Default\00000006\RNG,Providers,%REG_MULTI_SZ_APPEND%,%PROVIDER_NAME%
+
+
+; -------------------------------------
+; WDF & Device CoInstaller Installation
+; -------------------------------------
+
+[VirtRng_Device.NT.CoInstallers]
+AddReg=VirtRng_Wdf_CoInstaller_AddReg
+CopyFiles=VirtRng_Wdf_CoInstaller_CopyFiles
+
+[VirtRng_Wdf_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000,"WdfCoInstaller01011.dll,WdfCoInstaller"
+
+[VirtRng_Wdf_CoInstaller_CopyFiles]
+WdfCoInstaller01011.dll
+
+[VirtRng_Device.NT.Wdf]
+KmdfService = VirtRng, VirtRng_wdfsect
+
+[VirtRng_wdfsect]
+KmdfLibraryVersion = 1.11
+
+[Strings]
+VENDOR              = "Red Hat, Inc."
+DiskName            = "VirtIO RNG Installation Disk"
+VirtRng.DeviceDesc  = "VirtIO RNG Device"
+VirtRng.Service     = "VirtIO RNG Service"
+REG_DWORD           = 0x00010001
+REG_MULTI_SZ        = 0x00010000
+REG_MULTI_SZ_APPEND = 0x00010008
+PROVIDER_NAME       = "QEMU VirtIO RNG Provider"
