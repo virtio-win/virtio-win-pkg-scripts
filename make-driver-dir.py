@@ -169,15 +169,15 @@ def check_remaining_files(input_dir, seenfiles):
         "/rhel/qemupciserial.cat",
         "/rhel/qemupciserial.inf",
 
-        "/Win10/amd64/qemufwcfg.cat",
-        "/Win10/amd64/qemufwcfg.inf",
-        "/Win10/x86/qemufwcfg.cat",
-        "/Win10/x86/qemufwcfg.inf",
+#        "/Win10/amd64/qemufwcfg.cat",
+#        "/Win10/amd64/qemufwcfg.inf",
+#        "/Win10/x86/qemufwcfg.cat",
+#        "/Win10/x86/qemufwcfg.inf",
 
-        "/Win10/amd64/qemupciserial.cat",
-        "/Win10/amd64/qemupciserial.inf",
-        "/Win10/x86/qemupciserial.cat",
-        "/Win10/x86/qemupciserial.inf",
+#        "/Win10/amd64/qemupciserial.cat",
+#        "/Win10/amd64/qemupciserial.inf",
+#        "/Win10/x86/qemupciserial.cat",
+#        "/Win10/x86/qemupciserial.inf",
     ]
 
     remaining = []

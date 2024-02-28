@@ -1,0 +1,107 @@
+;/*++
+;
+;Copyright (c) 2009-2022 Red Hat Inc.
+;
+;
+;Module Name:
+;    BALLOON.INF
+;
+;Abstract:
+;
+;Installation Notes: 
+;    Using Devcon: Type "devcon install BALLOON.inf PCI\VEN_1AF4&DEV_1002&SUBSYS_00051AF4&REV_00" or
+;                       "devcon install BALLOON.inf PCI\VEN_1AF4&DEV_1045&SUBSYS_11001AF4&REV_01" to install
+;
+;--*/
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=System
+ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318}
+Provider=%VENDOR%
+DriverVer = 07/21/2023,62.93.104.24000
+CatalogFile=Balloon.cat
+DriverPackageType = PlugAndPlay
+DriverPackageDisplayName = %BALLOON.DeviceDesc%
+PnpLockdown = 1
+
+[DestinationDirs]
+DefaultDestDir = 12
+BALLOON_Device_CoInstaller_CopyFiles = 11
+
+[SourceDisksNames]
+1 = %DiskId1%,,,""
+
+[SourceDisksFiles]
+balloon.sys  = 1,,
+WdfCoInstaller01011.dll=1 ; make sure the number matches with SourceDisksNames
+
+;*****************************************
+; BALLOON  Install Section
+;*****************************************
+
+[Manufacturer]
+%VENDOR%=Standard,NTamd64.6.2
+
+[Standard.NTamd64.6.2]
+%BALLOON.DeviceDesc%=BALLOON_Device, PCI\VEN_1AF4&DEV_1002&SUBSYS_00051AF4&REV_00, PCI\VEN_1AF4&DEV_1002
+%BALLOON.DeviceDesc%=BALLOON_Device, PCI\VEN_1AF4&DEV_1045&SUBSYS_11001AF4&REV_01, PCI\VEN_1AF4&DEV_1045
+
+[BALLOON_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+balloon.sys
+
+[BALLOON_Device.NT.HW]
+AddReg=BALLOON_SD
+
+[BALLOON_SD]
+HKR,,Security,,"D:P(A;;GA;;;SY)"
+
+;-------------- Service installation
+[BALLOON_Device.NT.Services]
+AddService = BALLOON,%SPSVCINST_ASSOCSERVICE%, BALLOON_Service_Inst, BALLOON_Logging_Inst
+
+; -------------- BALLOON driver install sections
+[BALLOON_Service_Inst]
+DisplayName    = %BALLOON.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START 
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\balloon.sys
+
+; -------------- BALLOON driver eventlog install sections
+[BALLOON_Logging_Inst]
+AddReg = BALLOON_Logging_Inst_AddReg
+
+[BALLOON_Logging_Inst_AddReg]
+HKR,,EventMessageFile,0x00020000,"%%SystemRoot%%\System32\IoLogMsg.dll;%%SystemRoot%%\System32\drivers\balloon.sys"
+HKR,,TypesSupported,0x00010001,7
+
+;--- BALLOON_Device Coinstaller installation ------
+;
+
+[BALLOON_Device.NT.CoInstallers]
+AddReg=BALLOON_Device_CoInstaller_AddReg
+CopyFiles=BALLOON_Device_CoInstaller_CopyFiles
+
+[BALLOON_Device_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller01011.dll,WdfCoInstaller"
+
+[BALLOON_Device_CoInstaller_CopyFiles]
+WdfCoInstaller01011.dll
+
+[BALLOON_Device.NT.Wdf]
+KmdfService =  BALLOON, BALLOON_wdfsect
+[BALLOON_wdfsect]
+KmdfLibraryVersion = 1.11
+
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+VENDOR = "Red Hat, Inc."
+DiskId1 = "VirtIO Balloon Installation Disk #1"
+BALLOON.DeviceDesc = "VirtIO Balloon Driver"
+BALLOON.SVCDESC = "VirtIO Balloon Service"
+ClassName       = "VirtIO Balloon Device"

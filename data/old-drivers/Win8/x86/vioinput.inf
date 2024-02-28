@@ -1,0 +1,129 @@
+;/*++
+;
+;Copyright (c) 2016-2022 Red Hat Inc.
+;
+;
+;Module Name:
+;    vioinput.inf
+;
+;Abstract:
+;
+;Installation Notes:
+;    Using Devcon: Type "devcon install vioinput.inf PCI\VEN_1AF4&DEV_1052&SUBSYS_11001AF4&REV_01" to install
+;
+;--*/
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=HIDClass
+ClassGuid={745a17a0-74d3-11d0-b6fe-00a0c90f57da}
+Provider=%VENDOR%
+DriverVer = 07/21/2023,62.93.104.24000
+CatalogFile=vioinput.cat
+DriverPackageType = PlugAndPlay
+DriverPackageDisplayName = %VirtioInput.DeviceDesc%
+PnpLockdown = 1
+
+; ================= Class section =====================
+
+;[ClassInstall32]
+;Addreg=VirtioInputClassReg
+
+;[VirtioInputClassReg]
+;HKR,,,0,%ClassName%
+;HKR,,Icon,,-5
+
+[DestinationDirs]
+DefaultDestDir = 12
+VirtioInput_Device_CoInstaller_CopyFiles = 11
+
+[SourceDisksFiles]
+vioinput.sys  = 1,,
+viohidkmdf.sys = 1,,
+WdfCoInstaller01011.dll=1 ; make sure the number matches with SourceDisksNames
+
+[SourceDisksNames]
+1 = %DiskId1%,,,""
+
+;*****************************************
+; vioinput  Install Section
+;*****************************************
+
+[Manufacturer]
+%VENDOR%=VirtioInput,NTx86.6.2
+
+[VirtioInput.NTx86.6.2]
+;
+; Hw Id is PCI\VEN_1AF4&DEV_1052&SUBSYS_11001AF4&CC_090200&REV_01
+;
+%VirtioInput.DeviceDesc%=VirtioInput_Device, PCI\VEN_1AF4&DEV_1052&SUBSYS_11001AF4&REV_01, PCI\VEN_1AF4&DEV_1052
+%VirtioInput.ChildDesc%=VirtioInput_Child, VIOINPUT\REV_01
+
+[VirtioInput_Device.NT]
+CopyFiles=CopyFiles_Device
+
+[VirtioInput_Child.NT]
+CopyFiles=CopyFiles_Child
+
+[VirtioInput_Device.NT.HW]
+AddReg=VirtioInput_AddReg
+
+[VirtioInput_AddReg]
+HKR,Interrupt Management,,0x00000010
+HKR,Interrupt Management\MessageSignaledInterruptProperties,,0x00000010
+HKR,Interrupt Management\MessageSignaledInterruptProperties,MSISupported,0x00010001,1
+HKR,Interrupt Management\MessageSignaledInterruptProperties,MessageNumberLimit,0x00010001,2
+
+[CopyFiles_Device]
+vioinput.sys
+
+[CopyFiles_Child]
+viohidkmdf.sys
+
+;-------------- Service installation
+
+[VirtioInput_Device.NT.Services]
+AddService = VirtioInput, 0x00000002, VirtioInput_Service_Inst  ;flag 0x2 sets this as the service for the device
+
+[VirtioInput_Child.NT.Services]
+AddService = viohidkmdf, 0x00000002, viohidkmdf_Service_Inst
+
+; -------------- VirtioInput driver install sections
+[viohidkmdf_Service_Inst]
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\viohidkmdf.sys
+
+[VirtioInput_Service_Inst]
+DisplayName    = %VirtioInput.ServiceDesc%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\vioinput.sys
+
+;--- VirtioInput_Device Coinstaller installation ------
+;
+
+[VirtioInput_Device.NT.CoInstallers]
+AddReg=VirtioInput_Device_CoInstaller_AddReg
+CopyFiles=VirtioInput_Device_CoInstaller_CopyFiles
+
+[VirtioInput_Device_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller01011.dll,WdfCoInstaller"
+
+[VirtioInput_Device_CoInstaller_CopyFiles]
+WdfCoInstaller01011.dll
+
+[VirtioInput_Device.NT.Wdf]
+KmdfService =  VirtioInput, VirtioInput_wdfsect
+
+[VirtioInput_wdfsect]
+KmdfLibraryVersion = 1.11
+
+[Strings]
+VENDOR = "Red Hat, Inc."
+DiskId1 = "VirtIO Input Installation Disk #1"
+VirtioInput.DeviceDesc = "VirtIO Input Driver"
+VirtioInput.ChildDesc = "VirtIO Input Driver Helper"
+VirtioInput.ServiceDesc = "VirtIO Input Service"

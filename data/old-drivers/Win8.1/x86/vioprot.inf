@@ -1,0 +1,87 @@
+;-----------------------------------
+;Copyright (c) 2008-2022 Red Hat Inc.
+;
+;-----------------------------------
+;          vioprot.inf
+;-----------------------------------
+;       VIRTIO network protocol
+;-----------------------------------
+
+[version]
+Signature   = "$Windows NT$"
+Class       = NetTrans
+ClassGUID   = {4d36e975-e325-11ce-bfc1-08002be10318}
+Provider    = %VENDOR%
+DriverVer = 07/21/2023,63.93.104.24000
+CatalogFile  = vioprot.cat
+
+
+[Manufacturer]
+%VENDOR%=Standard,NTx86,NTamd64
+
+[Standard.NTx86]
+%NETKVMP_Desc%=Install,VIOPROT
+
+[Standard.NTamd64]
+%NETKVMP_Desc%=Install,VIOPROT
+
+;-------------------------------------------------------------------------
+; Installation Section
+;-------------------------------------------------------------------------
+[Install]
+AddReg=Inst_Ndi
+Characteristics=0x0
+CopyFiles=Copy.Exec
+
+;-------------------------------------------------------------------------
+; Ndi installation support
+;-------------------------------------------------------------------------
+[Inst_Ndi]
+HKR, Ndi, ClsID, 0, {F69513F1-8E1A-4F35-82D9-046406970E6D}
+HKR,Ndi,Service,,netkvmp
+HKR,Ndi,HelpText,,%NETKVMP_HelpText%
+HKR,Ndi\Interfaces, UpperRange,, noupper
+HKR,Ndi\Interfaces, LowerRange,,"ndis5,ndis5_prot"
+
+;-------------------------------------------------------------------------
+; Service installation support
+;-------------------------------------------------------------------------
+[Install.Services]
+AddService=netkvmp,0x800,NETKVMP.ServiceInst ;SPSVCSINST_STARTSERVICE
+
+[NETKVMP.ServiceInst]
+DisplayName     = %NETKVMP_Desc%
+ServiceType     = 16 ;SERVICE_WIN32_OWN_PROCESS
+StartType       = 2 ;SERVICE_AUTO_START
+ErrorControl    = 1 ;SERVICE_ERROR_NORMAL
+ServiceBinary   = %11%\netkvmp.exe
+Description     = %NETKVMP_Desc%
+
+[Install.Remove.Services]
+DelService=netkvmp,0x200 ;SPSVCINST_STOPSERVICE
+
+;-------------------------------------------------------------------------
+; Declare Destination Directories for file copy/deletion
+;-------------------------------------------------------------------------
+[SourceDisksNames]
+1=%DiskDescription%,"",,
+
+[SourceDisksFiles]
+netkvmno.dll=1
+netkvmp.exe=1
+
+[DestinationDirs]
+Copy.Exec    = 11    ; %windir%\System32
+
+;-------------------------------------------------------------------------
+; Files to Copy/Delete - Referenced by Install and Remove sections above
+;-------------------------------------------------------------------------
+[Copy.Exec]
+netkvmno.dll,,,0x00004002     ; COPYFLG_NOSKIP | COPYFLG_IN_USE_RENAME
+netkvmp.exe,,,0x00004002      ; COPYFLG_NOSKIP | COPYFLG_IN_USE_RENAME
+
+[Strings]
+VENDOR = "Red Hat, Inc."
+DiskDescription = "Red Hat VirtIO NetKVM Protocol Driver Disk"
+NETKVMP_Desc = "Red Hat VirtIO NetKVM Protocol Driver"
+NETKVMP_HelpText = "A driver to support SRIOV Failover for VirtIO network devices"
