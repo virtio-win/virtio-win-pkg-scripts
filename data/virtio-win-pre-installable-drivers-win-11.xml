@@ -92,6 +92,11 @@
       <file>viogpudo.inf</file>
       <file>viogpudo.sys</file>
       <device id="http://pcisig.com/pci/1af4/1050"/>
+
+      <file>viomem.cat</file>
+      <file>viomem.inf</file>
+      <file>viomem.sys</file>
+      <device id="http://pcisig.com/pci/1af4/1058"/>
     </driver>
   </os>
 </libosinfo>
