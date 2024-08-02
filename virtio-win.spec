@@ -226,6 +226,7 @@ add_osinfo virtio-win-pre-installable-drivers-win-11.xml win-11.d
 %{_datadir}/%{name}/drivers/by-driver/sriov
 %{_datadir}/%{name}/drivers/by-driver/qxldod
 %{_datadir}/%{name}/drivers/by-driver/viogpudo
+%{_datadir}/%{name}/drivers/by-driver/viomem
 %exclude %{_datadir}/%{name}/drivers/by-driver/virtio-win_license.txt
 %if %{fedora_defaults}
 %{_datadir}/%{name}/drivers/by-driver/smbus
