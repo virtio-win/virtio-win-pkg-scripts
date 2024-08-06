@@ -72,8 +72,9 @@ def main():
 
     shellcomm("git clean -xdf")
 
-    shellcomm("./automation/build-artifacts.sh %s %s %s %s" %
-            (driverdir, ga_x64_msi, ga_x86_msi, options.nvr))
+    shellcomm("./automation/build-artifacts.sh %s %s %s %s %s %s %s %s" %
+            (driverdir, vdagent_x64_msi, vdagent_x86_msi, qxlwddm_x64_msi,
+             qxlwddm_x86_msi, ga_x64_msi, ga_x86_msi, options.nvr))
 
     shellcomm("mv ./exported-artifacts/* %s" % output_dir)
 
