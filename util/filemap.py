@@ -14,7 +14,7 @@ SUPPORTED_ARCHES = ['x86', 'amd64']
 # List of drivers and windows versions we want to add to the
 # autodetectable $arch/$os/$driver symlink tree on the iso
 AUTO_DRIVERS = ["viostor", "vioscsi"]
-AUTO_OS_BLACKLIST = ['xp', '2k3', '2k8', 'w7', '2k8R2, 'w8', 'w8.1', '2k12', '2k12R2']
+AUTO_OS_BLACKLIST = ['xp', '2k3', '2k8', 'w7', '2k8R2', 'w8', 'w8.1', '2k12', '2k12R2']
 AUTO_ARCHES = {
     # pairs of: (iso arch naming, auto arch naming)
     "x86": "i386",
