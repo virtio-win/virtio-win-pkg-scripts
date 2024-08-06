@@ -274,6 +274,7 @@ def build_vfd(fname, dmap, driverdir, rootdir, rpmdriversdir, mediadir):
             #   such doesn't have much use at boot/install time
             if (src_file.endswith('.pdb') or
                 src_file.endswith('.doc') or
+                src_file == 'netkvmco.dll' or
                 src_file == 'netkvmco.exe'):
                 continue
 
