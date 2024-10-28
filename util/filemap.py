@@ -626,7 +626,6 @@ DRIVER_OS_MAP = {
     },
 
     'viomem': {
-        'Win10/x86': ['w10/x86'],
         'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64', '2k22/amd64'],
         'Win10/ARM64': ['w10/ARM64'],
 
