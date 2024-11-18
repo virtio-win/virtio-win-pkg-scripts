@@ -178,6 +178,10 @@ def check_remaining_files(input_dir, seenfiles):
 #        "/Win10/amd64/qemupciserial.inf",
 #        "/Win10/x86/qemupciserial.cat",
 #        "/Win10/x86/qemupciserial.inf",
+         "/Win10/x86/viomem.cat",
+         "/Win10/x86/viomem.sys",
+         "/Win10/x86/viomem.inf",
+         "/Win10/x86/viomem.pdb",
     ]
 
     remaining = []
