@@ -128,13 +128,7 @@ def check_remaining_files(input_dir, seenfiles):
         # Added for support different XMLs for Windows 10 and Windows 11
         r".*DVL-win10\.XML",
 
-        # These are files that are needed for the vfd build process. They
-        # were added to the prewhql sources in July 2015.
-        # See: https://bugzilla.redhat.com/show_bug.cgi?id=1217799
-        #
-        # We could possibly use them in this repo, but it's a bit
-        # difficult because of the RHEL build process sharing.
-        # Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1251770
+        # Files needed for .vfd builds which we no longer generate
         ".*/disk1",
         ".*/txtsetup-i386.oem",
         ".*/txtsetup-amd64.oem",
