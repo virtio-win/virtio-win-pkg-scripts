@@ -127,11 +127,6 @@ for srcdir in iso-content rpm-drivers; do
     rm_driver_dir 2k8
     rm_driver_dir smbus
     rm_driver_dir cert
-
-    # Old floppy naming
-    rm_driver_dir WinXP
-    rm_driver_dir Win2003
-    rm_driver_dir Win2008
 done
 %endif
 
@@ -206,9 +201,6 @@ add_osinfo virtio-win-pre-installable-drivers-win-11.xml win-11.d
 %{_datadir}/%{name}/%{name}.iso
 %{_datadir}/%{name}/guest-agent/*.msi
 
-%{_datadir}/%{name}/drivers/i386
-%{_datadir}/%{name}/drivers/amd64
-
 # Add some by-os and by-driver whitelisting, so unintended things don't
 # sneak into the hierarchy
 %{_datadir}/%{name}/drivers/by-driver/Balloon
@@ -235,12 +227,6 @@ add_osinfo virtio-win-pre-installable-drivers-win-11.xml win-11.d
 
 %if %{fedora_defaults}
 %{_datadir}/%{name}/drivers/by-driver/cert
-%endif
-
-%{_datadir}/%{name}/drivers/by-os/i386
-%{_datadir}/%{name}/drivers/by-os/amd64
-%if %{fedora_defaults}
-%{_datadir}/%{name}/drivers/by-os/ARM64
 %endif
 
 %if %{rhel_defaults} && 0%{?rhel} <= 7
