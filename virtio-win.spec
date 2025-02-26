@@ -154,14 +154,6 @@ add_link() {
 # Install .iso, create non-versioned symlink
 add_link .iso
 
-# RHEL-8 does not support vfd images
-%if %{rhel_defaults} && 0%{?rhel} <= 7
-add_link _x86.vfd
-add_link _amd64.vfd
-add_link _servers_x86.vfd
-add_link _servers_amd64.vfd
-%endif
-
 
 %if %{rhel_defaults}
 add_osinfo() {
@@ -227,10 +219,6 @@ add_osinfo virtio-win-pre-installable-drivers-win-11.xml win-11.d
 
 %if %{fedora_defaults}
 %{_datadir}/%{name}/drivers/by-driver/cert
-%endif
-
-%if %{rhel_defaults} && 0%{?rhel} <= 7
-%{_datadir}/%{name}/*.vfd
 %endif
 
 %if %{fedora_defaults}
