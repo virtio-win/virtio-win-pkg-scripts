@@ -16,6 +16,8 @@ from util.utils import fail, shellcomm, yes_or_no
 # Note, if you update this, --repo-only doesn't currently handle
 # the .htacess updating. Do it by hand or fix this script :)
 STABLE_RPMS = [
+    "0.1.271-1",  # RHEL10.0.0
+    "0.1.266-1",  # RHEL9.5.0.z
     "0.1.262-2",  # RHEL9.5.0
     "0.1.240-1",  # RHEL9.3.0 and RHEL8.9
     "0.1.229-1",  # RHEL9.1.0.z and RHEL8.7
@@ -247,14 +249,17 @@ def _populate_local_tree(buildversions, rpm_output, rpm_buildroot):
     """
     rpm_output = os.path.realpath(rpm_output)
     rpm_buildroot = os.path.realpath(rpm_buildroot)
-    extract_dir = _glob(rpm_buildroot + "/virtio-win*.x86_64")[0]
-    sharedir = extract_dir + "/usr/share/virtio-win/"
+    extract_dir = _glob(rpm_buildroot + "/virtio-win-*-build")[0]
+    sharedir = extract_dir + "/BUILDROOT/usr/share/virtio-win/"
     assert os.path.exists(sharedir)
 
     # filename will be like .../virtio-win-0.1.171-6.x86_64
     # extract the RPM version and release
-    virtio_release_str = os.path.basename(extract_dir).rsplit(".", 1)[0]
+
+    output_dir = _glob(rpm_output + "/**/*.rpm", recursive=True)[0]
+    virtio_release_str = os.path.basename(output_dir).rsplit(".", 2)[0]
     virtio_version_str = virtio_release_str.rsplit("-", 1)[0]
+
     assert re.match(r"virtio-win-[\d\.]+", virtio_version_str)
     assert re.match(r"virtio-win-[\d\.]+-\d+", virtio_release_str)
 
@@ -262,7 +267,7 @@ def _populate_local_tree(buildversions, rpm_output, rpm_buildroot):
     # $rpm_buildroot/virtio-win-$version/qemu-ga-win-100.0.0.0-3.el7ev/
     # Get the basename of that
     qemuga_release_str = os.path.basename(
-            _glob(rpm_buildroot + "/*/qemu-ga-win*")[0])
+            _glob(rpm_buildroot + "/*/*/qemu-ga-win*")[0])
 
     localrepo = LocalRepo(virtio_version_str,
             virtio_release_str, qemuga_release_str)
