@@ -396,7 +396,7 @@ def main():
              win_fsp_msi, installer_output_dir))
     shellcomm("cp %s/* %s" % (installer_output_dir, rpm_src_dir))
 
-    # Generate RPM input archive + vfd + iso
+    # Generate RPM input archive + iso
     shellcomm("./make-virtio-win-rpm-archive.py %s %s" %
         (buildversions.virtio_rpm_str, driver_output_dir))
     shellcomm("mv *.tar.gz %s" % rpm_src_dir)

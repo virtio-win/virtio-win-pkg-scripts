@@ -30,7 +30,7 @@ from util.utils import fail, shellcomm
 def extract_files(filename):
     """
     Passed in either a zip, tar.gz, or RPM, extract the contents, including
-    the contents of any contained vfd or iso files. Move these to a temp
+    the contents of any contained iso files. Move these to a temp
     directory for easy comparison.
     """
     output_dir = tempfile.mkdtemp(prefix="virtio-win-archive-compare-")
@@ -58,14 +58,14 @@ def extract_files(filename):
              "or a directory" % filename)
 
 
-    # Find .vfd files
+    # Find .iso
     mediafiles = []
     for root, dirs, files in os.walk(output_dir):
         dummy = dirs
         mediafiles += [os.path.join(root, name) for name in files
-                       if name.endswith(".vfd") or name.endswith(".iso")]
+                       if name.endswith(".iso")]
 
-    # Extract vfd file contents with guestfish
+    # Extract iso file contents with guestfish
     for mediafile in mediafiles:
         if os.path.islink(mediafile):
             continue
@@ -125,7 +125,7 @@ def main():
         print()
         print("file diff:")
         shellcomm(r"diff -rup "
-            "--exclude \\*.vfd --exclude \\*.iso --exclude \\*.msi "
+            "--exclude \\*.iso --exclude \\*.msi "
             "%s %s" %
             (origdir, newdir))
 

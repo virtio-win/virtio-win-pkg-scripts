@@ -1,4 +1,4 @@
-Scripts for packaging virtio-win drivers into VFDs, ISO, and an RPM. The goal
+Scripts for packaging virtio-win drivers into ISO and an RPM. The goal
 here is to generate a virtio-win RPM that matches the same file layout as
 the RHEL virtio-win RPM, and publish the contents on `fedorapeople.org`.
 

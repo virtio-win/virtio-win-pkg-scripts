@@ -6,7 +6,7 @@
 # See the COPYING file in the top-level directory.
 
 
-# Script for generating .vfd and .tar.gz for virtio-win RPM
+# Script for generating .tar.gz for virtio-win RPM
 #
 # Note to the maintainer: This script is also used internally for the RHEL
 #   virtio-win RPM build process. Consider that when making changes to the
@@ -27,114 +27,6 @@ import tempfile
 from util import filemap
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-
-# .vfd images are floppy disk images that can be passed to windows
-# for OS install time driver usage. It's only strictly required for
-# winxp and win2003, newer versions can use the .iso for this purpose.
-# However we still ship all windows versions of these particular drivers
-# so the floppy images work for all windows versions.
-#
-# The .vfd files are size constrained, since they need to appear like
-# a floppy disk. AIUI the idea is we only ship the really essential
-# install time drivers. Here's what's on the floppy
-#
-# * block driver
-# * scsi driver
-# * net driver
-# * qxl driver
-#
-# storage and scsi and network make sense here. But qxl certainly
-# doesn't seem required at early install. I think it was added to
-# the floppy somewhat accidentally when it was first introduced to
-# the virtio-win RPM. Instead it should have been added to the .iso
-# But now that it's on the floppy I'm not going remove it for fear
-# of breaking things for someone.
-#
-# (Note: apparently extra drivers were added to the vfd a long time ago
-#  to work around a RHEV/Ovirt limitation: they could not add more that
-#  one CDROM to a VM, and one slot was already taken up by the windows
-#  media. No idea if this still applies, but if any additional drivers
-#  are requested for the VFDs, we should get clarification.)
-#
-# Note it's very unlikely that we should ever need to add a new driver
-# to the floppy, given it's limited target.
-vfd_dirs_32 = {
-    'NetKVM/w7/x86'     : 'i386/Win7',
-    'NetKVM/xp/x86'     : 'i386/WinXP',
-    'viostor/w7/x86'    : 'i386/Win7',
-    'viostor/xp/x86'    : 'i386/WinXP',
-    'vioscsi/w7/x86'    : 'i386/Win7',
-    'qxl/w7/x86'        : 'i386/Win7',
-    'qxl/xp/x86'        : 'i386/WinXP',
-    'NetKVM/w8/x86'     : 'i386/Win8',
-    'NetKVM/w8.1/x86'   : 'i386/Win8.1',
-    'viostor/w8/x86'    : 'i386/Win8',
-    'viostor/w8.1/x86'  : 'i386/Win8.1',
-    'vioscsi/w8/x86'    : 'i386/Win8',
-    'vioscsi/w8.1/x86'  : 'i386/Win8.1',
-    'NetKVM/w10/x86'    : 'i386/Win10',
-    'viostor/w10/x86'   : 'i386/Win10',
-    'vioscsi/w10/x86'   : 'i386/Win10',
-}
-
-vfd_dirs_servers_32 = {
-    'NetKVM/2k8/x86'    : 'i386/Win2008',
-    'NetKVM/2k3/x86'    : 'i386/Win2003',
-    'viostor/2k8/x86'   : 'i386/Win2008',
-    'viostor/2k3/x86'   : 'i386/Win2003',
-    'vioscsi/2k8/x86'   : 'i386/Win2008',
-}
-
-
-vfd_dirs_64 = {
-    'viostor/w7/amd64'  : 'amd64/Win7',
-    'vioscsi/w7/amd64'  : 'amd64/Win7',
-    'qxl/w7/amd64'      : 'amd64/Win7',
-    'NetKVM/w7/amd64'   : 'amd64/Win7',
-    'viostor/w8/amd64'  : 'amd64/Win8',
-    'viostor/w8.1/amd64': 'amd64/Win8.1',
-    'vioscsi/w8/amd64'  : 'amd64/Win8',
-    'vioscsi/w8.1/amd64': 'amd64/Win8.1',
-    'NetKVM/w8/amd64'   : 'amd64/Win8',
-    'NetKVM/w8.1/amd64' : 'amd64/Win8.1',
-    'viostor/w10/amd64' : 'amd64/Win10',
-    'vioscsi/w10/amd64' : 'amd64/Win10',
-    'NetKVM/w10/amd64'  : 'amd64/Win10',
-    'viostor/w11/amd64' : 'amd64/Win11',
-    'vioscsi/w11/amd64' : 'amd64/Win11',
-    'NetKVM/w11/amd64'  : 'amd64/Win11',
-}
-
-vfd_dirs_servers_64 = {
-    'viostor/2k25/amd64' : 'amd64/Win2025',
-    'viostor/2k22/amd64' : 'amd64/Win2022',
-    'viostor/2k16/amd64' : 'amd64/Win2016',
-    'viostor/2k12/amd64': 'amd64/Win2012',
-    'viostor/2k12R2/amd64': 'amd64/Win2012R2',
-    'viostor/2k19/amd64': 'amd64/Win2019',
-    'viostor/2k8/amd64' : 'amd64/Win2008',
-    'viostor/2k8R2/amd64' : 'amd64/Win2008R2',
-    'viostor/2k3/amd64' : 'amd64/Win2003',
-    'vioscsi/2k16/amd64' : 'amd64/Win2016',
-    'vioscsi/2k12/amd64': 'amd64/Win2012',
-    'vioscsi/2k12R2/amd64': 'amd64/Win2012R2',
-    'vioscsi/2k8/amd64' : 'amd64/Win2008',
-    'vioscsi/2k8R2/amd64' : 'amd64/Win2008R2',
-    'vioscsi/2k19/amd64' : 'amd64/Win2019',
-    'vioscsi/2k22/amd64' : 'amd64/Win2022',
-    'vioscsi/2k25/amd64' : 'amd64/Win2025',
-    'qxl/2k8R2/amd64'   : 'amd64/Win2008R2',
-    'NetKVM/2k22/amd64' : 'amd64/Win2022',
-    'NetKVM/2k25/amd64' : 'amd64/Win2025',
-    'NetKVM/2k16/amd64' : 'amd64/Win2016',
-    'NetKVM/2k12/amd64' : 'amd64/Win2012',
-    'NetKVM/2k12R2/amd64' : 'amd64/Win2012R2',
-    'NetKVM/2k19/amd64' : 'amd64/Win2019',
-    'NetKVM/2k8R2/amd64': 'amd64/Win2008R2',
-    'NetKVM/2k8/amd64'  : 'amd64/Win2008',
-    'NetKVM/2k3/amd64'  : 'amd64/Win2003',
-}
-
 
 ###################
 # Utility helpers #
@@ -235,87 +127,6 @@ def generate_version_manifest(isodir, datadir):
 ######################
 # Functional helpers #
 ######################
-
-def build_vfd(fname, dmap, driverdir, rootdir, rpmdriversdir, mediadir):
-    """construct the VFD from the checkout"""
-    print('building a VFD: ' + fname)
-
-    # The temp directory where we stage the files that will go on the vfd
-    floppydir = os.path.join(rootdir, "drivers")
-
-    # The actual .vfd file. Put it in the final archive directory. We
-    # will populate this using libguestfs.
-    full_fname = os.path.join(mediadir, fname)
-    run(('mkdosfs', '-C', full_fname, '2880'))
-
-    for vfd_map_src, vfd_map_dest in list(dmap.items()):
-        src = os.path.join(driverdir, vfd_map_src)
-        dest_vfd = os.path.join(floppydir, vfd_map_dest)
-
-        # This content will end up in /usr/share/virtio-win/drivers/
-        # For historical reasons this was a copy of the floppy content
-        dest_archive = os.path.join(rpmdriversdir, vfd_map_dest)
-
-        os.makedirs(dest_vfd, exist_ok=True)
-        os.makedirs(dest_archive, exist_ok=True)
-
-        for src_file in os.listdir(src):
-            # See the .vfd description at the top of this file.
-            # Given that, not all files per driver really _need_ to be
-            # put on the .vfd.
-            #
-            # Details on the files we skip:
-            #
-            # * .pdb files are kinda redundant for the .vfd... they aren't
-            #   used in any automatic fashion, so just putting them on the
-            #   .iso is sufficient
-            # * .doc doesn't serve any purpose on the .vfd
-            # * netkvmco.exe is an end user configuration tool for, as
-            #   such doesn't have much use at boot/install time
-            if (src_file.endswith('.pdb') or
-                src_file.endswith('.doc') or
-                src_file == 'netkvmco.dll' or
-                src_file == 'netkvmco.exe'):
-                continue
-
-            shutil.copy2(os.path.join(src, src_file), dest_vfd)
-            shutil.copy2(os.path.join(src, src_file), dest_archive)
-
-    # These files only land in the VFDs
-    vfd_dir = os.path.join(script_dir, "data", "vfd-data")
-    diskstub = os.path.join(vfd_dir, "disk1")
-    shutil.copy2(diskstub, floppydir)
-    if fname.endswith('x86.vfd'):
-        txtsetup32 = os.path.join(vfd_dir, "txtsetup-i386.oem")
-        shutil.copy2(txtsetup32, os.path.join(floppydir, 'txtsetup.oem'))
-    elif fname.endswith('amd64.vfd'):
-        txtsetup64 = os.path.join(vfd_dir, "txtsetup-amd64.oem")
-        shutil.copy2(txtsetup64, os.path.join(floppydir, 'txtsetup.oem'))
-
-    # Copy files into the floppy image
-    cmd = ["guestfish", "--add", full_fname,
-           "--mount", "/dev/sda:/", "copy-in"]
-    cmd += glob.glob(os.path.abspath(floppydir) + "/*")
-    cmd += ["/"]
-    run(cmd)
-    shutil.rmtree(floppydir)
-
-
-def build_floppies(nvr, driverdir, rootdir, finaldir, rpmdriversdir):
-    # The archive directory where the .vfd files will be stored
-    mediadir = os.path.join(finaldir, "media")
-    os.makedirs(mediadir)
-
-    build_vfd(nvr + '_x86.vfd', vfd_dirs_32,
-        driverdir, rootdir, rpmdriversdir, mediadir)
-    build_vfd(nvr + '_amd64.vfd', vfd_dirs_64,
-        driverdir, rootdir, rpmdriversdir, mediadir)
-
-    build_vfd(nvr + '_servers_x86.vfd', vfd_dirs_servers_32,
-        driverdir, rootdir, rpmdriversdir, mediadir)
-    build_vfd(nvr + '_servers_amd64.vfd', vfd_dirs_servers_64,
-        driverdir, rootdir, rpmdriversdir, mediadir)
-
 
 def create_auto_symlinks(isodir):
     """
@@ -455,10 +266,6 @@ def main():
 
     # Create the auto directory naming symlink tree
     create_auto_symlinks(isodir)
-
-    # Build floppy images
-    build_floppies(options.nvr, options.driverdir,
-            rootdir, finaldir, rpmdriversdir)
 
     # Build by-os and by-driver dirs for the RPM
     make_rpm_driver_dirs(options.driverdir, rpmdriversdir)
