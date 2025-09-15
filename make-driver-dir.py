@@ -129,9 +129,9 @@ def check_remaining_files(input_dir, seenfiles):
         r".*DVL-win10\.XML",
 
         # Files needed for .vfd builds which we no longer generate
-        ".*/disk1",
-        ".*/txtsetup-i386.oem",
-        ".*/txtsetup-amd64.oem",
+  #      ".*/disk1",
+  #      ".*/txtsetup-i386.oem",
+  #      ".*/txtsetup-amd64.oem",
 
         # qxlwddm changelogs
         ".*/spice-qxl-wddm-dod/w10/Changelog",
