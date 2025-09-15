@@ -33,8 +33,8 @@
 %endif
 
 
-%global virtio_win_prewhql_build virtio-win-prewhql-0.1-271
-%global qemu_ga_win_build qemu-ga-win-109.1.0-7.el10
+%global virtio_win_prewhql_build virtio-win-prewhql-0.1-285
+%global qemu_ga_win_build qemu-ga-win-110.0.2-1.el10
 %global qxl_build qxl-win-unsigned-0.1-24
 # qxlwddm is fedora only for now
 %if %{fedora_defaults}
@@ -44,7 +44,7 @@
 
 Summary: VirtIO para-virtualized drivers for Windows(R)
 Name: virtio-win
-Version: 0.1.271
+Version: 0.1.285
 Release: 1
 Group: Applications/System
 URL: http://www.redhat.com/
@@ -134,6 +134,8 @@ done
 %build
 # Generate .iso
 pushd iso-content
+mkdir -p ../media
+
 /usr/bin/mkisofs \
     -o ../media/%{name}-%{version}.iso \
     -r -iso-level 4 \
@@ -211,6 +213,7 @@ add_osinfo virtio-win-pre-installable-drivers-win-11.xml win-11.d
 %{_datadir}/%{name}/drivers/by-driver/qxldod
 %{_datadir}/%{name}/drivers/by-driver/viogpudo
 %{_datadir}/%{name}/drivers/by-driver/viomem
+%{_datadir}/%{name}/drivers/by-driver/viosock
 %exclude %{_datadir}/%{name}/drivers/by-driver/virtio-win_license.txt
 %if %{fedora_defaults}
 %{_datadir}/%{name}/drivers/by-driver/smbus
@@ -219,6 +222,13 @@ add_osinfo virtio-win-pre-installable-drivers-win-11.xml win-11.d
 
 %if %{fedora_defaults}
 %{_datadir}/%{name}/drivers/by-driver/cert
+%{_datadir}/%{name}/drivers/by-driver/debug
+%endif
+
+%{_datadir}/%{name}/drivers/by-os/i386
+%{_datadir}/%{name}/drivers/by-os/amd64
+%if 0%{?fedora}
+%{_datadir}/%{name}/drivers/by-os/ARM64
 %endif
 
 %if %{fedora_defaults}

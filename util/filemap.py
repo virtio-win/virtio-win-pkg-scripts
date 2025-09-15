@@ -250,6 +250,13 @@ _certfiles = [
 ]
 FILELISTS['cert'] = _certfiles
 
+_debugfiles = [
+    'debug/CollectSystemInfo.ps1',
+    'debug/LICENSE',
+    'debug/README.md',
+]
+FILELISTS['debug'] = _debugfiles
+
 _viofsfiles = [
     'viofs.cat',
     'viofs.inf',
@@ -322,6 +329,33 @@ FILELISTS['viomem'] = [
     'viomem.pdb',
     'viomem.sys',
 ]
+
+_viosockfiles = [
+    'viosock.cat',
+    'viosock.inf',
+    'viosock.pdb',
+    'viosock.sys',
+    'viosocklib_x64.dll',
+    'viosocklib_x64.pdb',
+    'viosocklib_x86.dll',
+    'viosocklib_x86.pdb',
+    'viosockwspsvc.exe',
+    'viosockwspsvc.pdb',
+    'viosock-test.exe',
+    'viosock-test.pdb',
+    'viosocklib-test.exe',
+    'viosocklib-test.pdb',
+    'vstbridge.exe',
+    'vstbridge.pdb',
+
+]
+FILELISTS['viosock'] = _viosockfiles
+FILELISTS['viosock:w10'] = _viosockfiles + ['viosocklib.dll']
+FILELISTS['viosock:2k16'] = FILELISTS['viosock:w10']
+FILELISTS['viosock:2k19'] = FILELISTS['viosock:w10']
+FILELISTS['viosock:w11'] = _viosockfiles
+FILELISTS['viosock:2k22'] = FILELISTS['viosock:w10']
+FILELISTS['viosock:2k25'] = FILELISTS['viosock:w11']
 
 # Describes what windows arch the virtio-win build output maps to.
 #
@@ -575,9 +609,11 @@ DRIVER_OS_MAP = {
 
         'Win10/x86': ['w10/x86'],
         'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64', '2k22/amd64'],
+        'Win10/ARM64': ['w10/ARM64'],
 
         'Win11/amd64': ['w11/amd64', '2k25/amd64'],
-    },
+        'Win11/ARM64': ['w11/ARM64'],
+  },
 
     'sriov': {
         'Win8/x86': ['w8/x86'],
@@ -612,6 +648,10 @@ DRIVER_OS_MAP = {
         './': ['./'],
     },
 
+    'debug': {
+        './': ['./'],
+    },
+
     'fwcfg': {
         'Win8/x86': ['w8/x86'],
         'Win8/amd64': ['w8/amd64', '2k12/amd64'],
@@ -631,6 +671,12 @@ DRIVER_OS_MAP = {
 
         'Win11/amd64': ['w11/amd64', '2k25/amd64'],
         'Win11/ARM64': ['w11/ARM64', '2k25/ARM64'],
+    },
+
+    'viosock': {
+        'Win10/amd64': ['w10/amd64', '2k16/amd64', '2k19/amd64', '2k22/amd64'],
+
+        'Win11/amd64': ['w11/amd64', '2k25/amd64'],
     },
 
 }
