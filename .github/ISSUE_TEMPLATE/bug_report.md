@@ -10,19 +10,19 @@ assignees: vrozenfe
 
 A clear and concise description of what the bug is.
 
-#### **To Reproduce**
+#### To reproduce
 
 Steps to reproduce the behaviour.
 
-#### **Expected behavior**
+#### Expected behavior
 
 A clear and concise description of what you expected to happen.
 
-#### **Screenshots**
+#### Screenshots
 
 If applicable, add screenshots to help explain your problem.
 
-#### **Host**
+#### Host
 
  - Distro: [e.g. Fedora, Ubuntu, Proxmox]
  - Kernel version
@@ -31,11 +31,11 @@ If applicable, add screenshots to help explain your problem.
  - libvirt version
  - libvirt XML file
 
-#### **Guest**
+#### Guest
 
  - Windows version
  - virtio-win version or commit hash that was used to build it
 
-#### **Additional context**
+#### Additional context
 
 Add any other context about the problem here.
