@@ -33,8 +33,7 @@ Warning: Due to the [signing requirements of the Windows Driver Signing Policy](
 Install the repo file using the following command:
 
 ```sh
-sudo wget https://fedorapeople.org/groups/virt/virtio-win/virtio-win.repo \
-  -O /etc/yum.repos.d/virtio-win.repo
+wget -qO- https://fedorapeople.org/groups/virt/virtio-win/virtio-win.repo | sudo tee /etc/yum.repos.d/virtio-win.repo >/dev/null
 ```
 
 The default enabled repo is `virtio-win-stable`, but a `virtio-win-latest` repo
