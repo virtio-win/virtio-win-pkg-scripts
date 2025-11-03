@@ -47,7 +47,7 @@ Name: virtio-win
 Version: 0.1.285
 Release: 1
 Group: Applications/System
-URL: http://www.redhat.com/
+URL: https://github.com/virtio-win/virtio-win-pkg-scripts
 BuildArch: noarch
 
 %if %{rhel_defaults}
